@@ -12,7 +12,7 @@ use IO::File;
 use align qw( removeRedundancy bwa_remove );
 
 my $usage = <<_EOUSAGE_;
-
+# 12345
 ########################################################################
 # virus_detect.pl --file_type [String] --reference [FILE] [option] input
 #  
