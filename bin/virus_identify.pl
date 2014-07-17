@@ -21,10 +21,10 @@ use warnings;
 use Getopt::Long;
 use Cwd;
 use IO::File;
-use FindBin;
-use lib "$FindBin::RealBin/PerlLib";
-use Util;
 use File::Basename;
+use FindBin;
+use lib "$FindBin::RealBin";
+use Util;
 
 my $usage = <<_EOUSAGE_;
 

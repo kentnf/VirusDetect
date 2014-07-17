@@ -4,20 +4,18 @@ use strict;
 use warnings;
 use Getopt::Long;
 use Cwd;
-use FindBin;
 use Bio::SeqIO;
-use lib "$FindBin::RealBin/bin/PerlLib";
-use Util;
 use IO::File;
+use FindBin;
+use lib "$FindBin::RealBin/bin";
+use Util;
 use align qw( removeRedundancy bwa_remove );
 
 my $usage = <<_EOUSAGE_;
-# 12345
 ########################################################################
-# virus_detect.pl --file_type [String] --reference [FILE] [option] input
+# virus_detect.pl --reference [FILE] [option] input
 #  
 # Basic Options:
-#  --file_type		Format of input file (fastq or fasta)  [fastq]
 #  --reference		The name of a fasta file containing the virus 
 #                       reference sequences  [vrl_plant]
 #  --host_reference	Name of host reference file for subtraction [Null]
@@ -64,13 +62,12 @@ _EOUSAGE_
 ##  set file folder path      ##
 ################################
 my $WORKING_DIR   = cwd();				# set current folder as working folder
-my $DATABASE_DIR  = $WORKING_DIR."/databases";	# set database folder
+my $DATABASE_DIR  = $WORKING_DIR."/databases";		# set database folder
 my $BIN_DIR	  = ${FindBin::RealBin}."/bin";		# set script folder 
 my $TEMP_DIR	  = $WORKING_DIR."/temp";		# set temp folder
 my $tf = $TEMP_DIR;
 
 # basic options
-our $file_type= "fastq";				# [autodetect for it] input file type, fasta or fastq
 our $reference= "vrl_plant";			# virus sequence
 our $host_reference;       			# host reference
 our $thread_num = 8; 				# thread number
@@ -119,11 +116,9 @@ my $diff_contig_length= 100;
 
 # get input paras #
 GetOptions(
-	'file_type=s'	=> 	\$file_type,
 	'reference=s'	=> 	\$reference,
 	'host_reference=s' => 	\$host_reference,
 	'thread_num=i' => 	\$thread_num,
-    'file_list=s' => \$file_list,
 
 	'max_dist=i' => 	\$max_dist,
 	'max_open=i' => 	\$max_open,
@@ -161,11 +156,7 @@ die "Please input one file:\n\n$usage\n" unless scalar(@ARGV) == 1;
 die "Input file is not exist, please check it.\n\n$usage\n" unless -s $ARGV[0];
 
 # check filetype 
-my $file_type_check = Util::detect_FileType($ARGV[0]);
-if ($file_type_check ne $file_type){
-	print "Warning, file type is not correct, and has been changed to $file_type_check\n";
-	$file_type = $file_type_check;
-}
+my $file_type = Util::detect_FileType($ARGV[0]);
 
 # set paramsters
 my $parameters_remove_redundancy = "--min_overlap $min_overlap --max_end_clip $max_end_clip --cpu_num $thread_num ".
@@ -214,10 +205,11 @@ main: {
 	# detect known virus. Including:
 	# 1. align small RNA to plant virus
 	# 2. remove redundancy for aligned contigs 
-			  print ("####################################################################\nprocess sample $ARGV[0]\n");
+
+	print ("####################################################################\nprocess sample $ARGV[0]\n");
 	Util::print_user_message("Align reads to reference virus sequence database");
     
-    my $cmd_align = "$BIN_DIR/alignAndCorrect.pl --file_list $file_list --reference $DATABASE_DIR/$reference --coverage $coverage --output_suffix aligned";
+	my $cmd_align = "$BIN_DIR/alignAndCorrect.pl --file_list $file_list --reference $DATABASE_DIR/$reference --coverage $coverage --output_suffix aligned";
 	#my $cmd_align = "$BIN_DIR/alignAndCorrect.pl --file_list $file_list --reference $ref_list --coverage $coverage --output_suffix aligned";
 	Util::process_cmd($cmd_align, 1);
     removeRedundancy($file_list, $file_type, "aligned", "KNOWN", $parameters_remove_redundancy);
@@ -255,7 +247,7 @@ main: {
 	#$cmd_removeRedundancy = "$BIN_DIR/removeRedundancy_batch.pl --file_list $file_list --file_type $file_type --input_suffix combined ".
     #   				"--contig_prefix CONTIG --strand_specific $parameters_remove_redundancy";
 	#Util::process_cmd($cmd_removeRedundancy);
-    removeRedundancy($file_list, $file_type, "combined", "CONTIG", $parameters_remove_redundancy);
+    	removeRedundancy($file_list, $file_type, "combined", "CONTIG", $parameters_remove_redundancy);
 	# identify the virus
     
 	Util::print_user_message("Virus identification");
