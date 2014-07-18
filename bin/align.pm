@@ -419,6 +419,8 @@ sub bwa_remove{
     close(IN);
 }
 
+=cut
+
 sub removeRedundancy{
     my ($file_list, $file_type, $input_suffix, $contig_prefix, $parameters_remove_redundancy) = @_;
     open(IN1,$file_list) || die "Can't open the file $file_list\n";
