@@ -174,7 +174,7 @@ foreach my $sample (@ARGV)
 					   "--mis_penalty $mis_penalty --gap_cost $gap_cost --gap_extension $gap_extension";
 	if ($strand_specific) { $parameters_remove_redundancy.=" --strand_specific"; }
 
-	# part A: 1. align reads to plant virus; 2. extract aligned seqs
+	# part A: 1. align reads to plant virus; 2. extract aligned seqs; 3. remove redundancy contigs
 	my $align_parameters = "-n $max_dist -o $max_open -e $max_extension -i 0 -l $len_seed -k $dist_seed -t $thread_num";
 	my $align_program    = "$BIN_DIR/bwa";
 
@@ -184,30 +184,14 @@ foreach my $sample (@ARGV)
 	Util::print_user_message("Align reads to reference virus sequence database");
 	align::align_to_reference($align_program, $sample, $reference, "$sample.sam", $align_parameters, $TEMP_DIR, $debug);
 	align::filter_SAM($sample.".sam");	# filter out unmapped, 2nd hits, only keep the best hit
-	Util::process_cmd("$BIN_DIR/samtools view -bt $reference.fai $sample.sam > $sample.bam 2> $TEMP_DIR/samtools.log") unless (-s "$sample.bam");
-	Util::process_cmd("$BIN_DIR/samtools sort $sample.bam $sample.sorted 2> $TEMP_DIR/samtools.log") unless (-s "$sample.sorted.bam");
-	Util::process_cmd("$BIN_DIR/samtools mpileup -f $reference $sample.sorted.bam > $sample.pileup 2> $TEMP_DIR/samtools.log") unless (-s "$sample.pre.pileup");
-	align::pileup_filter("$sample.pre.pileup", "$seq_info", "$coverage", "$sample.pileup") unless (-s "$sample.pileup");	# filter pileup file 
-	#align::pileup_to_contig("$sample.pileup", "$sample.aligned");
-	exit;
+	Util::process_cmd("$BIN_DIR/samtools view -bt $reference.fai $sample.sam > $sample.bam 2> $TEMP_DIR/samtools.log", $debug) unless (-s "$sample.bam");
+	Util::process_cmd("$BIN_DIR/samtools sort $sample.bam $sample.sorted 2> $TEMP_DIR/samtools.log", $debug) unless (-s "$sample.sorted.bam");
+	Util::process_cmd("$BIN_DIR/samtools mpileup -f $reference $sample.sorted.bam > $sample.pileup 2> $TEMP_DIR/samtools.log", $debug) unless (-s "$sample.pre.pileup");
+	align::pileup_filter("$sample.pre.pileup", "$seq_info", "$coverage", "$sample.pileup", $debug) unless (-s "$sample.pileup");	# filter pileup file 
+	align::pileup_to_contig("$sample.pileup", "$sample.aligned", 40, 1, 'ALIGNED');		# input, output, min_len, min_depth, prefix
+	align::removeRedundancy("$sample.aligned", $parameters_remove_redundancy);		# input, parameters, prefix
 
-	#align::removeRedundancy() $
-
-	#my $cmd_align = "$BIN_DIR/alignAndCorrect.pl --file_list $file_list --reference $DATABASE_DIR/$reference --coverage $coverage --output_suffix aligned";
-	#Util::process_cmd($cmd_align, 1);
-    
-	removeRedundancy($file_list, $file_type, "aligned", "KNOWN", $parameters_remove_redundancy);
-
-	#my $cmd_removeRedundancy = "$BIN_DIR/removeRedundancy_batch.pl --file_list $file_list --file_type $file_type --input_suffix aligned ".
-	#			   "--contig_prefix KNOWN $parameters_remove_redundancy";
-
-	#Util::process_cmd($cmd_removeRedundancy);
-	#removeRedundancy($file_list, $file_type, "aligned", "KNOWN", $parameters_remove_redundancy);
-
-	# detect unknown virus, then assembly them, it including
-	# 1. remove host related reads  
-	# 2. de novo assembly
-	# 3. remove redundancy contigs after assembly
+	# part B: 1. remove host related reads  2. de novo assembly 3. remove redundancy contigs
 	
 	if( $host_reference ){
 		Util::print_user_message("Align reads to host reference sequences");

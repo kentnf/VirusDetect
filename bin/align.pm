@@ -198,6 +198,154 @@ sub pileup_filter
 	$out->close;
 }
 
+=head2
+pileup_to_contig -- convert pileup file to contig sequences
+=cut
+sub pileup_to_contig
+{
+	my ($input_pileup, $output_seq, $len_cutoff, $depth_cutoff, $prefix) = @_;
+
+	my %contig;
+	my $contig_num = 0;
+	$prefix = 'ALIGNED';
+
+	my $fh = IO::File->new($input_pileup) || die $!;
+	my $out = IO::File->new(">".$output_seq) || die $!;
+
+	my $line = <$fh>; chomp($line); die "[ERROR]Pileup File, 1st Line $line\n" if $line =~ m/^#/;
+	my @t = split(/\t/, $line); die "[EROR]Pileup File, Line $line\n" if scalar @t < 5;
+	my ($pre_id, $pre_pos, $base, $dep, $align) = ($t[0], $t[1], $t[2], $t[3], $t[4]);
+        my $match_depth = $align =~ tr/.,/.,/; my $match_max = $match_depth;
+        my $match_baseA = $align =~ tr/Aa/Aa/;
+        my $match_baseT = $align =~ tr/Tt/Tt/;
+        my $match_baseC = $align =~ tr/Cc/Cc/;
+        my $match_baseG = $align =~ tr/Gg/Gg/;
+        if ($match_baseA >= $match_max) { $match_max = $match_baseA; $base = 'A'; }
+        if ($match_baseT >= $match_max) { $match_max = $match_baseT; $base = 'T'; }
+        if ($match_baseC >= $match_max) { $match_max = $match_baseC; $base = 'C'; }
+        if ($match_baseG >= $match_max) { $match_max = $match_baseG; $base = 'G'; }
+	my $seq = $base;
+	my $len = 1;
+	my ($id, $pos, $depth, $qual);
+
+	while(<$fh>)
+	{
+		chomp;
+		# ref pos base depth match Qual?
+		# AB000282 216 T 1 ^!, ~
+		my @a = split(/\t/, $_);
+		die "[EROR]Pileup File, Line $_\n" if scalar @a < 5;
+		($id, $pos, $base, $depth, $align, $qual) = ($a[0], $a[1], $a[2], $a[3], $a[4], $a[5]);
+
+		# get best base by depth and quality
+		$align =~ s/\^\S//g;
+		$align =~ s/\d+\S//g;
+		$align =~ s/\$//g;
+		$align =~ s/\+//g;
+		$align =~ s/-//g;
+		die "[ERROR]Align Len $_\n$align\n" if length($align) != $depth;
+		die "[ERROR]Qua Len" if length($qual) != $depth;
+		$align =~ tr/atcg/ATCG/;
+
+		my @m = split(//, $align);
+		my @n = split(//, $qual);
+		my %binfo = ();
+		my $maxb = 1;
+		for(my $i=0; $i<$depth; $i++)
+		{
+			my $b = $m[$i];
+			my $q = ord($n[$i]);
+			$b = $base if ($b eq "," || $b eq ".");
+
+			if (defined $binfo{$b}{'freq'}) {
+				$binfo{$b}{'freq'}++;
+				if ($binfo{$b}{'freq'} > $maxb) { $maxb = $binfo{$b}{'freq'}; }
+			} else {
+				$binfo{$b}{'freq'} = 1;
+			}
+
+			if (defined $binfo{$b}{'qual'}) {
+				$binfo{$b}{'qual'}+=$q;
+			} else {
+				$binfo{$b}{'qual'} = $q;
+			}
+		}
+
+		my @maxb;
+		foreach my $b (sort keys %binfo) {
+			if ($binfo{$b}{'freq'} == $maxb) {
+				push(@maxb, $b)
+			}
+		}
+
+		my $maxq = 0;
+		foreach my $b (@maxb) {
+			if ($binfo{$b}{'qual'} > $maxq) {
+				$maxq = $binfo{$b}{'qual'};
+				$base = $b;
+			}	
+		}
+
+		#gene the contig sequence
+		if ( $id eq $pre_id ) # same reference
+		{
+			if ($pos == $pre_pos + 1) # extend contig
+			{
+				$len++;
+				$dep+=$depth;
+				$seq.=$base;
+				$pre_pos = $pos;
+				$pre_id = $id;
+			}
+			else # end pre contig, start new one
+			{
+
+				if ( $len > $len_cutoff && ($dep/$len > $depth_cutoff)) {
+					die "[ERROR]Already defined contig $pre_id $pre_pos $seq\n" if defined $contig{$pre_id."#".$pre_pos};
+					$contig{$pre_id."#".$pre_pos} = $seq;
+					$contig_num++;
+					print $out ">".$prefix.$contig_num." ".$pre_id." ".$pre_pos."\n".$seq."\n";
+				}
+
+				$len = 1;
+				$dep = $depth;
+				$seq = $base;
+				$pre_pos = $pos;
+				$pre_id = $id;
+			}
+		}
+		else
+		{
+			# end pre contig, start new one
+			if ( $len > $len_cutoff && ($dep/$len > $depth_cutoff)) {
+				die "[ERROR]Already defined contig $pre_id $pre_pos $seq\n" if defined $contig{$pre_id."#".$pre_pos};
+				$contig{$pre_id."#".$pre_pos} = $seq;
+				$contig_num++;
+				print $out ">".$prefix.$contig_num." ".$pre_id." ".$pre_pos."\n".$seq."\n";
+			}
+
+			$len = 1;
+			$dep = $depth;
+			$seq = $base;
+			$pre_pos = $pos;
+			$pre_id = $id;
+		}
+	}
+	$fh->close;
+
+	# parse the last one
+	if ( $len > $len_cutoff && ( $dep/$len > $depth_cutoff )) {
+		die "[ERROR]Already defined contig $pre_id $pre_pos $seq\n" if defined $contig{$pre_id."#".$pre_pos};
+		$contig{$pre_id."#".$pre_pos} = $seq;
+		$contig_num++;
+		print $out ">".$prefix.$contig_num." ".$pre_id." ".$pre_pos."\n".$seq."\n";
+	}
+
+	$out->close;
+}
+
+
+
 =head
 sub renameFasta
 {
