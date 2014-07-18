@@ -1,14 +1,11 @@
 #!/usr/bin/perl
 
 package align;
+
 use strict;
 use warnings;
-use Getopt::Long;
-use Cwd;
-use FindBin;
-use Bio::SeqIO;
-use IO::File;
 use Exporter;
+use FindBin;
 use lib "$FindBin::RealBin";
 use Util;
 
@@ -24,16 +21,16 @@ use Util;
 =cut
 sub align_to_reference
 {
-	my ($align_program, $input, $reference, $output_file, $parameters, $temp_folder, $debug) = @_;
+	my ($align_program, $input_file, $reference, $output_file, $parameters, $temp_folder, $debug) = @_;
 
 	# align for bwa
 	if ($align_program =~ m/bwa/)
 	{
 		my $sai = $temp_folder."/bwa.sai";
 		my $log = $temp_folder."/bwa.log";
-		Util::process_cmd("$align_program index -p $reference -a bwtsw $reference 2> $log", $debug) unless -s "$referencei.amb";
-		Util::process_cmd("$align_program aln $parameters $reference $input 1> $sai 2>> $log", $debug) unless -s $sai;
-		Util::process_cmd("$align_program samse -n 10000 -s $reference $sai $input 1> $output 2>> $log", $debug) unless -s $output;
+		Util::process_cmd("$align_program index -p $reference -a bwtsw $reference 2> $log", $debug) unless -s "$reference.amb";
+		Util::process_cmd("$align_program aln $parameters $reference $input_file 1> $sai 2>> $log", $debug) unless -s $sai;
+		Util::process_cmd("$align_program samse -n 10000 -s $reference $sai $input_file 1> $output_file 2>> $log", $debug) unless -s $output_file;
 	}
 
 	# align for bowtie2
@@ -41,13 +38,167 @@ sub align_to_reference
 	{
 		my $build_program = $align_program."-build";
 		Util::process_cmd("$build_program $reference $reference", $debug) unless -s "$reference.1.bt2";
-		Util::process_cmd("$align_program $parameters -x $reference -U $input -S $output", $debug);		
+		Util::process_cmd("$align_program $parameters -x $reference -U $input_file -S $output_file", $debug);		
 	}
 
 	return 1;
 }
 
+=head2
 
+  filter_SAM -- filter sam file
+
+=cut
+sub filter_SAM
+{
+        my $input_SAM = shift;
+        my $temp_SAM = $input_SAM.".temp";
+        my ($total_count, $filtered_count) = (0, 0);
+        my ($query_col, $opt_col) = (0, 11);    # query and option column number for sam
+        my $max_distance = 2;                   # set $max_distance for all selected hits
+        my $bestEditDist = -1;                  # set best edit distance
+        my @alignment = ();                     # alignment to array
+        my $pre_query_name = '';                # previous query name
+
+        my $in  = IO::File->new($input_SAM) || die $!;
+        my $out = IO::File->new(">".$temp_SAM) || die $!;
+        while(<$in>)
+        {
+                chomp;
+                if ($_ =~ m/^@/) { print $out $_."\n"; next; }
+                my @a = split(/\t/, $_);
+                if ( $a[1] == 4 ) { $filtered_count++; }
+                else {  print $out $_."\n"; }
+                $total_count++;
+        }
+        #my ($total_count, $kept_align) = (0,0);
+	my $kept_align = 0;
+        $in->close;
+        $out->close;
+        Util::process_cmd("mv $temp_SAM $input_SAM");
+        #print STDERR "This program filtered $filtered_count out of $total_count reads (" . sprintf("%.2f", $filtered_count / $total_count * 100) . ") as unmapped reads, only for BWA\n";
+        $in  = IO::File->new($input_SAM) || die $!;
+        $out = IO::File->new(">".$temp_SAM) || die $!;
+        while(<$in>)
+        {
+                chomp;
+                if ($_ =~ m/^@/) { 
+			next; #print $out $_."\n"; next; 
+		}
+                my @a = split(/\t/, $_);
+
+                my $query_name = $a[$query_col];
+
+                if ($query_name ne $pre_query_name)
+                {
+                        # parse the pre results
+                        foreach my $align (@alignment)
+                        {
+                                my $editDistance;
+                                if ($align =~ m/\tNM:i:(\d+)/) { $editDistance = $1; }
+                                else { die "Error, this alignment info do not have edit distance : $align\n"; }
+                                if ($editDistance == $bestEditDist) { print $out $align."\n"; $kept_align++; }
+                        }
+
+                        # init vars;
+                        @alignment = ();
+                        $bestEditDist = -1;
+                        $pre_query_name = $query_name;
+                }
+
+                my $distance;
+                if ($_ =~ /\tNM:i:(\d+)/) { $distance = $1; }
+                else { die "Error, this alignment info do not have edit distance : $_\n"; }
+                next if $distance >= $max_distance;
+                if ($bestEditDist == -1) { $bestEditDist = $distance; }
+                if ($distance < $bestEditDist) { $bestEditDist = $distance; }
+                push (@alignment, $_);
+
+                $total_count++;
+        }
+        $in->close;
+        # parse final query recoed
+        if (scalar(@alignment) > 0)
+        {
+                foreach my $align (@alignment)
+                {
+                        my $editDistance;
+                        if ($align =~ m/\tNM:i:(\d+)/) { $editDistance = $1; }
+                        else { die "Error, this alignment info do not have edit distance : $align\n"; }
+                        if ($editDistance == $bestEditDist) { print $out $align."\n"; $kept_align++; }
+                }
+        }
+        $out->close;
+        $filtered_count = $total_count - $kept_align;
+        #print STDERR "This program filtered $filtered_count out of $total_count reads (" . sprintf("%.2f", $filtered_count / $total_count * 100) . ") as 2ndhits reads, only for BWA\n";
+}
+
+=head2
+	pileup_filter -- filter the pileup file by coverage (sRNA aligned)
+	20140712: the input and output file is same
+=cut
+sub pileup_filter
+{
+	my ($input_pileup, $virus_seq_info, $coverage, $output_pileup) = @_;
+
+	# put plant virus sequence length to hash
+	my %seq_len;
+	my $fh1 = IO::File->new($virus_seq_info) || die $!;
+	while(<$fh1>) {
+		chomp;
+		next if $_ =~ m/^#/;
+		# ID Len Desc
+		# AB000048 2007 Parvovirus Feline panleukopenia virus gene ...... 1 Vertebrata
+		my @a = split(/\t/, $_);
+		$seq_len{$a[0]} = $a[1];
+	}
+	$fh1->close;
+
+	# filter the pileup file by coverage length
+	my $pre_id;
+	my @pileup_info;
+	my $out = IO::File->new(">".$output_pileup) || die $!;
+	my $in = IO::File->new($input_pileup) || die $!;
+	while(<$in>)
+	{
+		chomp;
+		# ref pos base depth match Qual?
+		# AB000282 216 T 1 ^!, ~
+		my @a = split(/\t/, $_);
+		die "[EROR]Pileup File, Line $_\n" if scalar @a < 5;
+		my ($id, $pos, $base, $depth) = ($a[0], $a[1], $a[2], $a[3]);
+
+		if ( defined $pre_id && $id ne $pre_id)
+		{
+
+			# parse previous ref pileup info
+			die "[ERROR]undef ref id $id for lengh\n" unless defined $seq_len{$id};
+			my $len_cutoff = $seq_len{$pre_id} * $coverage;
+			my $len = scalar(@pileup_info);
+			if ($len > $len_cutoff) {
+				print $out join("\n", @pileup_info),"\n";
+			}
+
+			@pileup_info = ();
+			$pre_id = $id;
+		}
+
+		push(@pileup_info, $_);
+		$pre_id = $id unless defined $pre_id;
+	}
+	$in->close;
+
+	# parse info for last reference
+	my $len_cutoff = $seq_len{$pre_id} * $coverage;
+	my $len = scalar(@pileup_info);
+	if ($len > $len_cutoff) {
+		print $out join("\n", @pileup_info),"\n";
+	}	
+
+	$out->close;
+}
+
+=head
 sub renameFasta
 {
 	my ($input_fasta_file, $output_fasta_file, $prefix) = @_;
@@ -232,96 +383,7 @@ sub removeRedundancy{
     close(IN1);
 }
 
-=head filter_SAM
-
-=cut
-
-sub filter_SAM
-{
-	my $input_SAM = shift;
-	my $temp_SAM = $input_SAM.".temp";
-	my ($total_count, $filtered_count) = (0, 0);
-    my ($query_col, $opt_col) = (0, 11); 	# query and option column number for sam
-	my $max_distance = 2;			# set $max_distance for all selected hits
-	my $bestEditDist = -1;			# set best edit distance
-	my @alignment = ();			# alignment to array
-	my $pre_query_name = '';		# previous query name
-	
-    
-	my $in  = IO::File->new($input_SAM) || die $!;
-	my $out = IO::File->new(">".$temp_SAM) || die $!;
-	while(<$in>)
-	{
-		chomp;
-		if ($_ =~ m/^@/) { print $out $_."\n"; next; }
-		my @a = split(/\t/, $_);
-		if ( $a[1] == 4 ) { $filtered_count++; }
-		else {	print $out $_."\n"; }
-		$total_count++;
-	}
-    my ($total_count, $kept_align) = (0,0);
-	$in->close;
-	$out->close;
-	Util::process_cmd("mv $temp_SAM $input_SAM");
-	#print STDERR "This program filtered $filtered_count out of $total_count reads (" . sprintf("%.2f", $filtered_count / $total_count * 100) . ") as unmapped reads, only for BWA\n";
-    
-	my $in  = IO::File->new($input_SAM) || die $!;
-	my $out = IO::File->new(">".$temp_SAM) || die $!;
-	while(<$in>)
-	{
-		chomp;
-		if ($_ =~ m/^@/) { next; #print $out $_."\n"; next;
-        }
-		my @a = split(/\t/, $_);
-        
-		my $query_name = $a[$query_col];
-        
-		if ($query_name ne $pre_query_name)
-		{
-			# parse the pre results
-			foreach my $align (@alignment)
-			{
-				my $editDistance;
-				if ($align =~ m/\tNM:i:(\d+)/) { $editDistance = $1; }
-				else { die "Error, this alignment info do not have edit distance : $align\n"; }
-				if ($editDistance == $bestEditDist) { print $out $align."\n"; $kept_align++; }
-			}
-            
-			# init vars;
-			@alignment = ();
-			$bestEditDist = -1;
-			$pre_query_name = $query_name;
-		}
-        
-		my $distance;
-		if ($_ =~ /\tNM:i:(\d+)/) { $distance = $1; }
-		else { die "Error, this alignment info do not have edit distance : $_\n"; }
-		next if $distance >= $max_distance;
-		if ($bestEditDist == -1) { $bestEditDist = $distance; }
-		if ($distance < $bestEditDist) { $bestEditDist = $distance; }
-		push (@alignment, $_);
-        
-		$total_count++;
-	}
-	$in->close;
-    
-	# parse final query recoed
-	if (scalar(@alignment) > 0)
-	{
- 		foreach my $align (@alignment)
-		{
-			my $editDistance;
-			if ($align =~ m/\tNM:i:(\d+)/) { $editDistance = $1; }
-			else { die "Error, this alignment info do not have edit distance : $align\n"; }
-			if ($editDistance == $bestEditDist) { print $out $align."\n"; $kept_align++; }
-		}
-	}
-    
-	$out->close;
-	my $filtered_count = $total_count - $kept_align;
-	#print STDERR "This program filtered $filtered_count out of $total_count reads (" . sprintf("%.2f", $filtered_count / $total_count * 100) . ") as 2ndhits reads, only for BWA\n";
-}
-
+=head
 sub Velvet_Optimiser_combined{
     my ($parameters, $file_list, $input_suffix, $file_type, $bjective_type, $hash_end, $coverage_end, $output_suffix);
     my $sample;
@@ -502,5 +564,7 @@ sub contigStats {
 	#print "Leaving contigstats!\n" if $interested;
 	return (\%out);
 }
+
+=cut
 
 1;

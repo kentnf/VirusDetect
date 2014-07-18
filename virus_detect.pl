@@ -9,7 +9,7 @@ use File::Basename;
 use FindBin;
 use lib "$FindBin::RealBin/bin";
 use Util;
-#use align qw( removeRedundancy bwa_remove );
+use align;
 
 my $usage = <<_EOUSAGE_;
 ########################################################################
@@ -58,19 +58,19 @@ my $usage = <<_EOUSAGE_;
 _EOUSAGE_
 ;
 
+my $file_list;
+
 # basic options
-our $reference= "vrl_plant";			# virus sequence
-our $host_reference;       			# host reference
-our $thread_num = 8; 				# thread number
-our $file_list;
-our $output_suffix;
+my $reference= "vrl_plant";			# virus sequence
+my $host_reference;       			# host reference
+my $thread_num = 8; 				# thread number
 
 # paras for BWA
-our $max_dist = 1;  				# max edit distance
-our $max_open = 1;  				# max gap opening
-our $max_extension = 1; 				# max gap extension (gap length)
-our $len_seed = 15; 				# bwa seed length
-our $dist_seed = 1; 				# bwa seed max edit distance
+my $max_dist = 1;  				# max edit distance
+my $max_open = 1;  				# max gap opening
+my $max_extension = 1; 				# max gap extension (gap length)
+my $len_seed = 15; 				# bwa seed length
+my $dist_seed = 1; 				# bwa seed max edit distance
 
 # paras for megablast detection (remove redundancy )
 my $strand_specific;  				# switch for strand specific transcriptome data? 
@@ -160,69 +160,49 @@ foreach my $sample (@ARGV)
 	my $DATABASE_DIR  = ${FindBin::RealBin}."/databases";		# set database folder
 	my $BIN_DIR       = ${FindBin::RealBin}."/bin";			# set script folder 
 	my $TEMP_DIR      = $WORKING_DIR."/".$sample_base."_temp";	# set temp folder
-
+	$reference	  = $DATABASE_DIR."/".$reference;		# set reference
+	my $seq_info	  = $DATABASE_DIR."/vrl_genbank.info";		# set vrl info
 	print "Working: $WORKING_DIR\nDatabase: $DATABASE_DIR\nBin: $BIN_DIR\nTemp: $TEMP_DIR\n" if $debug;
 
+	# create temp folder and create link for sample
+	Util::process_cmd("mkdir $TEMP_DIR", $debug) unless -e $TEMP_DIR;
+	Util::process_cmd("ln -s $WORKING_DIR/$sample $TEMP_DIR/$sample_base", $debug) unless -e "$TEMP_DIR/$sample_base";
+	$sample = "$TEMP_DIR/$sample_base";				# change the sample name to the linke from this step
+
+	# set parameters for align and remove reduncancy 
+	my $parameters_remove_redundancy = "--min_overlap $min_overlap --max_end_clip $max_end_clip --cpu_num $thread_num ".
+					   "--mis_penalty $mis_penalty --gap_cost $gap_cost --gap_extension $gap_extension";
+	if ($strand_specific) { $parameters_remove_redundancy.=" --strand_specific"; }
+
+	# part A: 1. align reads to plant virus; 2. extract aligned seqs
+	my $align_parameters = "-n $max_dist -o $max_open -e $max_extension -i 0 -l $len_seed -k $dist_seed -t $thread_num";
+	my $align_program    = "$BIN_DIR/bwa";
+
+	print "Align Program: $align_program\nAlign Parameters: $align_parameters\nAlign Input File: $sample\nAlign Output File: $sample.sam\n" if $debug;
+
+	print ("####################################################################\nprocess sample $sample_base\n");
+	Util::print_user_message("Align reads to reference virus sequence database");
+	align::align_to_reference($align_program, $sample, $reference, "$sample.sam", $align_parameters, $TEMP_DIR, $debug);
+	align::filter_SAM($sample.".sam");	# filter out unmapped, 2nd hits, only keep the best hit
+	Util::process_cmd("$BIN_DIR/samtools view -bt $reference.fai $sample.sam > $sample.bam 2> $TEMP_DIR/samtools.log") unless (-s "$sample.bam");
+	Util::process_cmd("$BIN_DIR/samtools sort $sample.bam $sample.sorted 2> $TEMP_DIR/samtools.log") unless (-s "$sample.sorted.bam");
+	Util::process_cmd("$BIN_DIR/samtools mpileup -f $reference $sample.sorted.bam > $sample.pileup 2> $TEMP_DIR/samtools.log") unless (-s "$sample.pre.pileup");
+	align::pileup_filter("$sample.pre.pileup", "$seq_info", "$coverage", "$sample.pileup") unless (-s "$sample.pileup");	# filter pileup file 
+	#align::pileup_to_contig("$sample.pileup", "$sample.aligned");
 	exit;
 
-# set paramsters
-my $parameters_remove_redundancy = "--min_overlap $min_overlap --max_end_clip $max_end_clip --cpu_num $thread_num ".
-				   "--mis_penalty $mis_penalty --gap_cost $gap_cost --gap_extension $gap_extension";
-if ($strand_specific) { $parameters_remove_redundancy.=" --strand_specific"; }
+	#align::removeRedundancy() $
 
-my $parameters_bwa_align = "--max_dist $max_dist --max_open $max_open --max_extension $max_extension ".
-			   "--len_seed $len_seed --dist_seed $dist_seed --thread_num $thread_num";
-
-=head
-sub files_combine2
-{
-	my $file_list = shift;
-	my $fh = IO::File->new($file_list) || die "Can not open innput file list $file_list $!\n";
-	while(<$fh>)
-	{
-		chomp;
-		my $file = $_;
-		my $file_aligned	= $file.".aligned";
-		my $file_assemblied	= $file.".assemblied";
-		my $file_combined	= $file.".combined";
-		Util::process_cmd("cat $file_aligned $file_assemblied > $file_combined");
-	}
-	$fh->close;
-}
-
-=cut
-
-# main
-main: {
-	# create temp folder
-	# create softlink for input file
-	# create temp file list for input file
-	# *the file in file list has full path
-	Util::process_cmd("mkdir $TEMP_DIR") unless -e $TEMP_DIR;
-	my $file_list = "$TEMP_DIR/temp_file_list";
-	my $fh_list = IO::File->new(">".$file_list) || die "Can not open temp file list $file_list $!\n";
-	print $fh_list $TEMP_DIR."/".$ARGV[0]."\n"; 
-	$fh_list->close;
-	Util::process_cmd("ln -s $WORKING_DIR/$ARGV[0] $TEMP_DIR/$ARGV[0]") unless -e "$TEMP_DIR/$ARGV[0]";
-    my $ref_list = "$TEMP_DIR/temp_ref_list";
-	my $refopen = IO::File->new(">".$ref_list) || die "Can not open reference file list $file_list $!\n";
-    print $refopen $DATABASE_DIR."/".$reference."\n";
-    $refopen->close;
-	# detect known virus. Including:
-	# 1. align small RNA to plant virus
-	# 2. remove redundancy for aligned contigs 
-
-	print ("####################################################################\nprocess sample $ARGV[0]\n");
-	Util::print_user_message("Align reads to reference virus sequence database");
+	#my $cmd_align = "$BIN_DIR/alignAndCorrect.pl --file_list $file_list --reference $DATABASE_DIR/$reference --coverage $coverage --output_suffix aligned";
+	#Util::process_cmd($cmd_align, 1);
     
-	my $cmd_align = "$BIN_DIR/alignAndCorrect.pl --file_list $file_list --reference $DATABASE_DIR/$reference --coverage $coverage --output_suffix aligned";
-	#my $cmd_align = "$BIN_DIR/alignAndCorrect.pl --file_list $file_list --reference $ref_list --coverage $coverage --output_suffix aligned";
-	Util::process_cmd($cmd_align, 1);
-    removeRedundancy($file_list, $file_type, "aligned", "KNOWN", $parameters_remove_redundancy);
+	removeRedundancy($file_list, $file_type, "aligned", "KNOWN", $parameters_remove_redundancy);
+
 	#my $cmd_removeRedundancy = "$BIN_DIR/removeRedundancy_batch.pl --file_list $file_list --file_type $file_type --input_suffix aligned ".
 	#			   "--contig_prefix KNOWN $parameters_remove_redundancy";
-    #Util::process_cmd($cmd_removeRedundancy);
-    #removeRedundancy($file_list, $file_type, "aligned", "KNOWN", $parameters_remove_redundancy);
+
+	#Util::process_cmd($cmd_removeRedundancy);
+	#removeRedundancy($file_list, $file_type, "aligned", "KNOWN", $parameters_remove_redundancy);
 
 	# detect unknown virus, then assembly them, it including
 	# 1. remove host related reads  
@@ -232,7 +212,7 @@ main: {
 	if( $host_reference ){
 		Util::print_user_message("Align reads to host reference sequences");
 		#Util::process_cmd("$BIN_DIR/bwa_remove.pl --file_list $file_list --reference $DATABASE_DIR/$host_reference $parameters_bwa_align");
-		bwa_remove($file_list, $reference, $host_reference, $parameters_bwa_align);
+		#bwa_remove($file_list, $reference, $host_reference, $parameters_bwa_align);
 
 		# the input suffix of unmapped reads is 'unmapped'
 		# the seq from sam file is fastq format, no matter the format of input file
@@ -258,11 +238,11 @@ main: {
     
 	Util::print_user_message("Virus identification");
 	my $cmd_identify = "$BIN_DIR/virus_identify.pl ";
-       	$cmd_identify .= "--file_list $file_list --file_type $file_type --reference $reference --contig_type combined ";
+       	$cmd_identify .= "--reference $reference";
 	$cmd_identify .= "--word_size $word_size --exp_value $exp_value --percent_identity $percent_identity ";
 	$cmd_identify .= "--cpu_num $thread_num --mis_penalty $mis_penalty_b --gap_cost $gap_cost_b --gap_extension $gap_extension_b ";
 	$cmd_identify .= "--hsp_cover $hsp_cover --diff_ratio $diff_ratio --diff_contig_cover $diff_contig_cover --diff_contig_length $diff_contig_length ";
-	$cmd_identify .= "--coverage_cutoff $coverage_cutoff --depth_cutoff $depth_cutoff ";
+	$cmd_identify .= "--coverage_cutoff $coverage_cutoff --depth_cutoff $depth_cutoff $sample";
 	Util::process_cmd($cmd_identify);
 
 	# delete temp files and log files 
@@ -271,6 +251,5 @@ main: {
 
 	Util::print_user_message("Finished");
 	print ("####################################################################\n\n");
-}
 
 }
