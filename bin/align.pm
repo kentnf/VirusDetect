@@ -29,8 +29,8 @@ sub align_to_reference
 		my $sai = $temp_folder."/bwa.sai";
 		my $log = $temp_folder."/bwa.log";
 		Util::process_cmd("$align_program index -p $reference -a bwtsw $reference 2> $log", $debug) unless -s "$reference.amb";
-		Util::process_cmd("$align_program aln $parameters $reference $input_file 1> $sai 2>> $log", $debug) unless -s $sai;
-		Util::process_cmd("$align_program samse -n 10000 -s $reference $sai $input_file 1> $output_file 2>> $log", $debug) unless -s $output_file;
+		Util::process_cmd("$align_program aln $parameters $reference $input_file 1> $sai 2>> $log", $debug);
+		Util::process_cmd("$align_program samse -n 10000 -s $reference $sai $input_file 1> $output_file 2>> $log", $debug);
 	}
 
 	# align for bowtie2
@@ -556,3 +556,5 @@ sub contigStats
 	#print "Leaving contigstats!\n" if $interested;
 	return (\%out);
 }
+
+1;

@@ -128,7 +128,7 @@ GetOptions(
 	
 	'word_size=i' =>  	\$word_size,
 	'exp_value-s' =>  	\$exp_value,
-	'percent_identity=s' => 	\$percent_identity,	# tblastx“‘µ∞∞◊÷ –Ú¡–¿¥±»∂‘ ±hspµƒ◊Ó–°Õ¨“ª–‘
+	'percent_identity=s' => 	\$percent_identity,
 	'mis_penalty_b=i' => 	\$mis_penalty_b,
 	'gap_cost_b=i' => 	\$gap_cost_b,
 	'gap_extension_b=i' => 	\$gap_extension_b,
@@ -198,7 +198,7 @@ foreach my $sample (@ARGV)
 	# parameter for velvet: $sample, $output_contig, $kmer_start, $kmer_end, $coverage_start, $coverage_end, $objective_type, $bin_dir, $temp_dir, $debug
 	if( $host_reference ){
 		Util::print_user_message("Align reads to host reference sequences");
-		align::align_to_reference($align_program, $sample, $host_reference, "$sample.sam", $align_parameters, $TEMP_DIR, $debug);	
+		align::align_to_reference($align_program, $sample, $host_reference, "$sample.sam", $align_parameters, $TEMP_DIR, $debug);
 		align::generate_unmapped_reads("$sample.sam", "$sample.unmapped");
 		Util::print_user_message("De novo assembly");
 		align::velvet_optimiser_combine("$sample.unmapped", "$sample.assembled", 9, 19, 5, 25, $objective_type, $BIN_DIR, $TEMP_DIR, $debug);
@@ -223,12 +223,11 @@ foreach my $sample (@ARGV)
     
 	Util::print_user_message("Virus identification");
 	my $cmd_identify = "$BIN_DIR/virus_identify.pl ";
-       	$cmd_identify .= "--reference $reference";
-	$cmd_identify .= "--word_size $word_size --exp_value $exp_value --percent_identity $percent_identity ";
+	$cmd_identify .= "--word_size $word_size --exp_value $exp_value --identity_percen $percent_identity ";
 	$cmd_identify .= "--cpu_num $thread_num --mis_penalty $mis_penalty_b --gap_cost $gap_cost_b --gap_extension $gap_extension_b ";
 	$cmd_identify .= "--hsp_cover $hsp_cover --diff_ratio $diff_ratio --diff_contig_cover $diff_contig_cover --diff_contig_length $diff_contig_length ";
-	$cmd_identify .= "--coverage_cutoff $coverage_cutoff --depth_cutoff $depth_cutoff $sample";
-	Util::process_cmd($cmd_identify);
+	$cmd_identify .= "--coverage_cutoff $coverage_cutoff --depth_cutoff $depth_cutoff $sample $sample.combined";
+	Util::process_cmd($cmd_identify, $debug);
 
 	# delete temp files and log files 
 	# system("rm -r *.log");
