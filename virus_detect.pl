@@ -1,15 +1,15 @@
-#!/usr/bin/env perl
+#!/usr/bin/perl
 
 use strict;
 use warnings;
 use Getopt::Long;
 use Cwd;
-use Bio::SeqIO;
 use IO::File;
+use File::Basename;
 use FindBin;
 use lib "$FindBin::RealBin/bin";
 use Util;
-use align qw( removeRedundancy bwa_remove );
+#use align qw( removeRedundancy bwa_remove );
 
 my $usage = <<_EOUSAGE_;
 ########################################################################
@@ -57,15 +57,6 @@ my $usage = <<_EOUSAGE_;
 ########################################################################
 _EOUSAGE_
 ;
-
-################################
-##  set file folder path      ##
-################################
-my $WORKING_DIR   = cwd();				# set current folder as working folder
-my $DATABASE_DIR  = $WORKING_DIR."/databases";		# set database folder
-my $BIN_DIR	  = ${FindBin::RealBin}."/bin";		# set script folder 
-my $TEMP_DIR	  = $WORKING_DIR."/temp";		# set temp folder
-my $tf = $TEMP_DIR;
 
 # basic options
 our $reference= "vrl_plant";			# virus sequence
@@ -130,7 +121,7 @@ GetOptions(
 	'strand_specific!' => 	\$strand_specific,
 	'min_overlap=i' => 	\$min_overlap,
 	'max_end_clip=i' => 	\$max_end_clip,
-    'cpu_num=i' 		=> \$cpu_num,
+	'cpu_num=i' 		=> \$cpu_num,
 	'mis_penalty=i' => 	\$mis_penalty,
 	'gap_cost=i' => 	\$gap_cost,
 	'gap_extension=i' => 	\$gap_extension,
@@ -151,12 +142,28 @@ GetOptions(
 	'depth_cutoff=f' =>	\$depth_cutoff
 );
 
+my $debug = 1;
+
 # check input file
 die "Please input one file:\n\n$usage\n" unless scalar(@ARGV) == 1;
 die "Input file is not exist, please check it.\n\n$usage\n" unless -s $ARGV[0];
 
-# check filetype 
-my $file_type = Util::detect_FileType($ARGV[0]);
+# check filetype
+
+foreach my $sample (@ARGV) 
+{
+	my $file_type = Util::detect_FileType($sample);
+	my $sample_base = basename($sample);
+
+	# set path and folder folder
+	my $WORKING_DIR   = cwd();					# set current folder as working folder
+	my $DATABASE_DIR  = ${FindBin::RealBin}."/databases";		# set database folder
+	my $BIN_DIR       = ${FindBin::RealBin}."/bin";			# set script folder 
+	my $TEMP_DIR      = $WORKING_DIR."/".$sample_base."_temp";	# set temp folder
+
+	print "Working: $WORKING_DIR\nDatabase: $DATABASE_DIR\nBin: $BIN_DIR\nTemp: $TEMP_DIR\n" if $debug;
+
+	exit;
 
 # set paramsters
 my $parameters_remove_redundancy = "--min_overlap $min_overlap --max_end_clip $max_end_clip --cpu_num $thread_num ".
@@ -166,10 +173,7 @@ if ($strand_specific) { $parameters_remove_redundancy.=" --strand_specific"; }
 my $parameters_bwa_align = "--max_dist $max_dist --max_open $max_open --max_extension $max_extension ".
 			   "--len_seed $len_seed --dist_seed $dist_seed --thread_num $thread_num";
 
-
-#Usage: bowtie2-build [options]* <reference_in> <bt2_index_base>
-#reference_in            comma-separated list of files with ref sequences
-#bt2_index_base          write bt2 data to files with this dir/basename
+=head
 sub files_combine2
 {
 	my $file_list = shift;
@@ -185,6 +189,8 @@ sub files_combine2
 	}
 	$fh->close;
 }
+
+=cut
 
 # main
 main: {
@@ -265,4 +271,6 @@ main: {
 
 	Util::print_user_message("Finished");
 	print ("####################################################################\n\n");
+}
+
 }

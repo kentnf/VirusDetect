@@ -1,4 +1,5 @@
 #!/usr/bin/perl
+
 package align;
 use strict;
 use warnings;
@@ -6,121 +7,46 @@ use Getopt::Long;
 use Cwd;
 use FindBin;
 use Bio::SeqIO;
-use lib "$FindBin::RealBin/bin/PerlLib";
-use Util;
 use IO::File;
 use Exporter;
+use lib "$FindBin::RealBin";
+use Util;
 
 
-our @ISA = qw( Exporter );
+# our @ISA = qw( Exporter );
 
-our @EXPORT_OK = qw( renameFasta bwa_remove removeRedundancy filter_SAM files_combine2 );
-################################
-our $WORKING_DIR   = cwd();				# set current folder as working folder
-our $DATABASE_DIR  = $WORKING_DIR."/databases";	# set database folder
-our $BIN_DIR	  = ${FindBin::RealBin}."/bin";		# set script folder
-our $TEMP_DIR	  = $WORKING_DIR."/temp";		# set temp folder
-our $tf = $TEMP_DIR;
-our $output_suffix;	# output suffix
-# basic options
-my $file_type= "fastq";				# [autodetect for it] input file type, fasta or fastq
-my $reference= "vrl_plant";			# virus sequence
-my $host_reference;       			# host reference
-my $thread_num = 8; 				# thread number
-my $file_list;
+# our @EXPORT_OK = qw( renameFasta bwa_remove removeRedundancy filter_SAM files_combine2 );
 
-# paras for BWA
-my $max_dist = 1;  				# max edit distance
-my $max_open = 1;  				# max gap opening
-my $max_extension = 1; 				# max gap extension (gap length)
-my $len_seed = 15; 				# bwa seed length
-my $dist_seed = 1; 				# bwa seed max edit distance
+=head2
 
-# paras for megablast detection (remove redundancy )
-my $strand_specific;  				# switch for strand specific transcriptome data?
-my $min_overlap = 30; 				# minimum overlap for hsp combine
-my $max_end_clip = 6; 				# max end clip for hsp combine
-my $mis_penalty = -1;     			# megablast mismatch penlty, minus integer
-my $gap_cost = 2;         			# megablast gap open cost, plus integer
-my $gap_extension = 1;    			# megablast gap extension cost, plus integer
-my $cpu_num = 8;
-
-# paras for blast && identification
-my $word_size = 11;
-my $exp_value = 1e-5;				#
-my $percent_identity = 25;			# tblastx “‘µ∞∞◊÷ –Ú¡–¿¥±»∂‘ ±hspµƒ◊Ó–°Õ¨“ª–‘
-my $mis_penalty_b = -1;				# megablast mismatch penlty, minus integer
-my $gap_cost_b = 2;				# megablast gap open cost, plus integer
-my $gap_extension_b = 1;			# megablast gap extension cost, plus integer
-
-my $filter_query = "F";				# megablast switch for remove simple sequence
-my $hits_return = 500;				# megablast number of hit returns
-
-# paras for result filter
-my $hsp_cover = 0.75;
-my $coverage_cutoff = 0.1;			# coverage cutoff for final result
-my $depth_cutoff = 5;				# depth cutoff for final result
-
-# disabled parameters or used as fixed value
-my $input_suffix='clean'; 			# input_suffix, disabled
-my $coverage=0.3;  				# √øÃı≤Œøº–Ú¡–»Áπ˚±ªreads∏≤∏«µƒ≤ø∑÷’º»´≥§±»¿˝µƒ„–÷µ
-my $objective_type='maxLen';			# objective type for Velvet assembler: n50°¢maxLen, avgLen
-my $diff_ratio= 0.25;
-my $diff_contig_cover = 0.5;
-my $diff_contig_length= 100;
-
-# get input paras #
-GetOptions(
-'file_type=s'	=> 	\$file_type,
-'reference=s'	=> 	\$reference,
-'host_reference=s' => 	\$host_reference,
-'thread_num=i' => 	\$thread_num,
-'file_list=s' => \$file_list,
-
-'max_dist=i' => 	\$max_dist,
-'max_open=i' => 	\$max_open,
-'max_extension=i' => 	\$max_extension,
-'len_seed=i' => 	\$len_seed,
-'dist_seed=i' => 	\$dist_seed,
-
-
-'strand_specific!' => 	\$strand_specific,
-'min_overlap=i' => 	\$min_overlap,
-'max_end_clip=i' => 	\$max_end_clip,
-'cpu_num=i' 		=> \$cpu_num,
-'mis_penalty=i' => 	\$mis_penalty,
-'gap_cost=i' => 	\$gap_cost,
-'gap_extension=i' => 	\$gap_extension,
-
-'word_size=i' =>  	\$word_size,
-'exp_value-s' =>  	\$exp_value,
-'percent_identity=s' => 	\$percent_identity,	# tblastx“‘µ∞∞◊÷ –Ú¡–¿¥±»∂‘ ±hspµƒ◊Ó–°Õ¨“ª–‘
-'mis_penalty_b=i' => 	\$mis_penalty_b,
-'gap_cost_b=i' => 	\$gap_cost_b,
-'gap_extension_b=i' => 	\$gap_extension_b,
-
-'hsp_cover=s' =>	\$hsp_cover,
-'diff_ratio=s' => 	\$diff_ratio,
-'diff_contig_cover=s' =>\$diff_contig_cover,
-'diff_contig_length=s'=>\$diff_contig_length,
-
-'coverage_cutoff=f' =>	\$coverage_cutoff,
-'depth_cutoff=f' =>	\$depth_cutoff,
-'output_suffix=s'	=> \$output_suffix,
-
-'velvet_dir=s'		=> \$velvet_dir,
-'parameters=s' 		=> \$parameters,
-'objective_type=s'	=> \$objective_type,
-'hash_end=i'		=> \$hash_end,
-'coverage_end=i'	=> \$coverage_end
-);
-
-sub bowtie2_align
+ align_to_reference -- align read to reference, output is sam
+ 
+=cut
+sub align_to_reference
 {
-	my ($input, $output, $index, $parameters) = @_;
+	my ($align_program, $input, $reference, $output_file, $parameters, $temp_folder, $debug) = @_;
 
-	
+	# align for bwa
+	if ($align_program =~ m/bwa/)
+	{
+		my $sai = $temp_folder."/bwa.sai";
+		my $log = $temp_folder."/bwa.log";
+		Util::process_cmd("$align_program index -p $reference -a bwtsw $reference 2> $log", $debug) unless -s "$referencei.amb";
+		Util::process_cmd("$align_program aln $parameters $reference $input 1> $sai 2>> $log", $debug) unless -s $sai;
+		Util::process_cmd("$align_program samse -n 10000 -s $reference $sai $input 1> $output 2>> $log", $debug) unless -s $output;
+	}
+
+	# align for bowtie2
+	if ($align_program =~ m/bowtie2/) 
+	{
+		my $build_program = $align_program."-build";
+		Util::process_cmd("$build_program $reference $reference", $debug) unless -s "$reference.1.bt2";
+		Util::process_cmd("$align_program $parameters -x $reference -U $input -S $output", $debug);		
+	}
+
+	return 1;
 }
+
 
 sub renameFasta
 {
@@ -306,6 +232,10 @@ sub removeRedundancy{
     close(IN1);
 }
 
+=head filter_SAM
+
+=cut
+
 sub filter_SAM
 {
 	my $input_SAM = shift;
@@ -391,6 +321,7 @@ sub filter_SAM
 	my $filtered_count = $total_count - $kept_align;
 	#print STDERR "This program filtered $filtered_count out of $total_count reads (" . sprintf("%.2f", $filtered_count / $total_count * 100) . ") as 2ndhits reads, only for BWA\n";
 }
+
 sub Velvet_Optimiser_combined{
     my ($parameters, $file_list, $input_suffix, $file_type, $bjective_type, $hash_end, $coverage_end, $output_suffix);
     my $sample;
@@ -503,6 +434,7 @@ sub runVelvet1 {
 	Util::process_cmd($velvet_dir."/velveth $outputDir $hash_length -$file_type $file > $tf/velvet.log");
 	Util::process_cmd($velvet_dir."/velvetg $outputDir -cov_cutoff $cov_cutoff -min_contig_lgth 30 > $tf/velvet.log");
 }
+
 sub contigStats {
 	
 	my $file = shift;

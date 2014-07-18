@@ -14,8 +14,9 @@ use Bio::SeqIO;
 my $usage = <<_EOUSAGE_;
 
 #########################################################################################
-# alignAndCorrect.pl --file_list <FILE> --reference <FILE> --coverage <Float>
-#                 		 --max_dist[INT] --max_open [INT] --max_extension [INT] --len_seed [INT] --dist_seed [INT] --thread_num [INT]
+# alignAndCorrect.pl [options] reference_index input_reads
+#                              --coverage <Float>
+#                 	       --max_dist[INT] --max_open [INT] --max_extension [INT] --len_seed [INT] --dist_seed [INT] --thread_num [INT]
 #
 # Required(3):
 #  --file_list A txt file containing a list of input file names without any suffix
@@ -37,16 +38,16 @@ _EOUSAGE_
 #################
 #  global vars  #
 #################
-our $file_list;		# list of sample name
-our $reference;		# reference sequence, fasta format, full path
-our $coverage;  	# cutoff of mapping reads / reference
-our $max_dist = 1; 	# BWA allowed max distance
-our $max_open = 1; 	# BWA allowed max gap opens
-our $max_extension = 1; # BWA allowed max gap extension
-our $len_seed = 15; 	# length of seed
-our $dist_seed = 1; 	# BWA allowed seed max distance
-our $thread_num = 8; 	# thread number
-our $output_suffix;	# output suffix
+my $reference;		# reference sequence, fasta format, full path
+my $coverage;  	# cutoff of mapping reads / reference
+
+my $max_dist = 1; 	# BWA allowed max distance
+my $max_open = 1; 	# BWA allowed max gap opens
+my $max_extension = 1;	# BWA allowed max gap extension
+my $len_seed = 15; 	# length of seed
+my $dist_seed = 1; 	# BWA allowed seed max distance
+my $thread_num = 8; 	# thread number
+my $output_suffix;	# output suffix
 
 ################################
 # set folder and file path     #
