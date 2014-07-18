@@ -107,9 +107,9 @@ my $diff_contig_length= 100;
 
 # get input paras #
 GetOptions(
-	'reference=s'	=> 	\$reference,
-	'host_reference=s' => 	\$host_reference,
-	'thread_num=i' => 	\$thread_num,
+	'r|reference=s'	=> 		\$reference,
+	'h|host_reference=s' => 	\$host_reference,
+	't|thread_num=i' => 		\$thread_num,
 
 	'max_dist=i' => 	\$max_dist,
 	'max_open=i' => 	\$max_open,
@@ -188,36 +188,37 @@ foreach my $sample (@ARGV)
 	Util::process_cmd("$BIN_DIR/samtools sort $sample.bam $sample.sorted 2> $TEMP_DIR/samtools.log", $debug) unless (-s "$sample.sorted.bam");
 	Util::process_cmd("$BIN_DIR/samtools mpileup -f $reference $sample.sorted.bam > $sample.pileup 2> $TEMP_DIR/samtools.log", $debug) unless (-s "$sample.pre.pileup");
 	align::pileup_filter("$sample.pre.pileup", "$seq_info", "$coverage", "$sample.pileup", $debug) unless (-s "$sample.pileup");	# filter pileup file 
-	align::pileup_to_contig("$sample.pileup", "$sample.aligned", 40, 1, 'ALIGNED');		# input, output, min_len, min_depth, prefix
-	align::removeRedundancy("$sample.aligned", $parameters_remove_redundancy);		# input, parameters, prefix
+	align::pileup_to_contig("$sample.pileup", "$sample.aligned", 40, 1, 'ALIGNED') unless -s "$sample.aligned"; # input, output, min_len, min_depth, prefix
+
+	# align::removeRedundancy("$sample.aligned", $parameters_remove_redundancy);		# input, parameters, prefix
+	# my $cmd_removeRedundancy = "$BIN_DIR/removeRedundancy_batch.pl --contig_prefix KNOWN $parameters_remove_redundancy $sample.aligned";
+	# Util::process_cmd($cmd_removeRedundancy);
 
 	# part B: 1. remove host related reads  2. de novo assembly 3. remove redundancy contigs
-	
+	# parameter for velvet: $sample, $output_contig, $kmer_start, $kmer_end, $coverage_start, $coverage_end, $objective_type, $bin_dir, $temp_dir, $debug
 	if( $host_reference ){
 		Util::print_user_message("Align reads to host reference sequences");
-		#Util::process_cmd("$BIN_DIR/bwa_remove.pl --file_list $file_list --reference $DATABASE_DIR/$host_reference $parameters_bwa_align");
-		#bwa_remove($file_list, $reference, $host_reference, $parameters_bwa_align);
-
-		# the input suffix of unmapped reads is 'unmapped'
-		# the seq from sam file is fastq format, no matter the format of input file
+		align::align_to_reference($align_program, $sample, $host_reference, "$sample.sam", $align_parameters, $TEMP_DIR, $debug);	
+		align::generate_unmapped_reads("$sample.sam", "$sample.unmapped");
 		Util::print_user_message("De novo assembly");
-		Util::process_cmd("$BIN_DIR/Velvet_Optimiser_combined.pl --parameters $TEMP_DIR/optimization.result --file_list $file_list --input_suffix unmapped --file_type fastq --objective_type $objective_type --hash_end 19 --coverage_end 25 --output_suffix assemblied");
+		align::velvet_optimiser_combine("$sample.unmapped", "$sample.assembled", 9, 19, 5, 25, $objective_type, $BIN_DIR, $TEMP_DIR, $debug);
 	}	
 	else
 	{
 		Util::print_user_message("De novo assembly");
-		Util::process_cmd("$BIN_DIR/Velvet_Optimiser_combined.pl --parameters $TEMP_DIR/optimization.result --file_list $file_list --file_type $file_type --objective_type $objective_type --hash_end 19 --coverage_end 25 --output_suffix assemblied");
+		align::velvet_optimiser_combine($sample, "$sample.assembled", 9, 19, 5, 25, $objective_type, $BIN_DIR, $TEMP_DIR, $debug);
 	}
-    #the script is messing up here in this removeRedundancy line:
-    removeRedundancy($file_list, $file_type, "assemblied", "NOVEL", $parameters_remove_redundancy);
+
+    	# removeRedundancy($file_list, $file_type, "assemblied", "NOVEL", $parameters_remove_redundancy);
 	
 	# combine the known and unknown virus, remove redundancy of combined results, it must be using strand_specific parameter
 	Util::print_user_message("Remove redundancies in virus contigs");
-	files_combine2($file_list);
-	#$cmd_removeRedundancy = "$BIN_DIR/removeRedundancy_batch.pl --file_list $file_list --file_type $file_type --input_suffix combined ".
-    #   				"--contig_prefix CONTIG --strand_specific $parameters_remove_redundancy";
-	#Util::process_cmd($cmd_removeRedundancy);
-    	removeRedundancy($file_list, $file_type, "combined", "CONTIG", $parameters_remove_redundancy);
+	Util::process_cmd("cat $sample.aligned $sample.assembled > $sample.combined", $debug);
+
+	# $cmd_removeRedundancy = "$BIN_DIR/removeRedundancy_batch.pl --file_list $file_list --file_type $file_type --input_suffix combined ".
+    	#   				"--contig_prefix CONTIG --strand_specific $parameters_remove_redundancy";
+	# Util::process_cmd($cmd_removeRedundancy);
+    	# removeRedundancy($file_list, $file_type, "combined", "CONTIG", $parameters_remove_redundancy);
 	# identify the virus
     
 	Util::print_user_message("Virus identification");

@@ -12,14 +12,11 @@ use Cwd;
 my $usage = <<_EOUSAGE_;
 
 #########################################################################################################
-# removeRedundancy_batch.pl --file_list <FILE> --file_type <String> --input_suffix <String> --contig_type <String> --contig_prefix <String> 
-#                 --strand_specific --min_overlap [INT] --max_end_clip [INT] --cpu_num [INT] --mis_penalty [INT] --gap_cost [INT] --gap_extension [INT]
+# removeRedundancy_batch.pl [option] input_contig
+# --contig_prefix <String> 
+# --strand_specific --min_overlap [INT] --max_end_clip [INT] --cpu_num [INT] --mis_penalty [INT] --gap_cost [INT] --gap_extension [INT]
 #
 # Required(4):
-#  --file_list       A txt file containing a list of input file names without any suffix
-#  --file_type       The format of input files(fastq or fasta)
-#  --input_suffix    A file name suffix of input data 
-#  --contig_type     The contig type for redundancy removal (aligned or assembled)
 #  --contig_prefix   A prefix of each contig name in the data (fasta format)
 #
 # Megablast-related options(7):
@@ -58,7 +55,6 @@ our $gap_extension = 1;	# megablast: penalty for gap extension
 # set path for file and folders#
 ################################
 our $WORKING_DIR	= cwd();				# current folder
-our $DATABASE_DIR	= ${FindBin::RealBin}."/../databases";	# database folder
 our $BIN_DIR		= ${FindBin::RealBin};			# program folder
 our $TEMP_DIR 		= $WORKING_DIR."/temp";			# temp folder
 my $tf = $TEMP_DIR;						# short name of temp folder
@@ -81,31 +77,21 @@ GetOptions(
 	'gap_cost=i' 		=> \$gap_cost,
 	'gap_extension=i' 	=> \$gap_extension			 			 
 );
-			 
-die $usage unless ($file_list && $input_suffix && $contig_prefix);	# required parameters
+
+# check input parameters
+die $usage unless $ARGV[0];
+my $contig_file = $ARGV[0];
+die $usage unless -s $contig_file;
 
 #################
 # main 		#
 #################
-open(IN1,$file_list) || die "Can't open the file $file_list\n";
-my ($j, $sample, $contig_file);
-$j=0;
-while(<IN1>){
-	$j=$j+1;
-	chomp;
-	$sample = $_;
-	#print "#processing sample $j by $0: $sample\n";
-	$contig_file = $sample.".".$input_suffix;
 
-	# get aligned files size, do not remove redundancy if file size is 0
-	my $file_size = -s "$contig_file";
-	next if $file_size == 0;
 
-	# if file has sequence, move it to temp folder to remove redundancy
 	# 1. remove simple repeate sequence using mask
-	Util::process_cmd("$BIN_DIR/dust $sample.$input_suffix 1> $sample.masked 2> $tf/dust.log");
-	Util::process_cmd("$BIN_DIR/trim_XNseq1.pl $sample.masked $sample.$input_suffix 0.8 40 > $sample.$input_suffix.1");
-	Util::process_cmd("rm $sample.masked");
+	Util::process_cmd("$BIN_DIR/dust $contig_file 1> $contig_file.masked 2> $tf/dust.log");
+	Util::process_cmd("$BIN_DIR/trim_XNseq1.pl $contig_file.masked $contig_file 0.8 40 > $contig_file.1");
+	Util::process_cmd("rm $contig_file.masked");
 
 	my ($before_contig_num, $after_contig_num, $i);
 	$i = 1;								# get the number of contig file, default is 1
@@ -116,7 +102,7 @@ while(<IN1>){
 	while( $after_contig_num != $before_contig_num )
 	{
 		# the default output is the input_inset; 
-		Util::process_cmd ("$BIN_DIR/removeRedundancy.pl --input $sample.$input_suffix.$i --min_overlap $min_overlap --max_end_clip $max_end_clip --cpu_num $cpu_num --mis_penalty $mis_penalty --gap_cost $gap_cost --gap_extension $gap_extension");
+		Util::process_cmd ("$BIN_DIR/removeRedundancy.pl --input $contig_file.$i --min_overlap $min_overlap --max_end_clip $max_end_clip --cpu_num $cpu_num --mis_penalty $mis_penalty --gap_cost $gap_cost --gap_extension $gap_extension");
 		Util::process_cmd("rm $sample.$input_suffix.$i");# rm old file
 		my $remove_redundancy_result = "$sample.$input_suffix.$i"."_inset";
 
@@ -168,8 +154,6 @@ while(<IN1>){
 	system("rm $sample_reference.fai");
 	system("rm $tf/*.ebwt");
 	system("rm $sample.contigs$i.fa");	
-}
-close(IN1);
 
 #system("rm *.log");
 
