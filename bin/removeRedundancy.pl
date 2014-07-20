@@ -12,13 +12,10 @@ use Cwd;
 ################################
 # set path for file and folders#
 ################################
-my $WORKING_DIR	= cwd();			# current folder
 my $bin_dir	= ${FindBin::RealBin};		# program folder
-my $TEMP_DIR 	= $WORKING_DIR."/temp";		# temp folder
-my $tf = $TEMP_DIR;				# short name of temp folder
 
 # check input parameters
-if (@ARGV != 2) {
+if (scalar(@ARGV) != 2) {
 	print "USAGE $0 contig_file read_file\n";
 	exit;
 }
@@ -28,17 +25,19 @@ my $read_file = $ARGV[1];
 my $debug = 1;
 
 # parameters for megablast (remove redundancy)
-my $strand_specific;    #
 my $min_overlap = 30;   # hsp combine
 my $max_end_clip = 6;   # hsp combine
+
+my $strand_specific = 1;
 my $cpu_num = 8;        # megablast: thread
 my $mis_penalty = -1;   # megablast: penalty for mismatch
 my $gap_cost = 2;       # megablast: penalty for gap open
 my $gap_extension = 1;  # megablast: penalty for gap extension
 
-my $parameters = "--min_overlap $min_overlap --max_end_clip $max_end_clip --cpu_num $cpu_num --mis_penalty $mis_penalty --gap_cost $gap_cost --gap_extension $gap_extension";
+my $parameters = "-F F -W 10 -b 10 -a $cpu_num -q $mis_penalty -G $gap_cost -E $gap_extension";
+if ($strand_specific) { $parameters .= " -S 1"; }
 
-remove_redundancy($contig_file, $read_file, $parameters, $bin_dir, $debug);
+remove_redundancy($contig_file, $read_file, $parameters, $max_end_clip, $min_overlap, $bin_dir, $debug);
 
 =head2
  
@@ -47,7 +46,9 @@ remove_redundancy($contig_file, $read_file, $parameters, $bin_dir, $debug);
 =cut
 sub remove_redundancy
 {
-	my ($contig_file, $read_file, $parameters, $bin_dir, $debug) = @_;
+	my ($contig_file, $read_file, $parameters, $max_end_clip, $min_overlap, $bin_dir, $debug) = @_;
+
+	my $min_identity = '';	# pass this value to other subroutine for furture functions
 
 	# step 1. remove low complexity sequence using dust, 2 remov XN reads
 	dust_parse($contig_file, $bin_dir);
@@ -61,7 +62,7 @@ sub remove_redundancy
 	# if the new contig number != old contig number, continue remove redundancy
 	while( $after_contig_num != $before_contig_num )
 	{ 
-		remove_redundancy_main($contig_file, $parameters);
+		remove_redundancy_main($contig_file, $parameters, $max_end_clip, $min_overlap, $min_identity, $bin_dir);
 		$before_contig_num = $after_contig_num; 	# renew contig_num1
 		$after_contig_num  = count_seq($contig_file); 	# get seq number of new contig
 	}
@@ -83,18 +84,21 @@ sub remove_redundancy
  base_correction -- correct contig base using reads aligned to contigs
  # aligment -> sam -> bam -> sorted bam -> pileup -> Consensus sequence
 =cut
-# will fix this part final
-=head
+
 sub base_correction
 {
+	my ($read_file, $contig_file, $bin_dir, $debug);
+
+
+	my $cpu_num = 8;
+
 	#aligment -> sam -> bam -> sorted bam -> pileup
-        my $format = "-q"; if ($file_type eq "fasta") {$format="-f"};
-        Util::process_cmd("$BIN_DIR/bowtie-build --quiet -f $sample_reference $sample") unless (-e "$sample.1.amb");
-        Util::process_cmd("$BIN_DIR/samtools faidx $sample_reference 2> $tf/samtools.log") unless (-e "$sample_reference.fai");
-        Util::process_cmd("$BIN_DIR/bowtie --quiet $sample -v 1 -p $cpu_num $format $sample -S -a --best $sample.sam") unless (-s "$sample.sam");
-        Util::process_cmd("$BIN_DIR/samtools view -bt $sample_reference.fai $sample.sam > $sample.bam 2> $tf/samtools.log") unless (-s "$sample.bam");
-        Util::process_cmd("$BIN_DIR/samtools sort $sample.bam $sample.sorted 2> $tf/samtools.log") unless (-s "$sample.sorted.bam");
-        Util::process_cmd("$BIN_DIR/samtools mpileup -f $sample_reference $sample.sorted.bam > $sample.pileup 2> $tf/samtools.log") unless (-s "$sample.pileup");
+        Util::process_cmd("$bin_dir/bowtie-build --quiet -f $contig_file $contig_file") unless (-e "$sample.1.ebwt");
+        #Util::process_cmd("$BIN_DIR/samtools faidx $sample_reference 2> $tf/samtools.log") unless (-e "$sample_reference.fai");
+        Util::process_cmd("$bin_dir/bowtie --quiet $sample -v 1 -p $cpu_num $format $sample -S -a --best $sample.sam", $debug);
+        Util::process_cmd("$bin_dir/samtools view -bS $read_file.sam > $read_file.bam 2> $tf/samtools.log");
+        Util::process_cmd("$bin_dir/samtools sort $read_file.bam $read_file.sorted 2> $tf/samtools.log");
+        Util::process_cmd("$bin_dir/samtools mpileup -f $contig_file $read_file.sorted.bam > $read_file.pileup 2> $tf/samtools.log");
 
         $file_size = -s "$sample.pileup";               # get file size
         if( $file_size == 0 ){                          # if file size = 0, create blank file, and exit the loop
@@ -102,19 +106,17 @@ sub base_correction
                 next;
         }
 
-        $i++;
         Util::process_cmd("java -cp $BIN_DIR extractConsensus $sample 1 40 $i");
         renameFasta("$sample.contigs$i.fa", "$sample.$input_suffix", $contig_prefix);
 
-
 	# remove temp files
-        system("rm $sample.sam");
-        system("rm $sample.bam");
-        system("rm $sample.sorted.bam");
-        system("rm $sample.pileup"); # must delete this file for next cycle remove redundancy
-        system("rm $sample_reference");
-        system("rm $sample_reference.fai");
-        system("rm $tf/*.ebwt");
+        system("rm $read_file.sam");
+        system("rm $read_file.bam");
+        system("rm $read_file.sorted.bam");
+        system("rm $read_file.pileup"); 	# must delete this file for next cycle remove redundancy
+        system("rm $contig_file");
+        system("rm $contig_file.fai");
+        system("rm $temp_dir/*.ebwt");
         system("rm $sample.contigs$i.fa");
 }
 =cut
@@ -179,80 +181,20 @@ sub trim_XNseq
 	$fh->close;
 }
 
-=head
-my $usage = <<_EOUSAGE_;
+=head2
 
-#########################################################################################
-# removeRedundancy.pl --input <FILE> --strand_specific --min_overlap [INT] --max_end_clip [INT] 
-#                      --cpu_num [INT] --mis_penalty [INT] --gap_cost [INT] --gap_extension [INT]
-# Required[1]:
-#  --input              A name of an input file containing sequences in fasta format
-#
-# Megablast-related options[7]:
-#  --strand_specific    Only for sequences assembled from strand specific RNA-seq [Not selected]
-#  --min_overlap        The minimum overlap length between two contigs to be combined [30]
-#  --max_end_clip       The maximum length of end clips [4]
-#  --cpu_num         Number of processors to use [8] 
-#  --mis_penalty     Penalty for a nucleotide mismatch [-1]
-#  --gap_cost        Cost to open a gap [2] 
-#  --gap_extension   Cost to extend a gap [1]     
-##########################################################################################
-
-_EOUSAGE_
-	;
-#################
-## global vars ##
-#################	
-our $input;			# input file fasta format
-our $strand_specific;		# ×¨ÃÅÓÃÓÚstrand specific×ªÂ¼×é
-our $min_overlap = 30;		# hspºÏ²¢Ê±£¬×î¶ÌµÄoverlap
-our $max_end_clip = 4;		# hspºÏ²¢Ê±£¬Á½¶ËÔÊÐíµÄ×îÐ¡clip
-our $min_identity;		# hspºÏ²¢ÐèÒªÂú×ãµÄ×îÐ¡identity£¬Ëæhsp³¤¶È¶øµ÷Õû
-
-our $filter_query = "F";	# Ä¬ÈÏ²»ÐèÒªÈ¥³ý¼òµ¥ÐòÁÐ
-our $word_size = int($min_overlap/3);
-our $cpu_num = 8;		# megablastÊ¹ÓÃµÄcpuÊýÄ¿
-our $hits_return = 10;		# megablast·µ»ØµÄhitÊýÄ¿£¬Õâ¸ö²»ÐèÒªÓÃ»§Éè¶¨
-our $mis_penalty = -1;		# megablastÖÐ£¬¶Ô´íÅäµÄ·£·Ö£¬±ØÐëÊÇ¸ºÕûÊý
-our $gap_cost = 2;		# megablastÖÐ£¬¶Ôgap openµÄ·£·Ö£¬±ØÐëÊÇÕýÕûÊý
-our $gap_extension = 1;		# megablastÖÐ£¬¶Ôgap openµÄ·£·Ö£¬±ØÐëÊÇÕýÕûÊý
-
-################################
-##   ÉèÖÃËùÓÐÄ¿Â¼ºÍÎÄ¼þµÄÂ·¾¶ ##
-################################
-our $WORKING_DIR=cwd();			#¹¤×÷Ä¿Â¼¾ÍÊÇµ±Ç°Ä¿Â¼
-our $BIN_DIR=${FindBin::RealBin};	#ËùÓÐ¿ÉÖ´ÐÐÎÄ¼þËùÔÚµÄÄ¿Â¼
-
-##################
-## ³ÌÐò²ÎÊý´¦Àí ##
-##################
-&GetOptions( 
-	'input=s' 		=> \$input, 
-	'strand_specific!'	=> \$strand_specific,
-	'min_overlap=i' 	=> \$min_overlap,
-	'max_end_clip=i' 	=> \$max_end_clip,
-	'cpu_num=i' 		=> \$cpu_num ,
-	'mis_penalty=i' 	=> \$mis_penalty,
-	'gap_cost=i' 		=> \$gap_cost,
-	'gap_extension=i' 	=> \$gap_extension
-);
-
-die $usage unless $input;	# required parameter
 =cut			 
-#################
-##  main       ##
-#################
 
 sub remove_redundancy_main
 {
-	my ($input_contig, $parameters) = @_;
+	my ($input_contig, $parameters, $max_end_clip, $min_overlap, $min_identity, $bin_dir) = @_;
 
 	# step 1. sort seq by length
 	# create array for store sequence info
 	# [    Seq1     ,      Seq2     ,      Seq3    ]
 	# [ID, Len, Seq], [ID, Len, Seq], [ID, Len, Seq]
 	my @all_data; 
-	my $in = Bio::SeqIO->new(-format=>'fasta', -file=>$input);
+	my $in = Bio::SeqIO->new(-format=>'fasta', -file=>$input_contig);
 	while(my $inseq = $in->next_seq)
 	{
 		push(@all_data, [$inseq->id, $inseq->length, $inseq->seq]);
@@ -288,7 +230,7 @@ sub remove_redundancy_main
 			# return_string is tab delimit file
 			# 1. seqID
 			# 2. r or n, then combine the sequence according to r and n
-			my $return_string = ifRedundant(\%inset, \$query);
+			my $return_string = ifRedundant(\%inset, \$query, $input_contig, $parameters, $max_end_clip, $min_overlap, $min_identity, $bin_dir);
 			my @return_col = split(/\t/, $return_string);
 
 			if ($return_col[1] eq "r") 
@@ -315,7 +257,6 @@ sub remove_redundancy_main
 	}
 
 	# step 3 output contigs after remove redundancy
-
 	my $out1 = IO::File->new(">".$contig_file) || die $!; 
 	while (my ($k,$v) = each %inset) { print $out1 ">$k\n$v\n";  }
 	$out1->close; 
@@ -325,9 +266,6 @@ sub remove_redundancy_main
 	return 1;
 }
 
-#######################
-##     subroutine    ##
-#######################
 =head2
 
  ifRedundant: check if the query sequence is redundancy after compared with inset sequences 
@@ -335,12 +273,12 @@ sub remove_redundancy_main
 =cut
 sub ifRedundant 
 {
-	my ($inset, $query) = @_; 
+	my ($inset, $query, $input_contig, $blast_parameters, $max_end_clip, $min_overlap, $min_identity, $bin_dir) = @_; 
 	
 	# save query and hit seqeunces to files
-	my $query_seq_file = $input."_query";
-	my $hit_seq_file   = $input."_tem";
-	my $blast_output   = $input."_tem.paired";
+	my $query_seq_file = $input_contig."_query";
+	my $hit_seq_file   = $input_contig."_tem";
+	my $blast_output   = $input_contig."_tem.paired";
 
 	my $fh1 = IO::File->new(">".$query_seq_file) || die $!;
 	print $fh1 $$query;
@@ -352,19 +290,20 @@ sub ifRedundant
 	
     	# perform blast. 
 	# using process_cmd() could debug ouput result
-	system("$BIN_DIR/formatdb -i $hit_seq_file -p F");
-	my $blast_program = $BIN_DIR."/megablast";
-	my $blast_param = "-i $query_seq_file -d $hit_seq_file -o $blast_output -F $filter_query -a $cpu_num -W $word_size -q $mis_penalty -G $gap_cost -E $gap_extension -b $hits_return";
-	if ($strand_specific) { $blast_param .= " -S 1"; }
+	system("$bin_dir/formatdb -i $hit_seq_file -p F");
+	my $blast_program = $bin_dir."/megablast";
+
+	my $blast_param = "-i $query_seq_file -d $hit_seq_file -o $blast_output $blast_parameters";
 	system($blast_program." ".$blast_param) && die "Error at blast command: $blast_param\n";
 	
 	# get redundancy info from blast result
-	my $result = findRedundancy($inset, $query, $blast_output);
+	my $result = findRedundancy($inset, $query, $blast_output, $max_end_clip, $min_overlap, $min_identity);
 
-	#   if($$query =~ />NOVEL1\n/){#µ÷ÊÔÓÃ
-	#	    print STDERR $result."good\n";
-	#		die "this is >NOVEL1";
-	#	}
+	# for debug
+	# if($$query =~ />NOVEL1\n/){
+	# 	print STDERR $result."good\n";
+	#	die "this is >NOVEL1";
+	# }
 	
 	unlink ($query_seq_file, $hit_seq_file, $blast_output, "$hit_seq_file.nhr", "$hit_seq_file.nin", "$hit_seq_file.nsq");
 	return $result;
@@ -377,11 +316,11 @@ sub ifRedundant
 =cut
 sub findRedundancy
 {
-	my ($inset, $query, $blast_output) = @_;
+	my ($inset, $query, $blast_output, $max_end_clip, $min_overlap, $min_identity) = @_;
 
 	my ($query_name, $query_length, $hit_name, $hit_length, $hsp_length, $identity, $evalue, $score, $strand, $query_start, $query_end, $hit_start, $hit_end, $query_to_end, $hit_to_end);
 
-	my %hsp = ();  #´æ´¢ÌáÈ¡Ò»¸öqueryµÄËùÓÐhsp£¬×îºóÒ»Æð´¦Àí
+	my %hsp = ();  # key: query, value: hsp for one query
 	my $hsp_count=0; 
 	my $query_sequenc; 
 	my $subject_sequenc; 	
@@ -391,12 +330,12 @@ sub findRedundancy
 	while(<$bfh>)
 	{
 		chomp;
-		if (/Query=\s(\S+)/ || eof)#Ò»µ©Óöµ½(ÐÂ)Query Name»òÕßÎÄ¼þ×îÄ©£¨·ÀÖ¹Ö»ÓÐÒ»¸öQuery£©£¬¾ÍÊä³öÇ°ÃæÒ»¸öQueryËùÓÐµÄhsp
+		if (/Query=\s(\S+)/ || eof) # new Query or End of file, output result for previous hsp
 		{
 			#########################################
-			#           ¼ÇÂ¼Ç°Ò»¸öhsp¼ÇÂ¼           #
+			#  previous hsp info to hash		#
 			#########################################
-			if ($hsp_count > 0)#Èç¹û²»ÊÇµÚÒ»´Î³öÏÖ£¨¼´ÒÑ´æÓÐhsp£©£¬Ôò±£´æ£¨Ò²¿ÉÒÔÊä³ö£©Ç°ÃæÒ»¸öhsp½á¹û
+			if ($hsp_count > 0)#Èç¹û²»ÊÇµÚÒ»´Î³
 			{
 				my $hsp_info =  $query_name."\t".$query_length."\t".$hit_name."\t".$hit_length."\t".
 						$hsp_length."\t".$identity."\t".$evalue."\t".$score."\t".$strand."\t".
@@ -405,7 +344,7 @@ sub findRedundancy
 			}
 
 			#########################################
-			#  ·ÖÎöÊôÓÚÉÏÒ»¶Ôquery-hitµÄËùÓÐhsp	#
+			# parse all hsp info for prev query-hit	#
 			#########################################
 			if (scalar(keys(%hsp)) > 0)
 			{
@@ -423,96 +362,98 @@ sub findRedundancy
 					my $hit_to_end = $hit_length - $hit_end;
 					my $hit_to_start = $hit_length - $hit_start;
 
+					# set min identity for different hsp length
 					$identity =~ s/%//;
 					if($hsp_length <= 50) {$min_identity = 95;}
 					elsif($hsp_length > 50 && $hsp_length <= 100) {$min_identity = 96;}
 					else{$min_identity = 97;}
                     
-					#ÏÂÃæÅÐ¶ÏµÄË³Ðò·Ç³£ÖØÒª
-					if ($identity < $min_identity)#hspµÄidentity²»¹»£¬²»ÄÜºÏ²¢£¬²»ÄÜÅÐ¶¨Îª·ÇÈßÓà£¬ÐèÒª¿´ÏÂÒ»¸ö
+					# the if-eles order is importent (below)
+					# The query-subject are not redundancy if the identitiy is low
+					next if ($identity < $min_identity); 
+
+					# the query is included in subject
+					if ($query_start -1 <= $max_end_clip  && $query_to_end <= $max_end_clip)  
 					{
-						next;#ÕâÑù±£Ö¤ÁË£¬±ØÐëÂú×ã×îÐ¡identity£¬²ÅÈ¥ÅÐ¶ÏÏÂÃæÌõ¼þ£¬·ñÔò¾ÍÌø¹ýÈ¥ÁË
-					}
-					if ($query_start -1 <= $max_end_clip  && $query_to_end <= $max_end_clip)#query±»subject°üÀ¨£¬ÅÐ¶¨ÈßÓà
-					{
-					    #my $hit_seq = $inset->{$hit_name}; 
-					    #print "type1\t".$hit_name."\t".$query_name."\t".$hit_seq."\n";#Êä³öºÏ²¢ÐÅÏ¢¹©ÈË¹¤Ð£¶Ô£¬µ÷ÊÔÓÃ
+						#my $hit_seq = $inset->{$hit_name}; 
+					    	#print "type1\t".$hit_name."\t".$query_name."\t".$hit_seq."\n";#Êä³öºÏ²¢ÐÅÏ¢¹©ÈË¹¤Ð£¶Ô£¬µ÷ÊÔÓÃ
 						return $hit_name."\tr";
 					}
-					if($hsp_length >= $min_overlap)#µÚÈýÖÖÇé¿ö(ÓÐoverlap)ÐèÒªºÏ²¢
-					{
 
-					    my $combined_seq;
-					    (my $query_seq = $$query) =~ s/^>[^\n]+\n//;#Ìæ»»µôÇ°ÃæµÄquery name
+					# the query-subject are partially overlapped, need to combined, 
+					if($hsp_length >= $min_overlap)
+					{
+						my $combined_seq;
+					    	(my $query_seq = $$query) =~ s/^>[^\n]+\n//;# remove query name
 					        $query_seq =~ s/\s//g;
 						my $hit_seq = $inset->{$hit_name}; 
 						if ($strand==1)
 						{
-						    #ÏÂÁÐÊÇqueryÔÚÇ°µÄÇé¿ö
+						    	# Query on left
 							if($query_start -1 > $max_end_clip  && $query_to_end <= $max_end_clip && $hit_start <= $max_end_clip)
 							{ 
-						       my $query_string = substr($query_seq, 0, $query_start); 							   
-							   my $hit_string = substr($hit_seq, $hit_start, $hit_to_start);
-							   #print "type2\t".$hit_name."\t".$query_name."\t".$query_string."\t".$hit_string."\n";#Êä³öºÏ²¢ÐÅÏ¢¹©ÈË¹¤Ð£¶Ô£¬µ÷ÊÔÓÃ
-							   $combined_seq = $hit_name.":".$query_name."\t".$query_string.$hit_string;
-							   return $combined_seq;
+						      		my $query_string = substr($query_seq, 0, $query_start); 							   
+								my $hit_string = substr($hit_seq, $hit_start, $hit_to_start);
+								#print "type2\t".$hit_name."\t".$query_name."\t".$query_string."\t".$hit_string."\n";#Êä³öºÏ²¢ÐÅÏ¢¹©ÈË¹¤Ð£¶Ô£¬µ÷ÊÔÓÃ
+								$combined_seq = $hit_name.":".$query_name."\t".$query_string.$hit_string;
+								return $combined_seq;
 							} 
-							#ÏÂÁÐÊÇhitÔÚÇ°µÄÇé¿ö
+							# hit on the left
 							if($query_start -1 <= $max_end_clip  && $query_to_end > $max_end_clip && $hit_to_end <= $max_end_clip)
 							{ 
-							   my $hit_string = substr($hit_seq, 0, $hit_end); 
-							   my $query_string = substr($query_seq, $query_end, $query_to_end); 
-							   #print "type3\t".$hit_name."\t".$query_name."\t".$hit_string."\t".$query_string."\n";#Êä³öºÏ²¢ÐÅÏ¢¹©ÈË¹¤Ð£¶Ô£¬µ÷ÊÔÓÃ
-							   $combined_seq = $hit_name.":".$query_name."\t".$hit_string.$query_string;
-							   return $combined_seq;
-							} 
+								my $hit_string = substr($hit_seq, 0, $hit_end); 
+								my $query_string = substr($query_seq, $query_end, $query_to_end); 
+								#print "type3\t".$hit_name."\t".$query_name."\t".$hit_string."\t".$query_string."\n";#Êä³öºÏ²¢ÐÅÏ¢¹©ÈË¹¤Ð£¶Ô£¬µ÷ÊÔÓÃ
+								$combined_seq = $hit_name.":".$query_name."\t".$hit_string.$query_string;
+								return $combined_seq;
+							}
 						}
 						if ($strand==-1)
 						{
-							#ÏÂÁÐÊÇqueryÔÚÇ°µÄÇé¿ö
+							# Query one the left
 							if($query_start -1 > $max_end_clip  && $query_to_end <= $max_end_clip && $hit_to_end <= $max_end_clip)
 							{ 
-							   my $query_string = substr($query_seq, 0, $query_start); 							   
-							   my $hit_string = substr($hit_seq, 0, $hit_end-1);
-							   rcSeq(\$hit_string, 'rc'); #ÇóÐòÁÐµÄ·´Ïò»¥²¹
-							   #print "type4\t".$hit_name."\t".$query_name."\t".$query_string."\t".$hit_string."\n";#Êä³öºÏ²¢ÐÅÏ¢¹©ÈË¹¤Ð£¶Ô£¬µ÷ÊÔÓÃ
-							   $combined_seq = $hit_name.":".$query_name."\t".$query_string.$hit_string;
-							   return $combined_seq;
+								my $query_string = substr($query_seq, 0, $query_start); 							   
+								my $hit_string = substr($hit_seq, 0, $hit_end-1);
+								rcSeq(\$hit_string, 'rc'); 
+								#print "type4\t".$hit_name."\t".$query_name."\t".$query_string."\t".$hit_string."\n";#Êä³öºÏ²¢ÐÅÏ¢¹©ÈË¹¤Ð£¶Ô£¬µ÷ÊÔÓÃ
+								$combined_seq = $hit_name.":".$query_name."\t".$query_string.$hit_string;
+								return $combined_seq;
 							} 
-							#ÏÂÁÐÊÇhitÔÚÇ°µÄÇé¿ö
+							# hit one the left
 							if($query_start -1 <= $max_end_clip  && $query_to_end > $max_end_clip && $hit_start-1 <= $max_end_clip)
 							{ 
-							   my $hit_string = substr($hit_seq, $hit_start, $hit_to_start); 
-							   rcSeq(\$hit_string, 'rc'); #ÇóÐòÁÐµÄ·´Ïò»¥²¹
-							   my $query_string = substr($query_seq, $query_end, $query_to_end); 
-							   #print "type5\t".$hit_name."\t".$query_name."\t".$hit_string."\t".$query_string."\n";#Êä³öºÏ²¢ÐÅÏ¢¹©ÈË¹¤Ð£¶Ô£¬µ÷ÊÔÓÃ
-							   $combined_seq = $hit_name.":".$query_name."\t".$hit_string.$query_string;
-							   return $combined_seq;
+								my $hit_string = substr($hit_seq, $hit_start, $hit_to_start); 
+								rcSeq(\$hit_string, 'rc');
+								my $query_string = substr($query_seq, $query_end, $query_to_end); 
+								#print "type5\t".$hit_name."\t".$query_name."\t".$hit_string."\t".$query_string."\n";#Êä³öºÏ²¢ÐÅÏ¢¹©ÈË¹¤Ð£¶Ô£¬µ÷ÊÔÓÃ
+								$combined_seq = $hit_name.":".$query_name."\t".$hit_string.$query_string;
+								return $combined_seq;
 							} 
 						}
-					}#µÚÈýÖÖÇé¿öÐèÒªºÏ²¢
-				}#Ñ­»·½áÊø£¬Ã»ÓÐÓöµ½·ûºÏÈßÓàµÄÅÐ¶Ï£¬ÅÐ¶¨Îª·ÇÈßÓà
+					}
+				}
 				return $hit_name."\tn";
 			}
 			
 			#####################################
-			#  ¿ªÊ¼¼ÇÂ¼Ò»¸öÐÂµÄquery	    #
+			#  start a new query hsp	    #
 			#####################################
 			%hsp = ();$hsp_count = 0;
 			$query_name = $1; $query_length = ""; $hit_name = ""; $hit_length = "";
 		}
-		elsif (/\s+\((\S+)\sletters\)/)#È¡Query Length
+		elsif (/\s+\((\S+)\sletters\)/) # get Query Length
 		{
 			$query_length = $1;
 			$query_length =~ s/,//g;
 		}
 		
-		elsif (/>(\S+)/)#Ò»µ©Óöµ½Hit Name
+		elsif (/>(\S+)/)# Hit Name
 		{
 			#########################################
-			#           ¼ÇÂ¼Ç°Ò»¸öhsp¼ÇÂ¼           #
+			#  put previous hsp info to hash        #
 			#########################################
-			if ($hsp_count > 0 || eof)#Èç¹û²»ÊÇÔÚQueryºóµÚÒ»´Î³öÏÖ£¨¼´ÒÑ´æÓÐhsp£©£¬Ôò±£´æÇ°ÃæÒ»¸öhsp½á¹û£¨Ò²¿ÉÒÔÊä³ö£©
+			if ($hsp_count > 0 || eof)
 			{
 				my $hsp_info =  $query_name."\t".$query_length."\t".$hit_name."\t".$hit_length."\t".
 						$hsp_length."\t".$identity."\t".$evalue."\t".$score."\t".$strand."\t".
@@ -521,7 +462,7 @@ sub findRedundancy
 				$is_hsp = 0;
 			}
 			#################################
-			#  ¿ªÊ¼¼ÇÂ¼Ò»¸öÐÂµÄhit	        #
+			#  se4t a new hit	        #
 			#################################
 		    $hit_name = $1; $hit_length = "";
 		}
@@ -531,7 +472,7 @@ sub findRedundancy
 				$hit_length =~ s/,//g;
 		}
 
-		elsif (/Score =\s+(\S+) bits.+Expect(\(\d+\))? = (\S+)/)#Ò»µ©Óöµ½hsp
+		elsif (/Score =\s+(\S+) bits.+Expect(\(\d+\))? = (\S+)/)# hsp info
 		{
 			if ($hsp_count > 0 && $is_hsp == 1)
 			{	
@@ -542,7 +483,7 @@ sub findRedundancy
 			}
 
 			#################################
-			#  ¿ªÊ¼¼ÇÂ¼Ò»¸öÐÂµÄhsp		#
+			#  start a new hsp		#
 			#################################
 			$is_hsp = 1;
 			$hsp_count++; 
@@ -572,7 +513,7 @@ sub findRedundancy
 
 		elsif (/Sbjct\:\s(\d+)\s+(\S+)\s(\d+)/ && $hsp_count >= 1) 
 		{
-			if ( $strand == -1 )#ÓÀÔ¶±£Ö¤$hit_start>=$hit_end
+			if ( $strand == -1 )
 			{
 				if ($hit_end == 0) { $hit_end = $1; $hit_end =~ s/,//g;  };
 				$hit_start = $3;
@@ -594,20 +535,23 @@ sub findRedundancy
 	return "null\tn";
 }
 
+=head2
+ reverse comp seq
+=cut
+
 sub rcSeq 
 {
-        my $seq_r = shift;
-        my $tag = shift; defined $tag or $tag = 'rc'; # $tag = lc($tag);
-        my ($Is_r, $Is_c) = (0)x2;
+        my ($seq_r, $tag) = @_;
+        defined $tag or $tag = 'rc';
+
+        my ($Is_r, $Is_c) = (0,0);
         $tag =~ /r/i and $Is_r = 1;
         $tag =~ /c/i and $Is_c = 1;
-        #$tag eq 'rc' and ( ($Is_r,$Is_c) = (1)x2 );
-        #$tag eq 'r' and $Is_r = 1;
-        #$tag eq 'c' and $Is_c = 1;
+
         !$Is_r and !$Is_c and die "Wrong Input for function rcSeq! $!\n";
         $Is_r and $$seq_r = reverse ($$seq_r);
-        # $Is_c and $$seq_r =~ tr/acgturyksbdhvnACGTURYKSBDHVN/tgcaayrmwvhdbnTGCAAYRMWVHDBN/;  # 2007-07-18 refer to NCBI;
         $Is_c and $$seq_r =~ tr/acgturykmbvdhACGTURYKMBVDH/tgcaayrmkvbhdTGCAAYRMKVBHD/; # edit on 2010-11-14;
+
         return 0;
 }
 

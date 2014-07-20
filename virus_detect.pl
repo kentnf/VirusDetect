@@ -169,10 +169,11 @@ foreach my $sample (@ARGV)
 	Util::process_cmd("ln -s $WORKING_DIR/$sample $TEMP_DIR/$sample_base", $debug) unless -e "$TEMP_DIR/$sample_base";
 	$sample = "$TEMP_DIR/$sample_base";				# change the sample name to the linke from this step
 
-	# set parameters for align and remove reduncancy 
-	my $parameters_remove_redundancy = "--min_overlap $min_overlap --max_end_clip $max_end_clip --cpu_num $thread_num ".
-					   "--mis_penalty $mis_penalty --gap_cost $gap_cost --gap_extension $gap_extension";
-	if ($strand_specific) { $parameters_remove_redundancy.=" --strand_specific"; }
+	# set parameters for remove reduncancy (rr)
+	my $rr_blast_word_size = int($min_overlap/3);
+	my $rr_hits_returns = 10
+	my $rr_blast_parameters = "-F F -a $thread_num -W $word_size -q $mis_penalty -G $gap_cost -E $gap_extension -b $hits_returns";
+	if ($strand_specific) { $rr_blast_parameters .=" -S 1"; }
 
 	# part A: 1. align reads to plant virus; 2. extract aligned seqs; 3. remove redundancy contigs
 	my $align_parameters = "-n $max_dist -o $max_open -e $max_extension -i 0 -l $len_seed -k $dist_seed -t $thread_num";
@@ -189,10 +190,9 @@ foreach my $sample (@ARGV)
 	Util::process_cmd("$BIN_DIR/samtools mpileup -f $reference $sample.sorted.bam > $sample.pileup 2> $TEMP_DIR/samtools.log", $debug) unless (-s "$sample.pre.pileup");
 	align::pileup_filter("$sample.pre.pileup", "$seq_info", "$coverage", "$sample.pileup", $debug) unless (-s "$sample.pileup");	# filter pileup file 
 	align::pileup_to_contig("$sample.pileup", "$sample.aligned", 40, 1, 'ALIGNED') unless -s "$sample.aligned"; # input, output, min_len, min_depth, prefix
-
-	# align::removeRedundancy("$sample.aligned", $parameters_remove_redundancy);		# input, parameters, prefix
-	# my $cmd_removeRedundancy = "$BIN_DIR/removeRedundancy_batch.pl --contig_prefix KNOWN $parameters_remove_redundancy $sample.aligned";
-	# Util::process_cmd($cmd_removeRedundancy);
+	align::removeRedundancy("$sample.aligned", $rr_blast_parameters, $max_end_clip, $min_overlap, $BIN_DIR, $debug);
+	
+	
 
 	# part B: 1. remove host related reads  2. de novo assembly 3. remove redundancy contigs
 	# parameter for velvet: $sample, $output_contig, $kmer_start, $kmer_end, $coverage_start, $coverage_end, $objective_type, $bin_dir, $temp_dir, $debug
