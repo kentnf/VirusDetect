@@ -209,18 +209,15 @@ foreach my $sample (@ARGV)
 		align::velvet_optimiser_combine($sample, "$sample.assembled", 9, 19, 5, 25, $objective_type, $BIN_DIR, $TEMP_DIR, $debug);
 	}
 
-    	# removeRedundancy($file_list, $file_type, "assemblied", "NOVEL", $parameters_remove_redundancy);
+	align::removeRedundancy("$sample.assemblied", $sample, $rr_blast_parameters, $max_end_clip, $min_overlap, $BIN_DIR, $TEMP_DIR, $debug);
 	
 	# combine the known and unknown virus, remove redundancy of combined results, it must be using strand_specific parameter
 	Util::print_user_message("Remove redundancies in virus contigs");
 	Util::process_cmd("cat $sample.aligned $sample.assembled > $sample.combined", $debug);
+	align::removeRedundancy("$sample.combined", $sample, $rr_blast_parameters, $max_end_clip, $min_overlap, $BIN_DIR, $TEMP_DIR, $debug);
 
-	# $cmd_removeRedundancy = "$BIN_DIR/removeRedundancy_batch.pl --file_list $file_list --file_type $file_type --input_suffix combined ".
-    	#   				"--contig_prefix CONTIG --strand_specific $parameters_remove_redundancy";
-	# Util::process_cmd($cmd_removeRedundancy);
-    	# removeRedundancy($file_list, $file_type, "combined", "CONTIG", $parameters_remove_redundancy);
+
 	# identify the virus
-    
 	Util::print_user_message("Virus identification");
 	my $cmd_identify = "$BIN_DIR/virus_identify.pl ";
 	$cmd_identify .= "--word_size $word_size --exp_value $exp_value --identity_percen $percent_identity ";
