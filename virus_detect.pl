@@ -171,8 +171,8 @@ foreach my $sample (@ARGV)
 
 	# set parameters for remove reduncancy (rr)
 	my $rr_blast_word_size = int($min_overlap/3);
-	my $rr_hits_returns = 10
-	my $rr_blast_parameters = "-F F -a $thread_num -W $word_size -q $mis_penalty -G $gap_cost -E $gap_extension -b $hits_returns";
+	my $rr_hits_returns = 10;
+	my $rr_blast_parameters = "-F F -a $thread_num -W $rr_blast_word_size -q $mis_penalty -G $gap_cost -E $gap_extension -b $rr_hits_returns";
 	if ($strand_specific) { $rr_blast_parameters .=" -S 1"; }
 
 	# part A: 1. align reads to plant virus; 2. extract aligned seqs; 3. remove redundancy contigs
@@ -190,7 +190,7 @@ foreach my $sample (@ARGV)
 	Util::process_cmd("$BIN_DIR/samtools mpileup -f $reference $sample.sorted.bam > $sample.pileup 2> $TEMP_DIR/samtools.log", $debug) unless (-s "$sample.pre.pileup");
 	align::pileup_filter("$sample.pre.pileup", "$seq_info", "$coverage", "$sample.pileup", $debug) unless (-s "$sample.pileup");	# filter pileup file 
 	align::pileup_to_contig("$sample.pileup", "$sample.aligned", 40, 1, 'ALIGNED') unless -s "$sample.aligned"; # input, output, min_len, min_depth, prefix
-	align::removeRedundancy("$sample.aligned", $rr_blast_parameters, $max_end_clip, $min_overlap, $BIN_DIR, $debug);
+	align::removeRedundancy("$sample.aligned", $sample, $rr_blast_parameters, $max_end_clip, $min_overlap, $BIN_DIR, $TEMP_DIR, $debug);
 	
 	
 
