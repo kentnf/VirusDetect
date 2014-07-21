@@ -207,13 +207,12 @@ foreach my $sample (@ARGV)
 		align::velvet_optimiser_combine($sample, "$sample.assembled", 9, 19, 5, 25, $objective_type, $BIN_DIR, $TEMP_DIR, $debug);
 	}
 
-	align::remove_redundancy("$sample.assemblied", $sample, $rr_blast_parameters, $max_end_clip, $min_overlap, $BIN_DIR, $TEMP_DIR, $debug);
+	align::remove_redundancy("$sample.assembled", $sample, $rr_blast_parameters, $max_end_clip, $min_overlap, $BIN_DIR, $TEMP_DIR, $debug);
 	
 	# combine the known and unknown virus, remove redundancy of combined results, it must be using strand_specific parameter
 	Util::print_user_message("Remove redundancies in virus contigs");
 	Util::process_cmd("cat $sample.aligned $sample.assembled > $sample.combined", $debug);
 	align::remove_redundancy("$sample.combined", $sample, $rr_blast_parameters, $max_end_clip, $min_overlap, $BIN_DIR, $TEMP_DIR, $debug);
-
 
 	# identify the virus
 	Util::print_user_message("Virus identification");
