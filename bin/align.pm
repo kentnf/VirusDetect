@@ -595,9 +595,9 @@ sub remove_redundancy
 	# finish remove redundancy, next for base correction
 	my $cpu_num = 20;
 	if ($parameters =~ m/-a (\d+)/) { $cpu_num = $1; }
+
 	base_correction($read_file, $contig_file, $cpu_num, $bin_dir, $temp_dir, $debug);
 }
-
 
 =head2 
  base_correction -- correct contig base using reads aligned to contigs
@@ -606,7 +606,7 @@ sub remove_redundancy
 
 sub base_correction
 {
-	my ($read_file, $contig_file, $cpu_num, $bin_dir, $temp_dir, $debug);
+	my ($read_file, $contig_file, $cpu_num, $bin_dir, $temp_dir, $debug) = @_;
 
 	my $file_type = Util::detect_FileType($read_file);
 	my $format = '';

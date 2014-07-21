@@ -34,8 +34,9 @@ sub process_cmd {
 	return($ret);
 }
 
-sub detect_FileType{
+sub detect_FileType {
 	my $file = shift;
+	die "[ERR]Undef $file\n" unless -s $file; 
 	open(FH, $file) || die $!;
 	my $line = <FH>;
 	my $file_type;
