@@ -81,12 +81,13 @@ sub generate_unmapped_reads
 
 =head2
 
-  filter_SAM -- filter sam file
+  filter_SAM -- filter sam file ,unmapped reads, 2nd hits
 
 =cut
 sub filter_SAM
 {
         my $input_SAM = shift;
+
         my $temp_SAM = $input_SAM.".temp";
         my ($total_count, $filtered_count) = (0, 0);
         my ($query_col, $opt_col) = (0, 11);    # query and option column number for sam
@@ -112,6 +113,9 @@ sub filter_SAM
         $out->close;
         Util::process_cmd("mv $temp_SAM $input_SAM");
         #print STDERR "This program filtered $filtered_count out of $total_count reads (" . sprintf("%.2f", $filtered_count / $total_count * 100) . ") as unmapped reads, only for BWA\n";
+
+
+
         $in  = IO::File->new($input_SAM) || die $!;
         $out = IO::File->new(">".$temp_SAM) || die $!;
         while(<$in>)
@@ -152,6 +156,7 @@ sub filter_SAM
                 $total_count++;
         }
         $in->close;
+
         # parse final query recoed
         if (scalar(@alignment) > 0)
         {
@@ -165,6 +170,9 @@ sub filter_SAM
         }
         $out->close;
         $filtered_count = $total_count - $kept_align;
+
+	Util::process_cmd("mv $temp_SAM $input_SAM");	
+
         #print STDERR "This program filtered $filtered_count out of $total_count reads (" . sprintf("%.2f", $filtered_count / $total_count * 100) . ") as 2ndhits reads, only for BWA\n";
 }
 
