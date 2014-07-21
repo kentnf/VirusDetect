@@ -246,7 +246,7 @@ main: {
 		{
 			Util::process_cmd("touch $sample_dir/no_novel_virus_detected", $debug);
 			Util::process_cmd("cp $novel_contig $sample_dir/unknown.contigs.fa", $debug);
-			next;
+			exit;
 		}
 	
 		# 4. get coverage remove redundancy 
