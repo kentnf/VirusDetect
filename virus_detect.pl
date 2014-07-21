@@ -99,7 +99,7 @@ my $depth_cutoff = 5;				# depth cutoff for final result
 
 # disabled parameters or used as fixed value
 my $input_suffix='clean'; 			# input_suffix, disabled
-my $coverage=0.3;  				# √øÃı≤Œøº–Ú¡–»Áπ˚±ªreads∏≤∏«µƒ≤ø∑÷’º»´≥§±»¿˝µƒ„–÷µ
+my $coverage = 0.3;  				# √øÃı≤Œøº–Ú¡–»Áπ˚±ªreads∏≤∏«µƒ≤ø∑÷’º»´≥§±»¿˝µƒ„–÷µ
 my $objective_type='maxLen';			# objective type for Velvet assembler: n50°¢maxLen, avgLen
 my $diff_ratio= 0.25;
 my $diff_contig_cover = 0.5;
@@ -187,11 +187,8 @@ foreach my $sample (@ARGV)
 	align::filter_SAM($sample.".sam");	# filter out unmapped, 2nd hits, only keep the best hit
 	Util::process_cmd("$BIN_DIR/samtools view -bt $reference.fai $sample.sam > $sample.bam 2> $TEMP_DIR/samtools.log", $debug) unless (-s "$sample.bam");
 	Util::process_cmd("$BIN_DIR/samtools sort $sample.bam $sample.sorted 2> $TEMP_DIR/samtools.log", $debug) unless (-s "$sample.sorted.bam");
-	Util::process_cmd("$BIN_DIR/samtools mpileup -f $reference $sample.sorted.bam > $sample.pileup 2> $TEMP_DIR/samtools.log", $debug) unless (-s "$sample.pre.pileup");
+	Util::process_cmd("$BIN_DIR/samtools mpileup -f $reference $sample.sorted.bam > $sample.pre.pileup 2> $TEMP_DIR/samtools.log", $debug) unless (-s "$sample.pre.pileup");
 	align::pileup_filter("$sample.pre.pileup", "$seq_info", "$coverage", "$sample.pileup", $debug) unless (-s "$sample.pileup");	# filter pileup file 
-
-	exit;
-
 	align::pileup_to_contig("$sample.pileup", "$sample.aligned", 40, 1, 'ALIGNED') unless -s "$sample.aligned"; # input, output, min_len, min_depth, prefix
 	align::remove_redundancy("$sample.aligned", $sample, $rr_blast_parameters, $max_end_clip, $min_overlap, $BIN_DIR, $TEMP_DIR, $debug);
 	
