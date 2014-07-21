@@ -21,16 +21,18 @@ use Util;
 =cut
 sub align_to_reference
 {
-	my ($align_program, $input_file, $reference, $output_file, $parameters, $temp_folder, $debug) = @_;
+	my ($align_program, $input_file, $reference, $output_file, $parameters, $mhit_num, $temp_folder, $debug) = @_;
 
 	# align for bwa
 	if ($align_program =~ m/bwa/)
 	{
 		my $sai = $temp_folder."/bwa.sai";
 		my $log = $temp_folder."/bwa.log";
+		my $bwa_mhit_param = "-n $mhit_num";
+		if ($mhit_num > 1 ) { $bwa_mhit_param = "-n $mhit_num -s"  }
 		Util::process_cmd("$align_program index -p $reference -a bwtsw $reference 2> $log", $debug) unless -s "$reference.amb";
 		Util::process_cmd("$align_program aln $parameters $reference $input_file 1> $sai 2>> $log", $debug);
-		Util::process_cmd("$align_program samse -n 10000 -s $reference $sai $input_file 1> $output_file 2>> $log", $debug);
+		Util::process_cmd("$align_program samse $bwa_mhit_param $reference $sai $input_file 1> $output_file 2>> $log", $debug);
 	}
 
 	# align for bowtie2

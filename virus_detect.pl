@@ -183,7 +183,7 @@ foreach my $sample (@ARGV)
 
 	print ("####################################################################\nprocess sample $sample_base\n");
 	Util::print_user_message("Align reads to reference virus sequence database");
-	align::align_to_reference($align_program, $sample, $reference, "$sample.sam", $align_parameters, $TEMP_DIR, $debug);
+	align::align_to_reference($align_program, $sample, $reference, "$sample.sam", $align_parameters, 10000, $TEMP_DIR, $debug);
 	align::filter_SAM($sample.".sam");	# filter out unmapped, 2nd hits, only keep the best hit
 	Util::process_cmd("$BIN_DIR/samtools view -bt $reference.fai $sample.sam > $sample.bam 2> $TEMP_DIR/samtools.log", $debug) unless (-s "$sample.bam");
 	Util::process_cmd("$BIN_DIR/samtools sort $sample.bam $sample.sorted 2> $TEMP_DIR/samtools.log", $debug) unless (-s "$sample.sorted.bam");
@@ -196,10 +196,11 @@ foreach my $sample (@ARGV)
 	# parameter for velvet: $sample, $output_contig, $kmer_start, $kmer_end, $coverage_start, $coverage_end, $objective_type, $bin_dir, $temp_dir, $debug
 	if( $host_reference ){
 		Util::print_user_message("Align reads to host reference sequences");
-		align::align_to_reference($align_program, $sample, $host_reference, "$sample.sam", $align_parameters, $TEMP_DIR, $debug);
+		align::align_to_reference($align_program, $sample, $host_reference, "$sample.sam", $align_parameters, 1, $TEMP_DIR, $debug);
 		align::generate_unmapped_reads("$sample.sam", "$sample.unmapped");
 		Util::print_user_message("De novo assembly");
 		align::velvet_optimiser_combine("$sample.unmapped", "$sample.assembled", 9, 19, 5, 25, $objective_type, $BIN_DIR, $TEMP_DIR, $debug);
+		align::velvet_optimiser_combine("$sample.unmapped", "$sample.assembled", 15, 19, 10, 14, $objective_type, $BIN_DIR, $TEMP_DIR, $debug);
 	}	
 	else
 	{
