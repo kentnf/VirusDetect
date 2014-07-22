@@ -253,7 +253,7 @@ sub pileup_to_contig
 	#java -cp java -cp $BIN_DIR extractConsensus $sample 1 40 $i
 	my %contig;
 	my $contig_num = 0;
-	$prefix = 'ALIGNED';
+	$prefix = 'PILEUP2SEQ' unless $prefix;
 
 	my $fh = IO::File->new($input_pileup) || die $!;
 	my $out = IO::File->new(">".$output_seq) || die $!;
@@ -754,12 +754,8 @@ sub base_correction
                 next;
         }
 
-	exit;
-
 	# rewrite contig file using pileup to contigs
 	pileup_to_contig("$read_file.pileup", $contig_file, 40, 1, $perfix);
-        #Util::process_cmd("java -cp $BIN_DIR extractConsensus $sample 1 40 $i");
-        #renameFasta("$sample.contigs$i.fa", "$sample.$input_suffix", $contig_prefix);
 
 	# remove temp files
         system("rm $read_file.sam");

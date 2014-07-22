@@ -183,16 +183,14 @@ foreach my $sample (@ARGV)
 
 	print ("####################################################################\nprocess sample $sample_base\n");
 	Util::print_user_message("Align reads to reference virus sequence database");
-	#align::align_to_reference($align_program, $sample, $reference, "$sample.sam", $align_parameters, 10000, $TEMP_DIR, $debug);
-	#align::filter_SAM($sample.".sam");	# filter out unmapped, 2nd hits, only keep the best hit
-	#Util::process_cmd("$BIN_DIR/samtools view -bt $reference.fai $sample.sam > $sample.bam 2> $TEMP_DIR/samtools.log", $debug) unless (-s "$sample.bam");
-	#Util::process_cmd("$BIN_DIR/samtools sort $sample.bam $sample.sorted 2> $TEMP_DIR/samtools.log", $debug) unless (-s "$sample.sorted.bam");
-	#Util::process_cmd("$BIN_DIR/samtools mpileup -f $reference $sample.sorted.bam > $sample.pre.pileup 2> $TEMP_DIR/samtools.log", $debug) unless (-s "$sample.pre.pileup");
-	#align::pileup_filter("$sample.pre.pileup", "$seq_info", "$coverage", "$sample.pileup", $debug) unless (-s "$sample.pileup");	# filter pileup file 
-	#align::pileup_to_contig("$sample.pileup", "$sample.aligned", 40, 0, 'ALIGNED'); # input, output, min_len, min_depth, prefix
+	align::align_to_reference($align_program, $sample, $reference, "$sample.sam", $align_parameters, 10000, $TEMP_DIR, $debug);
+	align::filter_SAM($sample.".sam");	# filter out unmapped, 2nd hits, only keep the best hit
+	Util::process_cmd("$BIN_DIR/samtools view -bt $reference.fai $sample.sam > $sample.bam 2> $TEMP_DIR/samtools.log", $debug) unless (-s "$sample.bam");
+	Util::process_cmd("$BIN_DIR/samtools sort $sample.bam $sample.sorted 2> $TEMP_DIR/samtools.log", $debug) unless (-s "$sample.sorted.bam");
+	Util::process_cmd("$BIN_DIR/samtools mpileup -f $reference $sample.sorted.bam > $sample.pre.pileup 2> $TEMP_DIR/samtools.log", $debug) unless (-s "$sample.pre.pileup");
+	align::pileup_filter("$sample.pre.pileup", "$seq_info", "$coverage", "$sample.pileup", $debug) unless (-s "$sample.pileup");	# filter pileup file 
+	align::pileup_to_contig("$sample.pileup", "$sample.aligned", 40, 0, 'ALIGNED'); # input, output, min_len, min_depth, prefix
 	align::remove_redundancy("$sample.aligned", $sample, $rr_blast_parameters, $max_end_clip, $min_overlap, 'ALIGNED', $BIN_DIR, $TEMP_DIR, $debug);
-
-	exit;
 	
 	# part B: 1. remove host related reads  2. de novo assembly 3. remove redundancy contigs
 	# parameter for velvet: $sample, $output_contig, $kmer_start, $kmer_end, $coverage_start, $coverage_end, $objective_type, $bin_dir, $temp_dir, $debug
@@ -216,6 +214,8 @@ foreach my $sample (@ARGV)
 	Util::print_user_message("Remove redundancies in virus contigs");
 	Util::process_cmd("cat $sample.aligned $sample.assembled > $sample.combined", $debug);
 	align::remove_redundancy("$sample.combined", $sample, $rr_blast_parameters, $max_end_clip, $min_overlap, 'COMBINED', $BIN_DIR, $TEMP_DIR, $debug);
+
+	exit;
 
 	# identify the virus
 	Util::print_user_message("Virus identification");
