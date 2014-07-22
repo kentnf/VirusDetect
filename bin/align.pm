@@ -250,6 +250,7 @@ sub pileup_to_contig
 {
 	my ($input_pileup, $output_seq, $len_cutoff, $depth_cutoff, $prefix) = @_;
 
+	#java -cp java -cp $BIN_DIR extractConsensus $sample 1 40 $i
 	my %contig;
 	my $contig_num = 0;
 	$prefix = 'ALIGNED';
@@ -260,15 +261,7 @@ sub pileup_to_contig
 	my $line = <$fh>; chomp($line); die "[ERROR]Pileup File, 1st Line $line\n" if $line =~ m/^#/;
 	my @t = split(/\t/, $line); die "[EROR]Pileup File, Line $line\n" if scalar @t < 5;
 	my ($pre_id, $pre_pos, $base, $dep, $align) = ($t[0], $t[1], $t[2], $t[3], $t[4]);
-        my $match_depth = $align =~ tr/.,/.,/; my $match_max = $match_depth;
-        my $match_baseA = $align =~ tr/Aa/Aa/;
-        my $match_baseT = $align =~ tr/Tt/Tt/;
-        my $match_baseC = $align =~ tr/Cc/Cc/;
-        my $match_baseG = $align =~ tr/Gg/Gg/;
-        if ($match_baseA >= $match_max) { $match_max = $match_baseA; $base = 'A'; }
-        if ($match_baseT >= $match_max) { $match_max = $match_baseT; $base = 'T'; }
-        if ($match_baseC >= $match_max) { $match_max = $match_baseC; $base = 'C'; }
-        if ($match_baseG >= $match_max) { $match_max = $match_baseG; $base = 'G'; }
+	$base = get_best_base($base, $dep, $align, $line);
 	my $seq = $base;
 	my $len = 1;
 	my ($id, $pos, $depth, $qual);
@@ -283,53 +276,7 @@ sub pileup_to_contig
 		($id, $pos, $base, $depth, $align, $qual) = ($a[0], $a[1], $a[2], $a[3], $a[4], $a[5]);
 
 		# get best base by depth and quality
-		$align =~ s/\^\S//g;
-		$align =~ s/\d+\S//g;
-		$align =~ s/\$//g;
-		$align =~ s/\+//g;
-		$align =~ s/-//g;
-		die "[ERROR]Align Len $_\n$align\n" if length($align) != $depth;
-		die "[ERROR]Qua Len" if length($qual) != $depth;
-		$align =~ tr/atcg/ATCG/;
-
-		my @m = split(//, $align);
-		my @n = split(//, $qual);
-		my %binfo = ();
-		my $maxb = 1;
-		for(my $i=0; $i<$depth; $i++)
-		{
-			my $b = $m[$i];
-			my $q = ord($n[$i]);
-			$b = $base if ($b eq "," || $b eq ".");
-
-			if (defined $binfo{$b}{'freq'}) {
-				$binfo{$b}{'freq'}++;
-				if ($binfo{$b}{'freq'} > $maxb) { $maxb = $binfo{$b}{'freq'}; }
-			} else {
-				$binfo{$b}{'freq'} = 1;
-			}
-
-			if (defined $binfo{$b}{'qual'}) {
-				$binfo{$b}{'qual'}+=$q;
-			} else {
-				$binfo{$b}{'qual'} = $q;
-			}
-		}
-
-		my @maxb;
-		foreach my $b (sort keys %binfo) {
-			if ($binfo{$b}{'freq'} == $maxb) {
-				push(@maxb, $b)
-			}
-		}
-
-		my $maxq = 0;
-		foreach my $b (@maxb) {
-			if ($binfo{$b}{'qual'} > $maxq) {
-				$maxq = $binfo{$b}{'qual'};
-				$base = $b;
-			}	
-		}
+		$base = get_best_base($base, $depth, $align, $_);
 
 		#gene the contig sequence
 		if ( $id eq $pre_id ) # same reference
@@ -345,7 +292,7 @@ sub pileup_to_contig
 			else # end pre contig, start new one
 			{
 
-				if ( $len > $len_cutoff && ($dep/$len > $depth_cutoff)) {
+				if ( $len > $len_cutoff && ($dep/$len >= $depth_cutoff)) {
 					die "[ERROR]Already defined contig $pre_id $pre_pos $seq\n" if defined $contig{$pre_id."#".$pre_pos};
 					$contig{$pre_id."#".$pre_pos} = $seq;
 					$contig_num++;
@@ -362,7 +309,7 @@ sub pileup_to_contig
 		else
 		{
 			# end pre contig, start new one
-			if ( $len > $len_cutoff && ($dep/$len > $depth_cutoff)) {
+			if ( $len > $len_cutoff && ($dep/$len >= $depth_cutoff)) {
 				die "[ERROR]Already defined contig $pre_id $pre_pos $seq\n" if defined $contig{$pre_id."#".$pre_pos};
 				$contig{$pre_id."#".$pre_pos} = $seq;
 				$contig_num++;
@@ -388,6 +335,178 @@ sub pileup_to_contig
 
 	$out->close;
 }
+
+sub get_best_base
+{
+	my ($ref_base, $depth, $align, $line) = @_;
+
+	my @m = split(/\t/, $line);
+
+        my @acgt = qw/A C G T/;	# order of base have same frequence
+
+        my ($match_num, $ins_num, $del_num) = (0, 0 ,0);
+	$depth = $depth + 0.00001;
+        my ($mut_depth, $ins_depth, $del_depth) = ($depth, $depth, $depth);
+        my ($mut_percent, $ins_percent, $del_percent);
+
+        $ref_base = uc($ref_base);
+	my $best_base = $ref_base;
+	my $map_str = uc($align);
+
+        # init base freq
+        my %base_count;
+	foreach my $b (@acgt) { $base_count{$b} = 0; }
+
+        # parse alignment
+	my @ins_list;       
+        for(my $i=0; $i<length($map_str); $i++)
+        {
+                my $letter = substr($map_str, $i, 1);
+
+                if ($letter eq '^')
+                {
+                        $i++;
+                        $del_depth--;
+                }
+                elsif ($letter eq '$')
+                {
+                        $ins_depth--;
+                        $del_depth--;
+                }
+                elsif ($letter eq '+')
+                {
+
+			#print $i."\n" if ( $m[0] eq 'AB509457' && $m[1] == 1134 );
+
+                        my $ins_str = '';
+                        ($i, $ins_str) = parse_indel_str($map_str, $i);
+			push(@ins_list, $ins_str);	
+                        $ins_num++;
+
+			#print $i."\n" if ( $m[0] eq 'AB509457' && $m[1] == 1134 );
+			#print $ins_str."\n" if ( $m[0] eq 'AB509457' && $m[1] == 1134 );
+
+                }
+                elsif ($letter eq '-')
+                {
+			my $ins_str = '';
+			($i, $ins_str) = parse_indel_str($map_str, $i);
+			
+                }
+                elsif ($letter eq '*')
+                {
+			$del_num++;
+                }
+                elsif ($letter eq ',' || $letter eq '.')
+                {
+                        $match_num++;
+                }
+                elsif ($letter eq 'N' || $letter eq 'n')
+                {
+                        $mut_depth--;
+                }
+                elsif ( defined $base_count{$letter} ) 
+		{  
+			$base_count{$letter}++;
+		}
+        }
+
+        $base_count{$ref_base} = $match_num;
+
+	my $max_mut_percent = 0;
+	my $max_countx;
+	foreach my $b (@acgt)
+	{
+                if ( $base_count{$b} > $max_mut_percent) {
+                        $max_mut_percent = $base_count{$b};
+                        $best_base = $b;
+			$max_countx = $base_count{$b};
+                }
+        }
+
+	# check base freq for debug
+        # if ( $m[0] eq 'AY459601' && $m[1] == 652 ) {
+	#	foreach my $b (sort keys %base_count) {
+	#		print $b."\t".$base_count{$b}."\n";
+	#	}
+	#	print "$max_countx\t$mut_depth\t",$max_countx/$mut_depth,"\t$best_base\n";
+	#}
+
+        $max_mut_percent = sprintf("%.4f", ($max_mut_percent / $mut_depth));
+        $ins_percent = sprintf("%.4f", ($ins_num / $ins_depth));
+        $del_percent = sprintf("%.4f", ($del_num / $del_depth));
+
+	# get max count of ins
+	my %ins_count;
+        my $max_count = 0;
+        my $max_str = "";
+
+	if($ins_num > 0)
+	{
+		foreach my $ins_str (@ins_list)
+		{
+			if (defined $ins_count{$ins_str}) {
+				$ins_count{$ins_str}++;
+			} else {
+				$ins_count{$ins_str} = 1
+			}
+		}
+
+		foreach my $ins_str (@ins_list)
+		{
+			if ($ins_count{$ins_str} > $max_count) {
+				$max_count = $ins_count{$ins_str};
+				$max_str = $ins_str;
+			}
+		}
+        }
+
+        # find best base when indel have higher percentage
+        my $max_percent = $max_mut_percent;
+
+        if($del_percent > $max_percent)
+        {
+		$max_percent = $del_percent;
+		$best_base = "";
+        }
+
+        if($ins_percent >= $max_percent)
+        {
+		$max_percent = $ins_percent;
+		$best_base = $ref_base.$max_str;
+        }
+
+	# check point for debug
+	# if ( $m[0] eq 'AY459601' && $m[1] == 652 ) {
+	#	print $line."\n";
+	#	print "$best_base, $max_str, $max_mut_percent ($max_count/$mut_depth), $ins_percent ($ins_num/$ins_depth), $del_percent ($del_num/$del_depth)\n";
+	#	die;
+	#}
+
+        return $best_base;
+}
+
+sub parse_indel_str
+{
+        my ($map_str, $i) = @_;
+
+	$i++; # skip the + / -
+	
+	# get the freq and pattern of indel
+	my $sub_map_str = substr($map_str, $i);
+	my $ins_num;
+	if ($sub_map_str =~ m/^(\d+)/) {
+		$ins_num = $1;
+	}
+	
+	my $begin = $i + length($ins_num);
+	my $end = $i + $ins_num;
+	my $ins_str = substr($map_str, $begin, $ins_num);
+
+	#print "INS:$ins_num\t$ins_str\n"; # for debug
+        return ($end, $ins_str);
+}
+
 
 =head
 # input reads;
