@@ -215,8 +215,6 @@ foreach my $sample (@ARGV)
 	Util::process_cmd("cat $sample.aligned $sample.assembled > $sample.combined", $debug);
 	align::remove_redundancy("$sample.combined", $sample, $rr_blast_parameters, $max_end_clip, $min_overlap, 'COMBINED', $BIN_DIR, $TEMP_DIR, $debug);
 
-	exit;
-
 	# identify the virus
 	Util::print_user_message("Virus identification");
 	my $cmd_identify = "$BIN_DIR/virus_identify.pl ";
