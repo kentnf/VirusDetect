@@ -692,13 +692,12 @@ sub contigStats
 =cut
 sub remove_redundancy
 {
-	my ($contig_file, $read_file, $parameters, $max_end_clip, $min_overlap, $bin_dir, $temp_dir, $debug) = @_;
+	my ($contig_file, $read_file, $parameters, $max_end_clip, $min_overlap, $perfix, $bin_dir, $temp_dir, $debug) = @_;
 
 	my $min_identity = '';	# pass this value to other subroutine for furture functions
 
 	# step 1. remove low complexity sequence using dust, 2 remov XN reads
-	dust_parse($contig_file, $bin_dir, $debug);
-	trim_XNseq($contig_file, 0.8, 40);
+	trim_XNseq($contig_file, 0.8, 40, $bin_dir, $debug);
 
 	# step 2. get number of contigs 
 	my ($before_contig_num, $after_contig_num);
@@ -725,7 +724,7 @@ sub remove_redundancy
 	my $cpu_num = 20;
 	if ($parameters =~ m/-a (\d+)/) { $cpu_num = $1; }
 
-	base_correction($read_file, $contig_file, $cpu_num, $bin_dir, $temp_dir, $debug);
+	base_correction($read_file, $contig_file, $cpu_num, $perfix, $bin_dir, $temp_dir, $debug);
 }
 
 =head2 
@@ -735,7 +734,7 @@ sub remove_redundancy
 
 sub base_correction
 {
-	my ($read_file, $contig_file, $cpu_num, $bin_dir, $temp_dir, $debug) = @_;
+	my ($read_file, $contig_file, $cpu_num, $perfix, $bin_dir, $temp_dir, $debug) = @_;
 
 	my $file_type = Util::detect_FileType($read_file);
 	my $format = '';
@@ -755,7 +754,10 @@ sub base_correction
                 next;
         }
 
-	pileup_to_contig("$read_file.pileup", $contig_file, 40, 1, 'UNIQUE');
+	exit;
+
+	# rewrite contig file using pileup to contigs
+	pileup_to_contig("$read_file.pileup", $contig_file, 40, 1, $perfix);
         #Util::process_cmd("java -cp $BIN_DIR extractConsensus $sample 1 40 $i");
         #renameFasta("$sample.contigs$i.fa", "$sample.$input_suffix", $contig_prefix);
 
@@ -784,29 +786,21 @@ sub count_seq
 	return $seq_num;
 }
 
-=head2
- dust_parse -- using dust to remove low complexity contigs 
-=cut
-sub dust_parse
-{
-	my ($input_contig, $bin_dir, $debug) = @_;
-	Util::process_cmd("$bin_dir/dust $input_contig 1> $input_contig.masked 2> $input_contig.dust.log", $debug);
-	Util::process_cmd("mv $input_contig.masked $input_contig", $debug);
-}
-
 =head
  trim_XNseq -- trim X N base in contigs
 =cut
 sub trim_XNseq
 {
-	my ($input_contigs, $max_Xratio, $min_BaseNum) = @_;
+	my ($input_contig, $max_Xratio, $min_BaseNum, $bin_dir, $debug) = @_;
 
 	$max_Xratio = 0.8 unless defined $max_Xratio; 
 	$min_BaseNum = 40 unless defined $min_BaseNum; 
 
-	my $output_seq = '';
+	Util::process_cmd("$bin_dir/dust $input_contig 1> $input_contig.masked 2> $input_contig.dust.log", $debug);
+	
+	my %good_contig;
 	my ($seq_length, $seq_id, $sequence);
-	my $in = Bio::SeqIO->new(-format=>'fasta', -file=>$input_contigs);
+	my $in = Bio::SeqIO->new(-format=>'fasta', -file=>"$input_contig.masked");
 	while(my $inseq = $in->next_seq)
 	{
 		$seq_length= $inseq->length;
@@ -820,11 +814,24 @@ sub trim_XNseq
 		}
 		else
 		{
-			$output_seq.=">$seq_id\n$sequence\n";
+			$good_contig{$seq_id} = 1;
 		}
 	}
 
-	my $fh = IO::File->new(">".$input_contigs) || die $!;
+	my $output_seq = '';
+	my $in2 = Bio::SeqIO->new(-format=>'fasta', -file=>$input_contig);
+        while(my $inseq = $in2->next_seq)
+        {
+                $seq_id    = $inseq->id;
+                $sequence  = $inseq->seq;
+                
+                if ( defined $good_contig{$seq_id} )
+                {
+         		$output_seq.=">$seq_id\n$sequence\n";               
+                }
+        }	
+
+	my $fh = IO::File->new(">".$input_contig) || die $!;
 	print $fh $output_seq;
 	$fh->close;
 }
