@@ -29,7 +29,7 @@ use Util;
 my $usage = <<_EOUSAGE_;
 
 #########################################################################################
-# virus_itentify.pl [options] input_read contig
+# virus_itentify.pl [options] --reference reference input_read contig
 #  		
 #  		the contig was assembled from input_read
 #
@@ -175,9 +175,20 @@ main: {
 	my $blast_param   = "-F $filter_query -a $cpu_num -W $word_size -q $mis_penalty -G $gap_cost -E $gap_extension -b $hits_return -e $exp_value";
 	Util::process_cmd("$blast_program -i $contig -d $reference -o $blast_output $blast_param", $debug) unless -s $blast_output;
 	my $blast_table  = Util::parse_blast_to_table($blast_output, $blast_program);
+
+	Util::save_file($blast_table, "$sample.blastn.table1");	# checking files
+
 	my $nn1 = Util::line_num($blast_table);
 	   $blast_table  = Util::filter_blast_table($blast_table, $hsp_cover, $drop_off, $blast_program);
+
+	Util::save_file($blast_table, "$sample.blastn.table");	# checking files
+
 	my ($known_contig, $known_blast_table) = Util::find_known_contig($blast_table, 60, 50);
+
+	open(FHA, ">"."$sample.known.contigs") || die $!;	# checking files
+	foreach my $cid (sort keys %$known_contig) { print FHA $cid."\n"; } 
+	close(FHA);
+
 	unlink($blast_output) unless $debug;
 	if (scalar(keys(%$known_contig)) == 0) { system("touch $sample_dir/no_virus_detected"); exit; }
 
@@ -190,7 +201,13 @@ main: {
 
 	# 4. get hit coverage information, then remove redundancy hit 
 	my ($known_coverage, $known_block) = Util::get_hit_coverage($known_blast_table, 60, 0.5, 1);
+
+	Util::save_file($known_coverage, "$sample.known.cov");  # checking files
+
 	my $known_identified = Util::remove_redundancy_hit($known_coverage, $known_blast_table, $diff_ratio, $diff_contig_cover, $diff_contig_length);
+
+	Util::save_file($known_identified, "$sample.known.identified");
+	
 
 	# 5. aligne read to contigs get depth, then compute reference depth using contig depth
 	# key: contig ID, depth, coverage; value: depth, coverage
@@ -198,6 +215,8 @@ main: {
 	my %known_depth  = correct_depth($known_identified, \%contig_depth, \%contig_info);
 
 	$known_identified = filter_by_coverage_depth($known_identified, \%known_depth, $coverage_cutoff, $depth_cutoff);
+
+	Util::save_file($known_identified, "$sample.known.identified_with_depth");
 
 	my ($known_contig_table, $known_contig_blast_table, $known_reference) =  combine_table1($known_identified, $known_blast_table, \%contig_info, \%virus_info, \%reference_info);
 	my $known_contig_blast_sam = Util::blast_table_to_sam($known_contig_blast_table);
@@ -369,9 +388,9 @@ sub get_contig_mapped_depth
 	Util::process_cmd("$BIN_DIR/bowtie-build --quiet $contig $contig", $debug);
 	Util::process_cmd("$BIN_DIR/bowtie --quiet $contig -v 1 -p $cpu_num -a --best --strata $format $sample -S --sam-nohead $sample.sam", $debug);
 	Util::process_cmd("$BIN_DIR/samtools faidx $contig");
-	Util::process_cmd("$BIN_DIR/samtools view -bt $contig.fai $sample.sam > $sample.bam");
-	Util::process_cmd("$BIN_DIR/samtools sort $sample.bam $sample.sorted");
-	Util::process_cmd("$BIN_DIR/samtools mpileup -f $contig $sample.sorted.bam > $sample.pileup"); 
+	Util::process_cmd("$BIN_DIR/samtools view -bt $contig.fai $sample.sam > $sample.bam 2>$sample.samtools.log");
+	Util::process_cmd("$BIN_DIR/samtools sort $sample.bam $sample.sorted 2>$sample.samtools.log");
+	Util::process_cmd("$BIN_DIR/samtools mpileup -f $contig $sample.sorted.bam > $sample.pileup 2>$sample.samtools.log"); 
 	my %depth = Util::pileup_depth("$sample.pileup");
 
 	# unlink temp file

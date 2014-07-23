@@ -13,7 +13,7 @@ use align;
 
 my $usage = <<_EOUSAGE_;
 ########################################################################
-# virus_detect.pl --reference [FILE] [option] input
+# virus_detect.pl [option] --reference reference input1 input2 ...
 #  
 # Basic Options:
 #  --reference		The name of a fasta file containing the virus 
@@ -58,8 +58,6 @@ my $usage = <<_EOUSAGE_;
 _EOUSAGE_
 ;
 
-my $file_list;
-
 # basic options
 my $reference= "vrl_plant";			# virus sequence
 my $host_reference;       			# host reference
@@ -98,18 +96,19 @@ my $coverage_cutoff = 0.1;			# coverage cutoff for final result
 my $depth_cutoff = 5;				# depth cutoff for final result
 
 # disabled parameters or used as fixed value
-my $input_suffix='clean'; 			# input_suffix, disabled
 my $coverage = 0.3;  				# √øÃı≤Œøº–Ú¡–»Áπ˚±ªreads∏≤∏«µƒ≤ø∑÷’º»´≥§±»¿˝µƒ„–÷µ
 my $objective_type='maxLen';			# objective type for Velvet assembler: n50°¢maxLen, avgLen
 my $diff_ratio= 0.25;
 my $diff_contig_cover = 0.5;
 my $diff_contig_length= 100; 
+my $debug;
 
 # get input paras #
 GetOptions(
-	'r|reference=s'	=> 		\$reference,
-	'h|host_reference=s' => 	\$host_reference,
-	't|thread_num=i' => 		\$thread_num,
+	'r|reference=s'		=> 	\$reference,
+	'h|host_reference=s'	=> 	\$host_reference,
+	't|thread_num=i'	=> 	\$thread_num,
+	'd|debug'		=>	\$debug,
 
 	'max_dist=i' => 	\$max_dist,
 	'max_open=i' => 	\$max_open,
@@ -142,16 +141,15 @@ GetOptions(
 	'depth_cutoff=f' =>	\$depth_cutoff
 );
 
-my $debug = 1;
-
 # check input file
-die "Please input one file:\n\n$usage\n" unless scalar(@ARGV) == 1;
-die "Input file is not exist, please check it.\n\n$usage\n" unless -s $ARGV[0];
+if (scalar(@ARGV) < 1 ) {
+	print $usage; exit;
+}
 
-# check filetype
-
+# main
 foreach my $sample (@ARGV) 
 {
+	die $usage unless -s $sample;
 	my $file_type = Util::detect_FileType($sample);
 	my $sample_base = basename($sample);
 
@@ -213,7 +211,7 @@ foreach my $sample (@ARGV)
 	# combine the known and unknown virus, remove redundancy of combined results, it must be using strand_specific parameter
 	Util::print_user_message("Remove redundancies in virus contigs");
 	Util::process_cmd("cat $sample.aligned $sample.assembled > $sample.combined", $debug);
-	align::remove_redundancy("$sample.combined", $sample, $rr_blast_parameters, $max_end_clip, $min_overlap, 'COMBINED', $BIN_DIR, $TEMP_DIR, $debug);
+	align::remove_redundancy("$sample.combined", $sample, $rr_blast_parameters, $max_end_clip, $min_overlap, 'CONTIG', $BIN_DIR, $TEMP_DIR, $debug);
 
 	# identify the virus
 	Util::print_user_message("Virus identification");
@@ -221,11 +219,12 @@ foreach my $sample (@ARGV)
 	$cmd_identify .= "--word_size $word_size --exp_value $exp_value --identity_percen $percent_identity ";
 	$cmd_identify .= "--cpu_num $thread_num --mis_penalty $mis_penalty_b --gap_cost $gap_cost_b --gap_extension $gap_extension_b ";
 	$cmd_identify .= "--hsp_cover $hsp_cover --diff_ratio $diff_ratio --diff_contig_cover $diff_contig_cover --diff_contig_length $diff_contig_length ";
-	$cmd_identify .= "--coverage_cutoff $coverage_cutoff --depth_cutoff $depth_cutoff $sample $sample.combined";
+	$cmd_identify .= "--coverage_cutoff $coverage_cutoff --depth_cutoff $depth_cutoff $sample $sample.combined ";
+	$cmd_identify .= "-d" if $debug;
 	Util::process_cmd($cmd_identify, $debug);
 
 	# delete temp files and log files 
-	# system("rm -r *.log");
+	unlink("error.log", "formatdb.log");
 	# system("rm -r temp");
 
 	Util::print_user_message("Finished");
