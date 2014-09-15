@@ -190,6 +190,8 @@ foreach my $sample (@ARGV)
 	align::pileup_to_contig("$sample.pileup", "$sample.aligned", 40, 0, 'ALIGNED'); # input, output, min_len, min_depth, prefix
 	align::remove_redundancy("$sample.aligned", $sample, $rr_blast_parameters, $max_end_clip, $min_overlap, 'ALIGNED', $BIN_DIR, $TEMP_DIR, $debug);
 	
+	exit;
+	
 	# part B: 1. remove host related reads  2. de novo assembly 3. remove redundancy contigs
 	# parameter for velvet: $sample, $output_contig, $kmer_start, $kmer_end, $coverage_start, $coverage_end, $objective_type, $bin_dir, $temp_dir, $debug
 	if( $host_reference ){
