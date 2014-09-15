@@ -741,9 +741,16 @@ sub base_correction
 	$format = '-f' if $file_type eq 'fasta';
 	die "[ERR]Undef file type for $read_file\n" if ($file_type ne "fasta" && $file_type ne "fastq");
 	#aligment -> sam -> bam -> sorted bam -> pileup
-        Util::process_cmd("$bin_dir/bowtie-build --quiet -f $contig_file $contig_file", $debug);
-        Util::process_cmd("$bin_dir/samtools faidx $contig_file 2> $temp_dir/samtools.log", $debug);
-        Util::process_cmd("$bin_dir/bowtie --quiet -v 1 -p $cpu_num $format -S -a --best $contig_file $read_file $read_file.sam", $debug);
+        #Util::process_cmd("$bin_dir/bowtie-build --quiet -f $contig_file $contig_file", $debug);
+        #Util::process_cmd("$bin_dir/samtools faidx $contig_file 2> $temp_dir/samtools.log", $debug);
+        #Util::process_cmd("$bin_dir/bowtie --quiet -v 1 -p $cpu_num $format -S -a --best $contig_file $read_file $read_file.sam", $debug);
+
+	# try bowtie2
+	Util::process_cmd("bowtie2-build --quiet -f $contig_file $contig_file", $debug);
+	Util::process_cmd("$bin_dir/samtools faidx $contig_file 2> $temp_dir/samtools.log", $debug);
+	Util::process_cmd("bowtie2 --quiet --end-to-end -D 20 -R 3 -N 0 -L 13 -i S,1,0.50 --gbar 1 -p $cpu_num $format -a -x $contig_file -U $read_file -S $read_file.sam", $debug);
+
+
         Util::process_cmd("$bin_dir/samtools view -bS $read_file.sam > $read_file.bam 2> $temp_dir/samtools.log");
         Util::process_cmd("$bin_dir/samtools sort $read_file.bam $read_file.sorted 2> $temp_dir/samtools.log");
         Util::process_cmd("$bin_dir/samtools mpileup -f $contig_file $read_file.sorted.bam > $read_file.pileup 2> $temp_dir/samtools.log");
@@ -763,7 +770,8 @@ sub base_correction
         system("rm $read_file.sorted.bam");
         system("rm $read_file.pileup"); 	# must delete this file for next cycle remove redundancy
         system("rm $contig_file.fai");
-        system("rm $temp_dir/*.ebwt");
+        system("rm $temp_dir/*.ebwt") if -e "$read_file.1.ebwt";
+	system("rm $temp_dir/*.bt2") if -e "$read_file.1.bt2";
 }
 =cut
 
