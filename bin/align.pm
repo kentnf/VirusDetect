@@ -720,6 +720,10 @@ sub remove_redundancy
 		Util::print_user_submessage("None of uniq contig was generated");
 	}
 
+	if ($debug) {
+		print "[DEBUG]remove redundancy: BeforeContig: $before_contig_num; AfterContig: $after_contig_num\n";
+	}
+
 	# finish remove redundancy, next for base correction
 	my $cpu_num = 20;
 	if ($parameters =~ m/-a (\d+)/) { $cpu_num = $1; }
