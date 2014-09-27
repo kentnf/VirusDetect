@@ -27,69 +27,27 @@ sub align_to_reference
 		my $sai = $temp_folder."/bwa.sai";
 		my $log = $temp_folder."/bwa.log";
 		my $bwa_mhit_param = "-n $mhit_num";
-		if ($mhit_num > 1 ) { $bwa_mhit_param = "-n $mhit_num -s"  }
+		if ($mhit_num > 1 ) { $bwa_mhit_param = "-n $mhit_num";  }
 		Util::process_cmd("$align_program index -p $reference -a bwtsw $reference 2> $log", $debug) unless -s "$reference.amb";
 		Util::process_cmd("$align_program aln $parameters $reference $input_file 1> $sai 2>> $log", $debug);
 		Util::process_cmd("$align_program samse $bwa_mhit_param $reference $sai $input_file 1> $output_file 2>> $log", $debug);
-		xa2multi($output_file);
+		Util::xa2multi($output_file);
 	}
 
 	# align for bowtie2
 	if ($align_program =~ m/bowtie2/) 
 	{
-		my $build_program = $align_program."-build";
-		Util::process_cmd("$build_program $reference $reference", $debug) unless -s "$reference.1.bt2";
-		Util::process_cmd("$align_program $parameters -x $reference -U $input_file -S $output_file", $debug);		
+		die "[ERR]do not support bowtie2";
+		#my $build_program = $align_program."-build";
+		#Util::process_cmd("$build_program $reference $reference", $debug) unless -s "$reference.1.bt2";
+		#Util::process_cmd("$align_program $parameters -x $reference -U $input_file -S $output_file", $debug);		
 	}
 
 	return 1;
 }
 
-=head2
- xa2multi -- convert xa tag to multiply hit
-=cut
-sub xa2multi
-{
-	my $input_sam = shift;
-	my $tem_sam = $input_sam.".temp";
-
-	my $out = IO::File->new(">".$tem_sam) || die $!;
-	my $in = IO::File->new($input_sam) || die $!;
-	while (<$in>) {
-		if (/\tXA:Z:(\S+)/) 
-		{
-                	my $l = $1;
-			print $out $_;
-                	my @t = split("\t", $_);
-
-                	while ($l =~ /([^,;]+),([-+]\d+),([^,]+),(\d+);/g) 
-			{
-                        	my $mchr = ($t[6] eq $1)? '=' : $t[6]; # FIXME: TLEN/ISIZE is not calculated!
-	                        my $seq = $t[9];
-        	                my $phred = $t[10];
-                	        # if alternative alignment has other orientation than primary, 
-                        	# then print the reverse (complement) of sequence and phred string
-                        	if ((($t[1]&0x10)>0) xor ($2<0)) {
-                                	$seq = reverse $seq;
-	                                $seq =~ tr/ACGTacgt/TGCAtgca/;
-        	                        $phred = reverse $phred;
-                	        }
-
-	                        print $out (join("\t", $t[0], ($t[1]&0x6e9)|($2<0?0x10:0), $1, abs($2), 0, $3, @t[6..7], 0, $seq, $phred, "NM:i:$4"), "\n");
-        	        }
-        	} 
-		else 
-		{ 
-			print $out $_;
-		}
-	}
-	$in->close;
-	$out->close;
-	Util::process_cmd("mv $tem_sam $input_sam");
-}
-
 =head
-
+ generate_unmapped_reads -- xxx
 =cut
 sub generate_unmapped_reads
 {
@@ -107,7 +65,7 @@ sub generate_unmapped_reads
 		my @a = split(/\t/, $_);
 
 		if ( $a[1] == 4 ) {
-			print $out "\@$a[0]\n$a[9]\n+\n$a[10]\n";
+			print $out ">$a[0]\n$a[9]\n";
 			$num_unmapped_reads++;
 		} else {
 			$mapped_reads{$a[0]} = 1;
@@ -786,12 +744,25 @@ sub base_correction
 	my $format = '';
 	$format = '-f' if $file_type eq 'fasta';
 	die "[ERR]Undef file type for $read_file\n" if ($file_type ne "fasta" && $file_type ne "fastq");
-	#aligment -> sam -> bam -> sorted bam -> pileup
-        Util::process_cmd("$bin_dir/bowtie-build --quiet -f $contig_file $contig_file", $debug);
-        Util::process_cmd("$bin_dir/samtools faidx $contig_file 2> $temp_dir/samtools.log", $debug);
-        Util::process_cmd("$bin_dir/bowtie --quiet -v 1 -p $cpu_num $format -S -a --best $contig_file $read_file $read_file.sam", $debug);
 
-	# try bowtie2
+	# aligment -> sam -> bam -> sorted bam -> pileup -> contigs
+
+	# using bwa
+	my $sai = $temp_dir."/bwa.sai";
+	my $log = $temp_dir."/bwa.log";
+	my $parameters = "-n 1 -o 1 -e 1 -i 0 -l 15 -k 1 -t $cpu_num";
+	my $bwa_mhit_param = "-n 10000";
+	Util::process_cmd("$bin_dir/bwa index -p $contig_file -a bwtsw $contig_file 2> $log", $debug);
+	Util::process_cmd("$bin_dir/bwa aln $parameters $contig_file $read_file 1> $sai 2>> $log", $debug);
+	Util::process_cmd("$bin_dir/bwa samse $bwa_mhit_param $contig_file $sai $read_file 1> $read_file.sam 2>> $log", $debug);
+	Util::xa2multi("$read_file.sam");
+
+	# using bowtie
+	# Util::process_cmd("$bin_dir/bowtie-build --quiet -f $contig_file $contig_file", $debug);
+	# Util::process_cmd("$bin_dir/samtools faidx $contig_file 2> $temp_dir/samtools.log", $debug);
+	# Util::process_cmd("$bin_dir/bowtie --quiet -v 1 -p $cpu_num $format -S -a --best $contig_file $read_file $read_file.sam", $debug);
+
+	# using bowtie2
 	# Util::process_cmd("bowtie2-build --quiet -f $contig_file $contig_file", $debug);
 	# Util::process_cmd("$bin_dir/samtools faidx $contig_file 2> $temp_dir/samtools.log", $debug);
 	# Util::process_cmd("bowtie2 --quiet --end-to-end -D 20 -R 3 -N 0 -L 13 -i S,1,0.50 --gbar 1 -p $cpu_num $format -a -x $contig_file -U $read_file -S $read_file.sam", $debug);

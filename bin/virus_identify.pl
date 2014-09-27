@@ -384,9 +384,22 @@ sub get_contig_mapped_depth
 {
 	my ($contig, $sample, $cpu_num, $file_type) = @_;
 
-	my $format = ''; if( $file_type eq "fasta" ){ $format = "-f" };
-	Util::process_cmd("$BIN_DIR/bowtie-build --quiet $contig $contig", $debug);
-	Util::process_cmd("$BIN_DIR/bowtie --quiet $contig -v 1 -p $cpu_num -a --best --strata $format $sample -S --sam-nohead $sample.sam", $debug);
+
+	# using bw
+	my $sai = $sample."_bwa.sai";
+	my $log = $sample."_bwa.log";
+	my $parameters = "-n 1 -o 1 -e 1 -i 0 -l 15 -k 1 -t $cpu_num";
+	my $bwa_mhit_param = "-n 10000";
+	Util::process_cmd("$BIN_DIR/bwa index -p $contig -a bwtsw $contig 2> $log", $debug);
+	Util::process_cmd("$BIN_DIR/bwa aln $parameters $contig $sample 1> $sai 2>> $log", $debug);
+	Util::process_cmd("$BIN_DIR/bwa samse $bwa_mhit_param $contig $sai $sample 1> $sample.sam 2>> $log", $debug);
+	Util::xa2multi("$sample.sam");
+	
+	# using bowtie
+	# my $format = ''; if( $file_type eq "fasta" ){ $format = "-f" };
+	# Util::process_cmd("$BIN_DIR/bowtie-build --quiet $contig $contig", $debug);
+	# Util::process_cmd("$BIN_DIR/bowtie --quiet $contig -v 1 -p $cpu_num -a --best --strata $format $sample -S --sam-nohead $sample.sam", $debug);
+
 	Util::process_cmd("$BIN_DIR/samtools faidx $contig");
 	Util::process_cmd("$BIN_DIR/samtools view -bt $contig.fai $sample.sam > $sample.bam 2>$sample.samtools.log");
 	Util::process_cmd("$BIN_DIR/samtools sort $sample.bam $sample.sorted 2>$sample.samtools.log");
@@ -395,7 +408,6 @@ sub get_contig_mapped_depth
 
 	# unlink temp file
 	unlink("$sample.pileup", "$sample.sorted.bam", "$sample.bam", "$contig.fai", "$sample.sam") unless $debug;
-	unlink("$contig.1.ebwt", "$contig.2.ebwt", "$contig.3.ebwt", "$contig.4.ebwt", "$contig.rev.1.ebwt", "$contig.rev.2.ebwt") unless $debug;
 
 	return %depth;
 }

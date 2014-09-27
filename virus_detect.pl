@@ -115,7 +115,6 @@ GetOptions(
 	'max_extension=i' => 	\$max_extension,
 	'len_seed=i' => 	\$len_seed,
 	'dist_seed=i' => 	\$dist_seed,			 
-	
 		
 	'strand_specific!' => 	\$strand_specific,
 	'min_overlap=i' => 	\$min_overlap,
@@ -198,15 +197,13 @@ foreach my $sample (@ARGV)
 		align::generate_unmapped_reads("$sample.sam", "$sample.unmapped");
 		Util::print_user_message("De novo assembly");
 		align::velvet_optimiser_combine("$sample.unmapped", "$sample.assembled", 9, 19, 5, 25, $objective_type, $BIN_DIR, $TEMP_DIR, $debug);
-		align::velvet_optimiser_combine("$sample.unmapped", "$sample.assembled", 15, 19, 10, 14, $objective_type, $BIN_DIR, $TEMP_DIR, $debug);
 	}	
 	else
 	{
 		Util::print_user_message("De novo assembly");
 		align::velvet_optimiser_combine($sample, "$sample.assembled", 9, 19, 5, 25, $objective_type, $BIN_DIR, $TEMP_DIR, $debug);
 	}
-
-	align::remove_redundancy("$sample.assembled", $sample, $rr_blast_parameters, $max_end_clip, $min_overlap, 'ASSEMBLED',$BIN_DIR, $TEMP_DIR, $debug);
+	align::remove_redundancy("$sample.assembled", $sample, $rr_blast_parameters, $max_end_clip, $min_overlap, 'ASSEMBLED',$BIN_DIR, $TEMP_DIR, $debug) if -s "$sample.assembled";
 	
 	# combine the known and unknown virus, remove redundancy of combined results, it must be using strand_specific parameter
 	Util::print_user_message("Remove redundancies in virus contigs");
