@@ -198,7 +198,9 @@ foreach my $sample (@ARGV)
 	Util::process_cmd("$BIN_DIR/samtools sort $sample.bam $sample.sorted 2> $TEMP_DIR/samtools.log", $debug) unless (-s "$sample.sorted.bam");
 	Util::process_cmd("$BIN_DIR/samtools mpileup -f $reference $sample.sorted.bam > $sample.pre.pileup 2> $TEMP_DIR/samtools.log", $debug) unless (-s "$sample.pre.pileup");
 	align::pileup_filter("$sample.pre.pileup", "$seq_info", "$coverage", "$sample.pileup", $debug) unless (-s "$sample.pileup");	# filter pileup file 
-	align::pileup_to_contig("$sample.pileup", "$sample.aligned", 40, 0, 'ALIGNED'); # input, output, min_len, min_depth, prefix
+
+	# parameter fo pileup_to_contig: input, output, min_len, min_depth, prefix
+	align::pileup_to_contig("$sample.pileup", "$sample.aligned", 40, 0, 'ALIGNED') and system("touch $sample.aligned") if -s "$sample.pileup";
 	align::remove_redundancy("$sample.aligned", $sample, $rr_blast_parameters, $max_end_clip, $min_overlap, 'ALIGNED', $BIN_DIR, $TEMP_DIR, $debug) if -s "$sample.aligned";
 	
 	# part B: 1. remove host related reads  2. de novo assembly 3. remove redundancy contigs

@@ -258,8 +258,8 @@ sub pileup_to_contig
 	my $fh = IO::File->new($input_pileup) || die $!;
 	my $out = IO::File->new(">".$output_seq) || die $!;
 
-	my $line = <$fh>; chomp($line); die "[ERROR]Pileup File, 1st Line $line\n" if $line =~ m/^#/;
-	my @t = split(/\t/, $line); die "[EROR]Pileup File, Line $line\n" if scalar @t < 5;
+	my $line = <$fh>; chomp($line); die "[ERR]Pileup File, 1st Line $line\n" if $line =~ m/^#/;
+	my @t = split(/\t/, $line); die "[ERR]Pileup File, Line $line\n" if scalar @t < 5;
 	my ($pre_id, $pre_pos, $base, $dep, $align) = ($t[0], $t[1], $t[2], $t[3], $t[4]);
 	$base = get_best_base($base, $dep, $align, $line);
 	my $seq = $base;
