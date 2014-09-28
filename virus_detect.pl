@@ -145,6 +145,18 @@ if (scalar(@ARGV) < 1 ) {
 	print $usage; exit;
 }
 
+# check host 
+if ( $host_reference ) {
+
+	if (-s $host_reference ) {
+		# nothing to do with the reference	
+	} elsif ( -s ${FindBin::RealBin}."/databases/$host_reference" ) {
+		$host_reference = ${FindBin::RealBin}."/databases/$host_reference"; # change the reference address
+	} else {
+		$host_reference = "";	# set reference as blank to skip host reference remove if can not find it
+	}
+} 
+
 # main
 foreach my $sample (@ARGV) 
 {
@@ -187,7 +199,7 @@ foreach my $sample (@ARGV)
 	Util::process_cmd("$BIN_DIR/samtools mpileup -f $reference $sample.sorted.bam > $sample.pre.pileup 2> $TEMP_DIR/samtools.log", $debug) unless (-s "$sample.pre.pileup");
 	align::pileup_filter("$sample.pre.pileup", "$seq_info", "$coverage", "$sample.pileup", $debug) unless (-s "$sample.pileup");	# filter pileup file 
 	align::pileup_to_contig("$sample.pileup", "$sample.aligned", 40, 0, 'ALIGNED'); # input, output, min_len, min_depth, prefix
-	align::remove_redundancy("$sample.aligned", $sample, $rr_blast_parameters, $max_end_clip, $min_overlap, 'ALIGNED', $BIN_DIR, $TEMP_DIR, $debug);
+	align::remove_redundancy("$sample.aligned", $sample, $rr_blast_parameters, $max_end_clip, $min_overlap, 'ALIGNED', $BIN_DIR, $TEMP_DIR, $debug) if -s "$sample.aligned";
 	
 	# part B: 1. remove host related reads  2. de novo assembly 3. remove redundancy contigs
 	# parameter for velvet: $sample, $output_contig, $kmer_start, $kmer_end, $coverage_start, $coverage_end, $objective_type, $bin_dir, $temp_dir, $debug
