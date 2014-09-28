@@ -200,7 +200,8 @@ foreach my $sample (@ARGV)
 	align::pileup_filter("$sample.pre.pileup", "$seq_info", "$coverage", "$sample.pileup", $debug) unless (-s "$sample.pileup");	# filter pileup file 
 
 	# parameter fo pileup_to_contig: input, output, min_len, min_depth, prefix
-	align::pileup_to_contig("$sample.pileup", "$sample.aligned", 40, 0, 'ALIGNED') and system("touch $sample.aligned") if -s "$sample.pileup";
+	align::pileup_to_contig("$sample.pileup", "$sample.aligned", 40, 0, 'ALIGNED') if -s "$sample.pileup";
+	system("touch $sample.aligned") unless -s "$sample.pileup";
 	align::remove_redundancy("$sample.aligned", $sample, $rr_blast_parameters, $max_end_clip, $min_overlap, 'ALIGNED', $BIN_DIR, $TEMP_DIR, $debug) if -s "$sample.aligned";
 	
 	# part B: 1. remove host related reads  2. de novo assembly 3. remove redundancy contigs
@@ -222,7 +223,7 @@ foreach my $sample (@ARGV)
 	# combine the known and unknown virus, remove redundancy of combined results, it must be using strand_specific parameter
 	Util::print_user_message("Remove redundancies in virus contigs");
 	Util::process_cmd("cat $sample.aligned $sample.assembled > $sample.combined", $debug);
-	align::remove_redundancy("$sample.combined", $sample, $rr_blast_parameters, $max_end_clip, $min_overlap, 'CONTIG', $BIN_DIR, $TEMP_DIR, $debug);
+	align::remove_redundancy("$sample.combined", $sample, $rr_blast_parameters, $max_end_clip, $min_overlap, 'CONTIG', $BIN_DIR, $TEMP_DIR, $debug) if -s "$sample.combined";
 
 	# identify the virus
 	Util::print_user_message("Virus identification");
@@ -232,7 +233,7 @@ foreach my $sample (@ARGV)
 	$cmd_identify .= "--hsp_cover $hsp_cover --diff_ratio $diff_ratio --diff_contig_cover $diff_contig_cover --diff_contig_length $diff_contig_length ";
 	$cmd_identify .= "--coverage_cutoff $coverage_cutoff --depth_cutoff $depth_cutoff $sample $sample.combined ";
 	$cmd_identify .= "-d" if $debug;
-	Util::process_cmd($cmd_identify, $debug);
+	Util::process_cmd($cmd_identify, $debug) if -s "$sample.combined";
 
 	# delete temp files and log files 
 	unlink("error.log", "formatdb.log");
