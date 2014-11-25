@@ -2,6 +2,9 @@
 
 =head
  viral_DB_prepare.pl -- create viral database from genbank viral sequnece
+ ICTV virus list (http://talk.ictvonline.org/files/tags/default.aspx)
+ virus and host (http://www.mcb.uct.ac.za/tutorial/ICTV%20Species%20Lists%20by%20host.htm)
+ then get relationship between host and virus: host.info, Algae, Archaea, Bacteria, Fungi, Invertebrata, Protozoa, Plant, Protozoa, Vertebrata
 =cut
 
 use strict;
@@ -25,7 +28,7 @@ $ftp->cwd("/genbank") || die "[ERR]Cannot change working directory ", $ftp->mess
 my @vrl_files;
 my @files = $ftp->ls();
 foreach my $f (@files) {
-	if ($f =~ m/gbvrl11\.seq\.gz/) {
+	if ($f =~ m/gbvrl\d+\.seq\.gz/) {
 		$ftp->get($f) unless -s $f;
 		push(@vrl_files, $f);
 		print "== $f has been download from genbank ==\n";
@@ -43,18 +46,7 @@ $ftp->quit;
 # hash virus_genus_taxon_id: key: taxon_id; value: genus scientific name
 my $node_file = 'nodes.dmp';
 my $name_file = 'names.dmp';
-my $division_file = 'division.dmp';
-my %division;
-my $fh1 = IO::File->new($division_file) || die $!;
-while(<$fh1>)
-{
-	chomp;
-	next if $_ =~ m/^#/;
-	my @a = split(/\t\|\t/, $_);
-	$division{$a[0]} = $a[2];
-	#print "s $a[0] es $a[2] e\n";
-}
-$fh1->close;
+my %division  = get_division();
 my ($node_table, $virus_genus_taxon_id) = load_taxon_node($node_file);
 my ($name_table, $virus_genus_taxon) = load_taxon_name($name_file, $virus_genus_taxon_id);
 print "== ", scalar(keys(%$virus_genus_taxon_id)), " virus genus taxon has been load into hash ==\n";
@@ -73,14 +65,18 @@ while(<$fh2>)
 	chomp;
 	next if $_ =~ m/^#/;
 	my @a = split(/\t/, $_);
+	next if $a[1] eq 'NA';
 	# think about virus may infected more than 1 divison
-	$virus_hostdiv{$a[1]} = $a[0];
+	my $gname = lc($a[0]);
+	$virus_hostdiv{$gname} = $a[1];
 }
 $fh2->close;
 print "== ", scalar(keys(%virus_hostdiv)), " virus genus host info has been load into hash ==\n";
 
 # parse viral sequence to database file
-my $vrl_info = "vrl_genbank.info";
+my $vrl_info_classified   = "vrl_genbank.txt";
+my $vrl_info_unclassified = "vrl_genbank_unclassified.txt";
+my $vrl_seq_unclassified  = "vrl_genbank_unclassified.fasta"; 
 my $vrl_origin = "vrl_origin";
 
 # generate viral sequence with fasta format
@@ -92,113 +88,215 @@ if (-s $vrl_origin)
 } 
 else
 {
-	my $out1 = IO::File->new(">".$vrl_info) || die $!;
+	my $out1 = IO::File->new(">".$vrl_info_classified) || die $!;
+	my $out2 = IO::File->new(">".$vrl_info_unclassified) || die $!;
+	my $out3 = IO::File->new(">".$vrl_seq_unclassified) || die $!;
 
+	#@vrl_files = ('sequence.gb.gz');
 	foreach my $f (@vrl_files)
 	{
+		print "parsing file $f start ......\n";
 		my $f_head = `less $f | head`;
 		my $seq_num = 70000;
 		if ($f_head =~ m/(\d+) loci/) { $seq_num = $1; }
 		my $parse_seq_num = 0; 
-		my $pre_parse_percent;
+		my $pre_parse_percent = 0;
 
 		my $seqin = Bio::SeqIO->new(-format => 'GenBank', -file => "gunzip -c $f |" );
 		while(my $inseq = $seqin->next_seq)
 		{
-			#print $inseq->id."\n";
-			#print $inseq->seq_version."\n";
-			#print $inseq->desc."\n";
-			$vrl_seq_info{$inseq->id}{'ver'} = $inseq->seq_version;
-			$vrl_seq_info{$inseq->id}{'seq'} = $inseq->seq;
-			$vrl_seq_info{$inseq->id}{'des'} = $inseq->desc;
-			
-			my %host_division = (); # key: division id; value: source	
-			foreach my $feat_object ($inseq->get_SeqFeatures) { 
+			# print $inseq->id."\n".$inseq->seq_version."\n".$inseq->desc."\n";
+			my $sid = $inseq->id;
+			$vrl_seq_info{$sid}{'ver'} = $inseq->seq_version;
+			$vrl_seq_info{$sid}{'seq'} = $inseq->seq;
+			$vrl_seq_info{$sid}{'des'} = $inseq->desc;
+						
+			# get org taxon id or host name 
+			my ($org_taxon, $org_name, $genus_taxon, $genus_name, $genus_div, $host_taxon, $host_name, $host_div);
+			my %source; # key: org_taxon; value: host_name
+			foreach my $feat_object ($inseq->get_SeqFeatures) 
+			{ 
 				my $primary_tag = $feat_object->primary_tag;
 				next unless $primary_tag eq "source";
+
+				$org_taxon = 'NA'; $host_name = 'NA';
 				foreach my $tag ($feat_object->get_all_tags) { 
  					foreach my $value ($feat_object->get_tag_values($tag)) {
 						if ($tag eq 'db_xref' && $value =~ m/taxon:(\d+)/) {
-							my $org_taxon = $1;
-							$vrl_seq_info{$inseq->id}{'taxon'} = $org_taxon;
-							# convert the taxon to viral genus, then tracking host through host_info.txt
-							# print "$org_taxon\t$$node_table{$org_taxon}{'division'}\t$division{$$node_table{$org_taxon}{'division'}}\n";
-
-							my $round = 0;
-							my $genus_taxon = $org_taxon;
-							while(1) {
-								if (defined $$node_table{$genus_taxon}{'parent'}) {
-									$genus_taxon = $$node_table{$genus_taxon}{'parent'};
-									if (defined $$node_table{$genus_taxon}{'rank'} && $$node_table{$genus_taxon}{'rank'} eq 'genus') { last; }
-									last if $genus_taxon == 1;
-								} else {
-									last;
-								}
-							}
-
-							# print $genus_taxon,"\t", $$virus_genus_taxon{$genus_taxon},"\n"; exit;
-							my $genus_name = $$virus_genus_taxon{$genus_taxon} if defined $$virus_genus_taxon{$genus_taxon};
-
-							if (defined $virus_hostdiv{$genus_name}) {
-								$host_division{$virus_hostdiv{$genus_name}} = 'ICTV';
-							}
-						} 
-						if ($tag eq 'host' && defined $$name_table{$value} ) { 
-							my $host_taxon = $$name_table{$value};
-							$vrl_seq_info{$inseq->id}{'host_name'} = $value;
-							$vrl_seq_info{$inseq->id}{'host_taxon'} = $host_taxon;
-
-							##### get divison of host taxon #####
-							my $host_div = "NA";
-							$host_div = $$node_table{$host_taxon}{'division'} if defined $$node_table{$host_taxon}{'division'};
-
-							##### use the host div from feature attribute as host division #####
-							if ( defined $host_division{$host_div} ) {
-								$host_division{$host_div}.= ",genbank";
-							} else {
-								$host_division{$host_div} = "genbank";
-							}
-							#print "$host_taxon\t$value\t$host_div\t$division{$host_div}\n";
-
-							##### tracking host to high level #####
-							#my $round = 0;
-							#my $this_tax = $host_taxon;
-							#while(1) {
-							#	if (defined $node_table{$this_tax}) {
-							#		$this_tax = $node_table{$this_tax};
-							#		$round++;
-							#		last if $round > 200;
-							#		last if $this_tax == 33208;
-							#	} else {
-							#		last;
-							#	}	
-							#}
-							#$vrl_seq_info{$inseq->id}{'host_kingdom'} = $this_tax;
-							# print "$host_taxon\t$value\t$this_tax\n";
+							if ( $org_taxon eq 'NA' ) { $org_taxon = $1; } else { print "[ERR]Repeat organism taxon id $sid\n"; exit; }
+						}
+ 
+						if ($tag eq 'host' ) { 
+							if ( $host_name eq 'NA' ) { $host_name = $value; } else { $host_name.= "\t".$value; } # one org <=> more host
 						}      
       					}          
-   				}       
+   				}
+			
+				unless (defined $$node_table{$org_taxon}{'division'} && $$node_table{$org_taxon}{'division'} eq '9') {
+					my $changed_org_taxon = correct_org_taxon_division($sid);
+					$org_taxon = $changed_org_taxon unless $changed_org_taxon eq 'NA';
+				} 
+
+				next unless $$node_table{$org_taxon}{'division'} eq '9'; # example EF710638
+				$source{$org_taxon} = $host_name;
 			}
 
-			$vrl_seq_info{$inseq->id}{'host_div'} = \%host_division;
+			#$vrl_seq_info{$sid}{'taxon'} = $org_taxon;
+			#$vrl_seq_info{$sid}{'host_name'} = $host_name;
 
-			foreach my $host_div_id (sort keys %host_division)
+			if (scalar(keys(%source)) < 1 ) {  
+				print "STAT$f\t$sid\tNA\tNA\tNA\tNA\tNA\tNA\tNA\tNA\n";
+			}
+
+			my %host_division = (); # key: division id; value: source
+			foreach my $otid (sort keys %source) 
 			{
-				my $host_name = $division{$host_div_id};
-				my $host_source = $host_division{$host_div_id};
-				print $out1 $inseq->id,"\t",$inseq->length,"\t",$inseq->desc,"\t",$inseq->version,"\t",$host_name,"\t",$host_source,"\n";
+
+				#=== find genus taxon id according organism taxon id, then genus name, then division ===
+				my $genus_taxon_tracking = $otid;
+                        	while(1) {
+					if (defined $$node_table{$genus_taxon_tracking}{'parent'}) {
+						$genus_taxon_tracking = $$node_table{$genus_taxon_tracking}{'parent'};
+						if (defined $$node_table{$genus_taxon_tracking}{'rank'} && $$node_table{$genus_taxon_tracking}{'rank'} eq 'genus') { last; }
+							last if $genus_taxon_tracking == 1;
+					} else {
+						last;
+					}
+				}
+
+				if ($$node_table{$genus_taxon_tracking}{'rank'} eq 'genus' ) {
+					$genus_taxon = $genus_taxon_tracking;
+				} else {
+					$genus_taxon = "NA";
+				}
+
+				$genus_name = 'NA';
+				$genus_name = $$virus_genus_taxon{$genus_taxon} if defined $$virus_genus_taxon{$genus_taxon}; 
+
+				$genus_div = 'NA';	# the host div tracking by org_genus -- org_taxon_id
+				if ( defined $virus_hostdiv{$genus_name}) {
+					my @gdiv = split(/,/, $virus_hostdiv{$genus_name});
+					foreach $genus_div (@gdiv) { $host_division{"$genus_div"} = 'ICTV'; } # on organism may categorized into two division;
+				}
+
+				#=== find host name and host id, tracking host division ===
+				my @hname = split(/\t/, $source{$otid}); 
+				foreach my $hname (@hname)
+				{
+					$host_taxon = "NA"; $host_div = 'NA';
+					# find host taxon according to host name
+					my $host_taxon_fixed = "NA";
+					my $lchname = lc($hname);
+					if (defined $$name_table{$lchname}) {
+						$host_taxon = $$name_table{$lchname};
+					} else {
+						# fixed the host name for tracking host division 
+						my @hn = split(" ", $lchname);
+						while(scalar(@hn) > 1) {
+							pop @hn;
+							my $sname = join(" ", @hn);
+							chomp($sname);
+							$sname=~ s/ $//;
+							$sname=~ s/;$//;
+							$sname=~ s/,$//;
+							if (defined $$name_table{$sname}) {
+								$host_taxon = $$name_table{$sname};
+								$host_taxon_fixed = 'fixed';
+								last;
+							}
+						}
+					}
+
+					# get host division, and put it to hash
+					if ( defined $$node_table{$host_taxon}{'division'} ) {
+						$host_div = "G".$$node_table{$host_taxon}{'division'};
+						if (  defined $host_division{$host_div} ) {
+							if ( $host_division{$host_div} ne 'genbank' ) {
+								$host_division{$host_div}.=",genbank";
+							}
+						} else {
+							$host_division{$host_div} = "genbank";
+						}
+					}
+
+					print "STAT$f\t$sid\t$otid\t$genus_taxon\t$genus_name\t$genus_div\t$hname\t$host_taxon\t$host_taxon_fixed\t$host_div\n";
+				}
 			}
 
-			$parse_seq_num++;
-			my $parse_percent = int(($parse_seq_num/$seq_num) * 100);
-			if ($parse_percent % 5 == 0 && $parse_percent ne $pre_parse_percent) {
-				print "......$parse_percent......\n";
+			##### tracking host to high level #####
+			#my $round = 0;
+			#my $this_tax = $host_taxon;
+			#while(1) {
+			#       if (defined $node_table{$this_tax}) {
+			#               $this_tax = $node_table{$this_tax};
+			#               $round++;
+			#               last if $round > 200;
+			#               last if $this_tax == 33208;
+			#       } else {
+			#               last;
+			#       }       
+			#}
+			#$vrl_seq_info{$inseq->id}{'host_kingdom'} = $this_tax;
+			# print "$host_taxon\t$value\t$this_tax\n";
+
+			if ( scalar(keys(%host_division)) > 0 ) {	
+				$vrl_seq_info{$sid}{'host_div'} = \%host_division;
+
+				foreach my $host_div_id (sort keys %host_division) {
+					my $host_div_name = $division{$host_div_id};
+					my $host_source = $host_division{$host_div_id};
+					print $out1 $sid,"\t",$inseq->length,"\t",$inseq->desc,"\t",$inseq->version,"\t",$host_div_name,"\t",$host_source,"\n";
+				}
+
+			} else {
+				print $out2 $sid,"\t",$inseq->length,"\t",$inseq->desc,"\t",$inseq->version,"\tNA\n";
+				print $out3 ">",$sid,"\n",$inseq->seq,"\n";
 			}
-			$pre_parse_percent = $parse_percent;
+
+
+			
+
+			#$parse_seq_num++;
+			#my $parse_percent = int(($parse_seq_num/$seq_num) * 100);
+			#if ($parse_percent % 5 == 0 && $parse_percent ne $pre_parse_percent) {
+			#	print "......$parse_percent......\n";
+			#}
+			#$pre_parse_percent = $parse_percent;
 		}
+
+		print print "parsing file $f end ......\n\n";
 	}
 
 	$out1->close;
+	$out2->close;
+
+	# output sequence for each division and uniq them by uclust
+	foreach my $div_id (sort keys %division)
+	{
+		my $div_name = $division{$div_id};
+		$div_name =~ s/ /_/ig;
+		my $vrl_seq_file = "vrl_".$div_name."_all.fasta";
+		my $vrl_seq = '';
+		foreach my $id (sort keys %vrl_seq_info)
+		{
+			my $host_division = $vrl_seq_info{$id}{'host_div'} if defined $vrl_seq_info{$id}{'host_div'};
+			foreach my $host_div_id (sort keys %$host_division)
+			{
+				if ($host_div_id eq $div_id)
+				{
+					$vrl_seq.=">$id\n$vrl_seq_info{$id}{'seq'}\n";
+				}
+			}
+		}
+
+		if ($vrl_seq) {
+			my $fhs = IO::File->new(">".$vrl_seq_file) || die $!;
+			print $fhs $vrl_seq;
+			$fhs->close;
+		}
+		# cluster by uclust
+	}
+
 }
 
 #################################################################
@@ -253,7 +351,7 @@ sub load_taxon_name
 		chomp;
 		my @a = split(/\t\|\t/, $_);
 		$tax_id = $a[0];
-		$name = $a[1];
+		$name = lc($a[1]);
 		$name_class = $a[3];
 		$name_class =~ s/\t.*//;
 		# print "s $tax_id es $name es $name_class e\n"; exit;
@@ -271,3 +369,62 @@ sub load_taxon_name
 	$fh->close;
 	return (\%name_table, \%virus_genus_taxon);
 }
+
+=head2
+ get_division: division for both ICTV and genbank
+=cut
+sub get_division
+{
+	my %division = (
+		'G0' =>  'Bacteria',
+		'G1' =>  'Invertebrates',
+		'G2' =>  'Mammals',
+		'G3' =>  'Phages',
+		'G4' =>  'Plants',
+		'G5' =>  'Primates',
+		'G6' =>  'Rodents',
+		'G7' =>  'Synthetic',
+		'G8' =>  'Unassigned',
+		'G9' =>  'Viruses',
+		'G10' => 'Vertebrates',
+		'G11' => 'EnvironmentalSamples',
+		'X1' => 'Algae',
+		'X2' => 'Archaea',
+		'X3' => 'Fungi',
+		'X3' => 'Protozoa'
+	);
+	return %division;
+}
+
+=head2
+ correct_org_taxon_division:
+ will fix it later
+=cut
+sub correct_org_taxon_division
+{
+	my $seq_id = shift;
+	
+	my %sid_org_taxon = (
+		'KF178708' => 750074,
+		'KF178710' => 750074,
+		'KF178712' => 750074,
+		'KC167159' => 1449545,
+		'KC167160' => 1449545,
+		'KC167161' => 1449545,
+		'FJ654336' => 569708,
+		'EU100683' => 461790,
+		'EU100684' => 461791,
+		'EU478797' => 1503438,
+		'GU052197' => 352522,
+		'GU052198' => 352522,
+		'GU052199' => 352522,
+		'GU052200' => 352522,
+		'GU052201' => 352522,
+		'GU052202' => 352522
+	);
+
+	my $taxon = 'NA';
+	$taxon = $sid_org_taxon{$seq_id} if defined $sid_org_taxon{$seq_id};
+	return $taxon;
+}
+
