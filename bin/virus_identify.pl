@@ -57,6 +57,7 @@ my $usage = <<_EOUSAGE_;
 #
 #  --coverage_cutoff	The coverage cutoff for final ouput [0.1] 
 #  --depth_cutoff	The depth cutoff for final ouput    [5]
+#  --coverage_norm	Normalization of coverage by depth  [off]
 #
 ###########################################################################################
 
@@ -91,6 +92,7 @@ my $diff_contig_cover = 0.5;	# for hit filter
 my $diff_contig_length = 100;	# for hit filter
 my $coverage_cutoff = 0.1;	# coverage cutoff for final result
 my $depth_cutoff = 5;		# depth cutoff for final result
+my $coverage_norm = 0;		# coverage normalization by depth
 
 my $word_size = 11;
 my $cpu_num = 8;		# megablast: thread number
@@ -124,6 +126,7 @@ GetOptions(
 	'gap_extension=i' 	=> \$gap_extension,
 	'coverage_cutoff=f'	=> \$coverage_cutoff,
 	'depth_cutoff=f'	=> \$depth_cutoff,
+	'coverage_norm'		=> \$coverage_norm,
 	'd|debug'		=> \$debug,
 	'f|force'		=> \$debug_force,
 	'n|novel-check'		=> \$novel_check,
@@ -224,7 +227,7 @@ main: {
 	Util::save_file($known_reference, "$sample_dir/new.known.reference.fa");
 	Util::save_file($known_contig_blast_sam, "$sample_dir/$sample_base.new.known.sam");
 	
-	my $known_num = 0; ($known_num, $known_identified) = arrange_col2($known_identified, \%virus_info);
+	my $known_num = 0; ($known_num, $known_identified) = arrange_col2($known_identified, \%virus_info, $sample, $coverage_norm);
 	
 	if ( length($known_identified) > 1 ) { 
 		Util::plot_result($known_identified, $known_contig_blast_table, $sample_dir, 'known'); 
@@ -283,7 +286,7 @@ main: {
 		Util::save_file($novel_reference, "$sample_dir/new.novel.reference.fa");
         	Util::save_file($novel_contig_blast_sam, "$sample_dir/$sample_base.new.novel.sam");
 
-		my $novel_num = 0; ($novel_num, $novel_identified) = arrange_col2($novel_identified, \%virus_info);
+		my $novel_num = 0; ($novel_num, $novel_identified) = arrange_col2($novel_identified, \%virus_info, $sample, $coverage_norm);
 
 		if ( length($novel_identified) > 1 ) { 
 			Util::plot_result($novel_identified, $novel_contig_blast_table, $sample_dir, 'novel'); 
@@ -345,21 +348,39 @@ sub arrange_col1
 =cut
 sub arrange_col2
 {
-	my ($known_identified, $virus_info) = @_;
+	my ($known_identified, $virus_info, $sample, $coverage_norm) = @_;
 
 	my @all_data;
 
+	# get total read num
+	my $total_read = 0;
+	my $fh = IO::File->new($sample) || die $!;
+	while(<$fh>) {
+		my $id = $_;
+		if ($id =~ m/^>/) { <$fh>; }
+		if ($id =~ m/^@/) { <$fh>; <$fh>; <$fh>; }
+		$total_read++;
+	}
+
 	chomp($known_identified);
 	my @a = split(/\n/, $known_identified);
+
+	print "$total_read\n$coverage_norm\n";
+
 	foreach my $line (@a)
 	{
+		print $line."\nWarnings\n"; exit;
 		my @ta = split(/\t/, $line);
-		#my $coverage= 1.0 * $a[7] / $a[1];			# get coverage, shan's method
-		my $coverage = $ta[2] / $ta[1];				# changed by kentnf
+		#my $coverage= 1.0 * $a[7] / $a[1];					# get coverage, shan's method
+		my $coverage = $ta[2] / $ta[1];						# changed by kentnf
 		my $depth = $ta[6];
-		my $genus = $$virus_info{$ta[0]}{'genus'};
-		my $desc  = $$virus_info{$ta[0]}{'desc'};
-		push(@all_data, [@ta[0,1,2],$coverage,@ta[4,5,6],$genus,$desc]);  # re-order the data, then put them to array 
+
+		my $genus = $$virus_info{$ta[0]}{'genus'};				# col 8 
+		my $desc  = $$virus_info{$ta[0]}{'desc'};				# col 9 
+
+		my $depth_norm = 1e6 * $ta[6] * $ta[7] / ($ta[1] * $total_read);	# normalization depth
+		
+		push(@all_data, [@ta[0,1,2],$coverage,@ta[4,5,6],$genus,$desc]); 	# re-order the data, then put them to array 
 	}
 	
 	@all_data = sort { ($a->[7] cmp $b->[7]) || ($b->[2] cmp $a->[2])} @all_data; # sort according to Genus and hit_covered(bp)

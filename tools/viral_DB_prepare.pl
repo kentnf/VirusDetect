@@ -243,6 +243,16 @@ else
 				$vrl_seq_info{$sid}{'host_div'} = \%host_division;
 
 				foreach my $host_div_id (sort keys %host_division) {
+
+					unless ( defined $division{$host_div_id} ) {
+						print $host_div_id,"\n";
+						print $sid,"\n";
+						foreach my $aa (sort keys %host_division) {
+							print $aa."\t".$host_division{$aa}."\n";
+						}
+						exit;
+					}
+
 					my $host_div_name = $division{$host_div_id};
 					my $host_source = $host_division{$host_div_id};
 					print $out1 $sid,"\t",$inseq->length,"\t",$inseq->desc,"\t",$inseq->version,"\t",$host_div_name,"\t",$host_source,"\n";
@@ -391,7 +401,7 @@ sub get_division
 		'X1' => 'Algae',
 		'X2' => 'Archaea',
 		'X3' => 'Fungi',
-		'X3' => 'Protozoa'
+		'X4' => 'Protozoa'
 	);
 	return %division;
 }

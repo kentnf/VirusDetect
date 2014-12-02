@@ -54,6 +54,8 @@ my $usage = <<_EOUSAGE_;
 #  --coverage_cutoff	Coverage cutoff of a reported virus reference 
 #                        sequences by assembled virus contigs [0.1] 
 #  --depth_cutoff	Depth cutoff of a reported virus reference [5]
+#
+#  --coverage_norm	Coverage normalization by depth
 ########################################################################
 _EOUSAGE_
 ;
@@ -94,6 +96,7 @@ my $hits_return = 500;				# megablast number of hit returns
 my $hsp_cover = 0.75;
 my $coverage_cutoff = 0.1;			# coverage cutoff for final result
 my $depth_cutoff = 5;				# depth cutoff for final result
+my $coverage_norm = 0;				# coverage normalized by depth
 
 # disabled parameters or used as fixed value
 my $coverage = 0.3;  				# √øÃı≤Œøº–Ú¡–»Áπ˚±ªreads∏≤∏«µƒ≤ø∑÷’º»´≥§±»¿˝µƒ„–÷µ
@@ -137,7 +140,8 @@ GetOptions(
 	'diff_contig_length=s'=>\$diff_contig_length,
 
 	'coverage_cutoff=f' =>	\$coverage_cutoff,
-	'depth_cutoff=f' =>	\$depth_cutoff
+	'depth_cutoff=f' =>	\$depth_cutoff,
+	'coverage_norm'	 =>	\$coverage_norm
 );
 
 # check input file
@@ -231,7 +235,7 @@ foreach my $sample (@ARGV)
 	$cmd_identify .= "--word_size $word_size --exp_value $exp_value --identity_percen $percent_identity ";
 	$cmd_identify .= "--cpu_num $thread_num --mis_penalty $mis_penalty_b --gap_cost $gap_cost_b --gap_extension $gap_extension_b ";
 	$cmd_identify .= "--hsp_cover $hsp_cover --diff_ratio $diff_ratio --diff_contig_cover $diff_contig_cover --diff_contig_length $diff_contig_length ";
-	$cmd_identify .= "--coverage_cutoff $coverage_cutoff --depth_cutoff $depth_cutoff $sample $sample.combined ";
+	$cmd_identify .= "--coverage_cutoff $coverage_cutoff --depth_cutoff $depth_cutoff --coverage_norm $sample $sample.combined ";
 	$cmd_identify .= "-d" if $debug;
 	Util::process_cmd($cmd_identify, $debug) if -s "$sample.combined";
 
