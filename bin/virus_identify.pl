@@ -369,7 +369,14 @@ sub arrange_col2
 
 	foreach my $line (@a)
 	{
-		print $line."\nWarnings\n"; exit;
+		# 0 - virus seq ID
+		# 1 - virus seq length
+		# 2 - virus seq cover length
+		# 3 - coverage (cover_length/seq_length: col3/col2)
+		# 4 - contigs
+		# 5 - contig number
+		# 6 - depth (???)
+
 		my @ta = split(/\t/, $line);
 		#my $coverage= 1.0 * $a[7] / $a[1];					# get coverage, shan's method
 		my $coverage = $ta[2] / $ta[1];						# changed by kentnf
@@ -378,9 +385,14 @@ sub arrange_col2
 		my $genus = $$virus_info{$ta[0]}{'genus'};				# col 8 
 		my $desc  = $$virus_info{$ta[0]}{'desc'};				# col 9 
 
-		my $depth_norm = 1e6 * $ta[6] * $ta[7] / ($ta[1] * $total_read);	# normalization depth
-		
-		push(@all_data, [@ta[0,1,2],$coverage,@ta[4,5,6],$genus,$desc]); 	# re-order the data, then put them to array 
+		if ($coverage_norm == 1) {
+			# coverage_norm = 1;
+			my $depth_norm = 1e6 * $ta[6] * $ta[2] / ($ta[1] * $total_read);	# normalization depth
+			push(@all_data, [@ta[0,1,2],$coverage,@ta[4,5],$depth_norm,$genus,$desc,$ta[3]]); # why add $ta[3]
+		} else {
+			# coverage_norm = 0;
+			push(@all_data, [@ta[0,1,2],$coverage,@ta[4,5,6],$genus,$desc]); 	# re-order the data, then put them to array 
+		}
 	}
 	
 	@all_data = sort { ($a->[7] cmp $b->[7]) || ($b->[2] cmp $a->[2])} @all_data; # sort according to Genus and hit_covered(bp)

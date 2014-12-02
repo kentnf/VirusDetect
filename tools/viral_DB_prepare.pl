@@ -20,6 +20,11 @@ USAGE:
 
 ';
 
+# finish input and output information
+
+
+# making download is subroutine
+
 # download viral sequence file from genbank
 my $genbank_ftp = "ftp.ncbi.nih.gov";
 my $ftp = Net::FTP->new($genbank_ftp, Debug=>0) || die "[ERR]Cannot connect to $genbank_ftp $@\n";
@@ -35,6 +40,9 @@ foreach my $f (@files) {
 	}
 }
 $ftp->quit;
+
+# making below is subroutine 
+
 
 # load taxonomy information to hash for 
 # 1. tracking host to division
