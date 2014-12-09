@@ -12,90 +12,131 @@ use warnings;
 use Bio::SeqIO;
 use Net::FTP;
 use IO::File;
+use Getopt::Std;
 
-my $usage = qq'
-USAGE: 
+my $version = 0.1;
+my $debug = 0;
 
+my %options;
+getopts('a:b:c:d:e:f:g:i:j:k:l:m:n:o:p:q:r:s:t:u:v:w:x:y:z:h', \%options);
+unless (defined $options{'t'} ) { usage($version); }
+if	($options{'t'} eq 'download')	{ vrl_download(\%options, \@ARGV); }    # parse multi dataset
+elsif	($options{'t'} eq 'category')	{ vrl_category(\%options, \@ARGV); }    # parse multi dataset
+else	{ usage($version); }
+
+sub usage
+{
+	my $version = shift;
+	my $usage = qq'
+PIPELINE (version $version):
 1. download viral sequnece from genbank ftp (ftp://ftp.ncbi.nih.gov/genbank/)
+   \$ $0 -t download
+2. run viral_DB_prepare.pl script to category virus 
+   \$ $0 -t category gbvr*.gz
+
+';
+	print $usage;
+	exit;
+}
+
+=head2
+ vrl_download : download vrl database, just generate download command using wget
+=cut
+sub vrl_download
+{
+	my ($options, $files) = @_;
+	my $download_cmd = '';
+	my $download_cmd_all = '';
+	my $genbank_ftp = "ftp.ncbi.nih.gov";
+	my $ftp = Net::FTP->new($genbank_ftp, Debug=>0) || die "[ERR]Cannot connect to $genbank_ftp $@\n";
+	$ftp->login("anonymous",'-anonymous@') || die "[ERR]Cannot login ", $ftp->message, "\n";
+	$ftp->cwd("/genbank") || die "[ERR]Cannot change working directory ", $ftp->message;
+	my @vrl_files;
+	my @files = $ftp->ls();
+	foreach my $f (@files) {
+		if ($f =~ m/gbvrl\d+\.seq\.gz/) {
+			#$ftp->get($f) unless -s $f;
+			#push(@vrl_files, $f);
+			if ( -s $f ) {
+				print "# == $f has been download from genbank ==\n";
+			} else {
+				$download_cmd.="wget ftp://ftp.ncbi.nih.gov/genbank/$f\n";
+			}
+			$download_cmd_all.="wget ftp://ftp.ncbi.nih.gov/genbank/$f\n";
+		}
+	}
+	$ftp->quit;
+
+	print "# cmd for download vrl database\n$download_cmd\n\n";
+	print "# cmd for download all vrl database files\n$download_cmd_all\n\n";
+	exit;
+}
+
+=head2
+ vrl_category : 
+=cut
+sub vrl_category
+{
+	my ($options, $files) = @_;	
+
+	my $usage = qq'
+USAGE: $0 -t category input_file1 ... input_fileN
 
 ';
 
-# finish input and output information
+	print $usage and exit unless defined $$files[0];
+	my @vrl_files = @$files;
 
+	# load taxonomy information to hash for 
+	# # 1. tracking host to division
+	# # 2. tracking genus of virus
+	# # description of hash
+	# # hash division: key: taxon id, value division name
+	# # hash node_table: key: taxon id, parent, rank, division; value: parent taxon id, rank, and division
+	# # hash name_table: key: name; value: taxon id;
+	# # hash virus_genus_taxon_id: key: taxon_id; value: genus scientific name
 
-# making download is subroutine
+	my $node_file = 'nodes.dmp';
+	my $name_file = 'names.dmp';
+	my %division  = get_division();
+	my ($node_table, $virus_genus_taxon_id) = load_taxon_node($node_file);
+	my ($name_table, $virus_genus_taxon) = load_taxon_name($name_file, $virus_genus_taxon_id);
+	print "== ", scalar(keys(%$virus_genus_taxon_id)), " virus genus taxon has been load into hash ==\n";
+	print "== ", scalar(keys(%$virus_genus_taxon)), " virus genus taxon has been load into hash ==\n";
+	print "== taxon info has been load into hash ==\n";
 
-# download viral sequence file from genbank
-my $genbank_ftp = "ftp.ncbi.nih.gov";
-my $ftp = Net::FTP->new($genbank_ftp, Debug=>0) || die "[ERR]Cannot connect to $genbank_ftp $@\n";
-$ftp->login("anonymous",'-anonymous@') || die "[ERR]Cannot login ", $ftp->message, "\n";
-$ftp->cwd("/genbank") || die "[ERR]Cannot change working directory ", $ftp->message;
-my @vrl_files;
-my @files = $ftp->ls();
-foreach my $f (@files) {
-	if ($f =~ m/gbvrl\d+\.seq\.gz/) {
-		$ftp->get($f) unless -s $f;
-		push(@vrl_files, $f);
-		print "== $f has been download from genbank ==\n";
+	# debug: generate virus genus id and name
+	# foreach my $tid (sort keys %$virus_genus_taxon) { print $tid."\t".$$virus_genus_taxon{$tid}."\n"; } exit;
+
+	# load host info to hash (ICTV-Master-Species-List-2013_v2: http://www.mcb.uct.ac.za/tutorial/ICTV%20Species%20Lists%20by%20host.htm )
+	my $host_info_file = 'host_info.txt';
+	my %virus_hostdiv; # key: virus genus name, value: host divition num
+	my $fh2 = IO::File->new($host_info_file) || die $!;
+	while(<$fh2>)
+	{
+		chomp;
+		next if $_ =~ m/^#/;
+		my @a = split(/\t/, $_);
+		next if $a[1] eq 'NA';
+		# think about virus may infected more than 1 divison
+		my $gname = lc($a[0]);
+		$virus_hostdiv{$gname} = $a[1];
 	}
-}
-$ftp->quit;
+	$fh2->close;
+	print "== ", scalar(keys(%virus_hostdiv)), " virus genus host info has been load into hash ==\n";
 
-# making below is subroutine 
+	# parse viral sequence to database file
+	my $vrl_info_classified   = "vrl_genbank.txt";
+	my $vrl_info_unclassified = "vrl_genbank_unclassified.txt";
+	my $vrl_seq_unclassified  = "vrl_genbank_unclassified.fasta"; 
+	my $vrl_origin = "vrl_origin";
 
+	# generate viral sequence with fasta format
+	my %vrl_seq_info;
+	
+	print "[ERR]viral original sequence file exist $vrl_info_classified\n" and exit if -s $vrl_info_classified;
+	exit;
 
-# load taxonomy information to hash for 
-# 1. tracking host to division
-# 2. tracking genus of virus
-# description of hash
-# hash division: key: taxon id, value division name
-# hash node_table: key: taxon id, parent, rank, division; value: parent taxon id, rank, and division
-# hash name_table: key: name; value: taxon id;
-# hash virus_genus_taxon_id: key: taxon_id; value: genus scientific name
-my $node_file = 'nodes.dmp';
-my $name_file = 'names.dmp';
-my %division  = get_division();
-my ($node_table, $virus_genus_taxon_id) = load_taxon_node($node_file);
-my ($name_table, $virus_genus_taxon) = load_taxon_name($name_file, $virus_genus_taxon_id);
-print "== ", scalar(keys(%$virus_genus_taxon_id)), " virus genus taxon has been load into hash ==\n";
-print "== ", scalar(keys(%$virus_genus_taxon)), " virus genus taxon has been load into hash ==\n";
-print "== taxon info has been load into hash ==\n";
-
-# debug: generate virus genus id and name
-# foreach my $tid (sort keys %$virus_genus_taxon) { print $tid."\t".$$virus_genus_taxon{$tid}."\n"; } exit;
-
-# load host info to hash (ICTV-Master-Species-List-2013_v2: http://www.mcb.uct.ac.za/tutorial/ICTV%20Species%20Lists%20by%20host.htm )
-my $host_info_file = 'host_info.txt';
-my %virus_hostdiv; # key: virus genus name, value: host divition num
-my $fh2 = IO::File->new($host_info_file) || die $!;
-while(<$fh2>)
-{
-	chomp;
-	next if $_ =~ m/^#/;
-	my @a = split(/\t/, $_);
-	next if $a[1] eq 'NA';
-	# think about virus may infected more than 1 divison
-	my $gname = lc($a[0]);
-	$virus_hostdiv{$gname} = $a[1];
-}
-$fh2->close;
-print "== ", scalar(keys(%virus_hostdiv)), " virus genus host info has been load into hash ==\n";
-
-# parse viral sequence to database file
-my $vrl_info_classified   = "vrl_genbank.txt";
-my $vrl_info_unclassified = "vrl_genbank_unclassified.txt";
-my $vrl_seq_unclassified  = "vrl_genbank_unclassified.fasta"; 
-my $vrl_origin = "vrl_origin";
-
-# generate viral sequence with fasta format
-my %vrl_seq_info;
-
-if (-s $vrl_origin) 
-{
-	print "[ERR]viral original sequence file exist $vrl_origin\n";
-} 
-else
-{
 	my $out1 = IO::File->new(">".$vrl_info_classified) || die $!;
 	my $out2 = IO::File->new(">".$vrl_info_unclassified) || die $!;
 	my $out3 = IO::File->new(">".$vrl_seq_unclassified) || die $!;

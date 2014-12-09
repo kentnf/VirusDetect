@@ -322,6 +322,8 @@ sub arrange_col1
 	my $in = IO::File->new($input) || die "Can not open input file $input $!\n";
 	while(<$in>) {
 		chomp;
+
+		print $_."\n"; exit;
 		my @a = split(/\t/, $_);
 		push(@all_data, [@a[0,19,1,2,3,17,18,9,10,11,12,13,6,8]]);	# re-order the data, then put them to array 
 	}
@@ -365,7 +367,7 @@ sub arrange_col2
 	chomp($known_identified);
 	my @a = split(/\n/, $known_identified);
 
-	print "$total_read\n$coverage_norm\n";
+	print "$sample\t$total_read\n$coverage_norm\n";
 
 	foreach my $line (@a)
 	{
