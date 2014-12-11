@@ -305,14 +305,10 @@ main: {
 #################################################################
 
 =head2
- arrange_col1 : 
-
- # input format
- # Contig_ID	Contig_length	Hit_ID	Hit_length	strand	Contig_start	Contig_end	Hit_start	Hit_end	identity	genus	 description	contig_sequence
-
+ arrange_col1 : discard in the new
+ 
  just re-order the contig dataset, 
- the sort by some cols
-
+ then sort by some cols
 =cut
 sub arrange_col1 
 {
@@ -322,7 +318,21 @@ sub arrange_col1
 	my $in = IO::File->new($input) || die "Can not open input file $input $!\n";
 	while(<$in>) {
 		chomp;
-
+		# line format
+		# 0 - Contig_ID
+		# 1 - Contig_length
+		# 2 - Hit_ID
+		# 3 - Hit_length
+		# 4 - strand
+		# 5 - Contig_start
+		# 6 - Contig_end
+		# 7 - Hit_start 
+		# 8 - Hit_end
+		# 9 - identity
+		#10 - genus
+		#11 - description
+		#12 - contig_sequence
+		print "STOPPoint";
 		print $_."\n"; exit;
 		my @a = split(/\t/, $_);
 		push(@all_data, [@a[0,19,1,2,3,17,18,9,10,11,12,13,6,8]]);	# re-order the data, then put them to array 
@@ -345,7 +355,7 @@ sub arrange_col1
  output: sample.known.identified  or sample.novel.identified  
 
  Filter the result using coverage and depth setted by input parameter
- sort result by some col 
+ sort result by genus, then by read_cov(bp) 
 
 =cut
 sub arrange_col2
@@ -397,7 +407,7 @@ sub arrange_col2
 		}
 	}
 	
-	@all_data = sort { ($a->[7] cmp $b->[7]) || ($b->[2] cmp $a->[2])} @all_data; # sort according to Genus and hit_covered(bp)
+	@all_data = sort { ($a->[7] cmp $b->[7]) || ($b->[2] cmp $a->[2])} @all_data; # sort according to Genus and read_cov(bp)
 
 	my $output_identified = '';
 

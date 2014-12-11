@@ -101,6 +101,7 @@ USAGE: $0 -t category input_file1 ... input_fileN
 	my %division  = get_division();
 	my ($node_table, $virus_genus_taxon_id) = load_taxon_node($node_file);
 	my ($name_table, $virus_genus_taxon) = load_taxon_name($name_file, $virus_genus_taxon_id);
+	my %abnormal_host_name = load_abnormal_host_name('abnormal_host_name.txt');
 	print "== ", scalar(keys(%$virus_genus_taxon_id)), " virus genus taxon has been load into hash ==\n";
 	print "== ", scalar(keys(%$virus_genus_taxon)), " virus genus taxon has been load into hash ==\n";
 	print "== taxon info has been load into hash ==\n";
@@ -134,8 +135,8 @@ USAGE: $0 -t category input_file1 ... input_fileN
 	# generate viral sequence with fasta format
 	my %vrl_seq_info;
 	
-	print "[ERR]viral original sequence file exist $vrl_info_classified\n" and exit if -s $vrl_info_classified;
-	exit;
+	#print "[ERR]viral original sequence file exist $vrl_info_classified\n" and exit if -s $vrl_info_classified;
+	#exit;
 
 	my $out1 = IO::File->new(">".$vrl_info_classified) || die $!;
 	my $out2 = IO::File->new(">".$vrl_info_unclassified) || die $!;
@@ -176,7 +177,9 @@ USAGE: $0 -t category input_file1 ... input_fileN
 						}
  
 						if ($tag eq 'host' ) { 
-							if ( $host_name eq 'NA' ) { $host_name = $value; } else { $host_name.= "\t".$value; } # one org <=> more host
+							my $normal_host_name = $value;
+							$normal_host_name = $abnormal_host_name{$value} if defined $abnormal_host_name{$value};
+							if ( $host_name eq 'NA' ) { $host_name = $normal_host_name; } else { $host_name.= "\t".$normal_host_name; } # one org <=> more host
 						}      
       					}          
    				}
@@ -259,6 +262,7 @@ USAGE: $0 -t category input_file1 ... input_fileN
 					# get host division, and put it to hash
 					if ( defined $$node_table{$host_taxon}{'division'} ) {
 						$host_div = "G".$$node_table{$host_taxon}{'division'};
+						$host_div = "G10" if ($host_div eq "G2" || $host_div eq "G5" || $host_div eq "G6");
 						if (  defined $host_division{$host_div} ) {
 							if ( $host_division{$host_div} ne 'genbank' ) {
 								$host_division{$host_div}.=",genbank";
@@ -308,7 +312,8 @@ USAGE: $0 -t category input_file1 ... input_fileN
 				}
 
 			} else {
-				print $out2 $sid,"\t",$inseq->length,"\t",$inseq->desc,"\t",$inseq->version,"\tNA\n";
+				$host_name =~ s/\t/,/ig;
+				print $out2 $sid,"\t",$inseq->length,"\t",$inseq->desc,"\t",$inseq->version,"\tNA\t$host_name\n";
 				print $out3 ">",$sid,"\n",$inseq->seq,"\n";
 			}
 
@@ -437,11 +442,11 @@ sub get_division
 	my %division = (
 		'G0' =>  'Bacteria',
 		'G1' =>  'Invertebrates',
-		'G2' =>  'Mammals',
+		'G2' =>  'Vertebrates',
 		'G3' =>  'Phages',
 		'G4' =>  'Plants',
-		'G5' =>  'Primates',
-		'G6' =>  'Rodents',
+		'G5' =>  'Vertebrates',
+		'G6' =>  'Vertebrates',
 		'G7' =>  'Synthetic',
 		'G8' =>  'Unassigned',
 		'G9' =>  'Viruses',
@@ -487,3 +492,21 @@ sub correct_org_taxon_division
 	return $taxon;
 }
 
+=head2
+ load_abnormal_host_name
+=cut
+sub load_abnormal_host_name
+{
+	my $input = shift;
+	my %name;
+	my $fh = IO::File->new($input) || die $!;
+	while(<$fh>)
+	{
+		chomp;
+		next if $_ =~ m/^#/;
+		my @a = split(/\t/, $_);
+		chomp($a[1]);
+		$name{$a[0]} = $a[1] if (defined $a[1] && $a[1]=~ /\S+/);
+	}
+	return %name;
+}
