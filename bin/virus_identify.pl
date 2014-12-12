@@ -57,7 +57,7 @@ my $usage = <<_EOUSAGE_;
 #
 #  --coverage_cutoff	The coverage cutoff for final ouput [0.1] 
 #  --depth_cutoff	The depth cutoff for final ouput    [5]
-#  --coverage_norm	Normalization of coverage by depth  [off]
+#  --depth_norm		Normalization depth by library size [off]
 #
 ###########################################################################################
 
@@ -92,7 +92,7 @@ my $diff_contig_cover = 0.5;	# for hit filter
 my $diff_contig_length = 100;	# for hit filter
 my $coverage_cutoff = 0.1;	# coverage cutoff for final result
 my $depth_cutoff = 5;		# depth cutoff for final result
-my $coverage_norm = 0;		# coverage normalization by depth
+my $depth_norm = 0;		# normalization depth by library size
 
 my $word_size = 11;
 my $cpu_num = 8;		# megablast: thread number
@@ -126,7 +126,7 @@ GetOptions(
 	'gap_extension=i' 	=> \$gap_extension,
 	'coverage_cutoff=f'	=> \$coverage_cutoff,
 	'depth_cutoff=f'	=> \$depth_cutoff,
-	'coverage_norm'		=> \$coverage_norm,
+	'depth_norm'		=> \$depth_norm,
 	'd|debug'		=> \$debug,
 	'f|force'		=> \$debug_force,
 	'n|novel-check'		=> \$novel_check,
@@ -212,13 +212,13 @@ main: {
 	Util::save_file($known_identified, "$sample.known.identified");
 	
 
-	# 5. aligne read to contigs get depth, then compute reference depth using contig depth
-	# key: contig ID, depth, coverage; value: depth, coverage
+	# 5. align read to contigs get depth, then compute reference depth using contig depth
+	# %contig_depth -> key: contig ID, depth, cover; value: depth, coverage
+	# %known_depth  -> key: ref_ID, depth, normd; value: depth, normalized_depth
+	# filter the depth and coverage by depth cutoff and coverage cutoff, save the file
 	my %contig_depth = get_contig_mapped_depth($contig, $sample, $cpu_num, $file_type);
-	my %known_depth  = correct_depth($known_identified, \%contig_depth, \%contig_info);
-
+	my %known_depth  = correct_depth($known_identified, \%contig_depth, \%contig_info, $sample, $depth_norm); # input sample will provide lib_size for depth normalization
 	$known_identified = filter_by_coverage_depth($known_identified, \%known_depth, $coverage_cutoff, $depth_cutoff);
-
 	Util::save_file($known_identified, "$sample.known.identified_with_depth");
 
 	my ($known_contig_table, $known_contig_blast_table, $known_reference) =  combine_table1($known_identified, $known_blast_table, \%contig_info, \%virus_info, \%reference_info);
@@ -227,7 +227,7 @@ main: {
 	Util::save_file($known_reference, "$sample_dir/new.known.reference.fa");
 	Util::save_file($known_contig_blast_sam, "$sample_dir/$sample_base.new.known.sam");
 	
-	my $known_num = 0; ($known_num, $known_identified) = arrange_col2($known_identified, \%virus_info, $sample, $coverage_norm);
+	my $known_num = 0; ($known_num, $known_identified) = arrange_col2($known_identified, \%virus_info);
 	
 	if ( length($known_identified) > 1 ) { 
 		Util::plot_result($known_identified, $known_contig_blast_table, $sample_dir, 'known'); 
@@ -276,7 +276,7 @@ main: {
 		my $novel_identified = Util::remove_redundancy_hit($novel_coverage, $blast_novel_table, $diff_ratio, $diff_contig_cover, $diff_contig_length);		
 
 		# 5. get depth 
-		my %novel_depth  = correct_depth($novel_identified, \%contig_depth, \%contig_info);
+		my %novel_depth  = correct_depth($novel_identified, \%contig_depth, \%contig_info, $sample, $depth_norm);
 		$novel_identified = filter_by_coverage_depth($novel_identified, \%novel_depth, $coverage_cutoff, $depth_cutoff);	
 		
 		# combine
@@ -286,7 +286,7 @@ main: {
 		Util::save_file($novel_reference, "$sample_dir/new.novel.reference.fa");
         	Util::save_file($novel_contig_blast_sam, "$sample_dir/$sample_base.new.novel.sam");
 
-		my $novel_num = 0; ($novel_num, $novel_identified) = arrange_col2($novel_identified, \%virus_info, $sample, $coverage_norm);
+		my $novel_num = 0; ($novel_num, $novel_identified) = arrange_col2($novel_identified, \%virus_info);
 
 		if ( length($novel_identified) > 1 ) { 
 			Util::plot_result($novel_identified, $novel_contig_blast_table, $sample_dir, 'novel'); 
@@ -364,20 +364,8 @@ sub arrange_col2
 
 	my @all_data;
 
-	# get total read num
-	my $total_read = 0;
-	my $fh = IO::File->new($sample) || die $!;
-	while(<$fh>) {
-		my $id = $_;
-		if ($id =~ m/^>/) { <$fh>; }
-		if ($id =~ m/^@/) { <$fh>; <$fh>; <$fh>; }
-		$total_read++;
-	}
-
 	chomp($known_identified);
 	my @a = split(/\n/, $known_identified);
-
-	print "$sample\t$total_read\n$coverage_norm\n";
 
 	foreach my $line (@a)
 	{
@@ -387,24 +375,15 @@ sub arrange_col2
 		# 3 - coverage (cover_length/seq_length: col3/col2)
 		# 4 - contigs
 		# 5 - contig number
-		# 6 - depth (???)
+		# 6 - depth (read depth, from pileup file)
 
 		my @ta = split(/\t/, $line);
 		#my $coverage= 1.0 * $a[7] / $a[1];					# get coverage, shan's method
 		my $coverage = $ta[2] / $ta[1];						# changed by kentnf
 		my $depth = $ta[6];
-
 		my $genus = $$virus_info{$ta[0]}{'genus'};				# col 8 
 		my $desc  = $$virus_info{$ta[0]}{'desc'};				# col 9 
-
-		if ($coverage_norm == 1) {
-			# coverage_norm = 1;
-			my $depth_norm = 1e6 * $ta[6] * $ta[2] / ($ta[1] * $total_read);	# normalization depth
-			push(@all_data, [@ta[0,1,2],$coverage,@ta[4,5],$depth_norm,$genus,$desc,$ta[3]]); # why add $ta[3]
-		} else {
-			# coverage_norm = 0;
-			push(@all_data, [@ta[0,1,2],$coverage,@ta[4,5,6],$genus,$desc]); 	# re-order the data, then put them to array 
-		}
+		push(@all_data, [@ta[0,1,2],$coverage,@ta[4,5,6],$genus,$desc]); 	# re-order the data, then put them to array 
 	}
 	
 	@all_data = sort { ($a->[7] cmp $b->[7]) || ($b->[2] cmp $a->[2])} @all_data; # sort according to Genus and read_cov(bp)
@@ -449,6 +428,13 @@ sub get_contig_mapped_depth
 	Util::process_cmd("$BIN_DIR/samtools view -bt $contig.fai $sample.sam > $sample.bam 2>$sample.samtools.log");
 	Util::process_cmd("$BIN_DIR/samtools sort $sample.bam $sample.sorted 2>$sample.samtools.log");
 	Util::process_cmd("$BIN_DIR/samtools mpileup -f $contig $sample.sorted.bam > $sample.pileup 2>$sample.samtools.log"); 
+
+	# parse pileup file to save depth info to hash
+	# key: ref_id, mean, total. cover
+	# value: mean, total, cover
+	# cover: number base covered for each contig
+	# total: total depth for each contig
+	# mean: mean depth for each contig (total/cover)
 	my %depth = Util::pileup_depth("$sample.pileup");
 
 	# unlink temp file
@@ -464,8 +450,20 @@ sub get_contig_mapped_depth
 =cut
 sub correct_depth
 {	
-	my ($known_identified, $contig_depth, $contig_info) = @_;
+	my ($known_identified, $contig_depth, $contig_info, $sample, $ref_depth_norm) = @_;
 
+	# get total read num
+	my $lib_size = 0;
+	my $fh = IO::File->new($sample) || die $!;
+	while(<$fh>) {
+		my $id = $_;
+		if ($id =~ m/^>/) { <$fh>; }
+		if ($id =~ m/^@/) { <$fh>; <$fh>; <$fh>; }
+		$lib_size++;
+        }
+	$fh->close;
+
+	# convert contig depth to reference depth
 	my %known_depth;
 
 	chomp($known_identified);
@@ -482,15 +480,25 @@ sub correct_depth
 		{
 			die "Error, undef contig length $cid\n" unless defined $$contig_info{$cid}{'length'};
 			die "Error, undef contig total  $cid\n" unless defined $$contig_depth{$cid}{'total'};
-			$contig_len = $contig_len + $$contig_info{$cid}{'length'};
-			$total_len  = $total_len  + $$contig_depth{$cid}{'total'};
+			$contig_len = $contig_len + $$contig_info{$cid}{'length'};	# combine all contig length for each reference
+			$total_len  = $total_len  + $$contig_depth{$cid}{'total'};	# conbine all contig depth for each reference
 		}
 
 		die "Error in contig length: $contig_len\n" unless $contig_len > 0;
 		die "Error in total length: $total_len\n" unless $total_len > 0;
 
-		my $ref_depth = $total_len/$contig_len;
-		$known_depth{$a[0]} = $ref_depth;
+		# normalization depth using RPM method
+		# depth = (all_contig_depth / all_contig_length)
+		# norm_depth = (all_contig_depth * 1e+6) / (all_contig_length * lib_size)
+		my $ref_depth = $total_len / $contig_len;
+		my $norm_depth = (1e+6 * $total_len) / ($contig_len * $lib_size);
+
+		# select depth by user provided parameters	
+		if ($ref_depth_norm) {
+			$known_depth{$a[0]} = $norm_depth;
+		} else {
+			$known_depth{$a[0]} = $ref_depth;
+		}
 	}
 	
 	return %known_depth;
@@ -505,7 +513,7 @@ sub filter_by_coverage_depth
 {
 	my ($known_identified, $known_depth, $coverage_cutoff, $depth_cutoff) = @_;
 
-	my $output_identified = '';	
+	my $output_identified = '';
 
 	chomp($known_identified);
         my @a = split(/\n/, $known_identified);

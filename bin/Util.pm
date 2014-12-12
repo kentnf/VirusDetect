@@ -823,8 +823,8 @@ sub pileup_depth
 	my $input_pileup = shift;
 
 	# put mean depth, and total coverage to hash
-	# key: ref_id, mean, total
-	# value: mean, total
+	# key: ref_id, mean, total. cover
+	# value: mean, total, cover
 	my %depth;
 
 	my $prev_ref = '';	
