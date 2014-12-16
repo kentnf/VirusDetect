@@ -210,11 +210,10 @@ main: {
 	my $known_identified = Util::remove_redundancy_hit($known_coverage, $known_blast_table, $diff_ratio, $diff_contig_cover, $diff_contig_length);
 
 	Util::save_file($known_identified, "$sample.known.identified");
-	
 
 	# 5. align read to contigs get depth, then compute reference depth using contig depth
 	# %contig_depth -> key: contig ID, depth, cover; value: depth, coverage
-	# %known_depth  -> key: ref_ID, depth, normd; value: depth, normalized_depth
+	# %known_depth  -> key: ref_ID; value: depth
 	# filter the depth and coverage by depth cutoff and coverage cutoff, save the file
 	my %contig_depth = get_contig_mapped_depth($contig, $sample, $cpu_num, $file_type);
 	my %known_depth  = correct_depth($known_identified, \%contig_depth, \%contig_info, $sample, $depth_norm); # input sample will provide lib_size for depth normalization
