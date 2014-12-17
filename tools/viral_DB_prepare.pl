@@ -25,6 +25,7 @@ if	($options{'t'} eq 'download')	{ vrl_download(\%options, \@ARGV); }    # downl
 elsif	($options{'t'} eq 'category')	{ vrl_category(\%options, \@ARGV); }    # automatically classification
 elsif	($options{'t'} eq 'manually')	{ vrl_manually(\%options, \@ARGV); }	# manually classification
 elsif	($options{'t'} eq 'patch')	{ vrl_patch(\%options, \@ARGV); }	# combine the result
+elsif	($options{'t'} eq 'unique')	{ vrl_unique(\%options, \@ARGV);)}	# unique the classified virus
 else	{ usage($version); }
 
 sub usage
@@ -32,18 +33,83 @@ sub usage
 	my $version = shift;
 	my $usage = qq'
 PIPELINE (version $version):
+
 1. download viral sequnece from genbank ftp (ftp://ftp.ncbi.nih.gov/genbank/)
    \$ $0 -t download
+
 2. run viral_DB_prepare.pl script to category virus 
    \$ $0 -t category gbvr*.gz
+
 3. generate manually classification file
-   \$ $0 -t manually  
-4. combine the result (patch the manually to update file)
+   \$ $0 -t manually
+   * manually change the genus and hname file
+
+4. run viral_DB_prepare.pl script to category virus again using manually changed file
+   \$ $0 -t category -c 1 gbvr*.gz
+   \$ $0 -t manually
+   * manually change the desc file
+
+5. combine the result (patch the manually to update file)
    \$ $0 -t patch
+
+6. unique the classified virus
+   \$ $0 -t unique input_virus.fasta
 
 ';
 	print $usage;
 	exit;
+}
+
+=head2
+ vrl_unique : unique the classified virus 
+=cut
+sub vrl_unique
+{
+	my ($options, $files) = @_;
+	
+	my $usage = qq'
+USAGE: $0 -t unique input_file
+
+* remove sequence longer than 40kb
+* remove duplication virus (shorter one)	
+
+';
+
+	print $usage and exit unless defined $$files[0];
+	my $input_file = $$files[0];
+	die "[ERR]file not exist $input_file\n" unless -s $input_file;
+
+	# parameters
+	my $length_cutoff = 40000;
+
+	# remove seq longer than 40k, the left is ordered by length 
+	my %length_sid;
+	my %sid_seq;
+	my %uniq_seq;
+	my ($id, $seq, $length);
+	my $in = Bio::SeqIO->new(-format=>'fasta', -file=>$input_file);
+	while(my $inseq = $in->next_seq)
+	{
+		$id = $inseq->id;
+		$seq = $inseq->seq;
+		$length = $inseq->length;
+		next if $length >= $length_cutoff;
+		next if defined $uniq_seq{$seq};
+		$uniq_seq{$seq} = 1;
+
+		if (defined $length_sid{$length}) {
+			$length_sid{$length}.= "\t".$id;
+		} else {
+			$length_sid{$length} = $id;
+		}
+
+		$sid{$id} = $seq;
+	}
+
+	foreach my $len (sort {$b<=>$a} keys %length_sid)
+	{
+		
+	}
 }
 
 =head2
@@ -254,7 +320,10 @@ sub vrl_category
 	my $usage = qq'
 USAGE: $0 -t category input_file1 ... input_fileN
 
+	-c 1 make classify by classification enable
 ';
+	my $cbc = 0;
+	$cbc = 1 if defined $options{'c'};
 
 	print $usage and exit unless defined $$files[0];
 	my @vrl_files = @$files;
@@ -438,10 +507,9 @@ USAGE: $0 -t category input_file1 ... input_fileN
 						}
 					}
 
-					# record abnormal host name (for manually check table 1)
-					if ($host_taxon eq 'NA') {
-						$manual_hname_check{$hname} = 1;
-					}
+					# record abnormal host name (for manually chek)
+					# this will get all abnormal name, some of them could be classified by genus
+					# if ($host_taxon eq 'NA') { $manual_hname_check{$hname} = 1; }
 
 					# get host division, and put it to hash
 					if ( defined $$node_table{$host_taxon}{'division'} ) {
@@ -507,7 +575,10 @@ USAGE: $0 -t category input_file1 ... input_fileN
 				# check manually classification result
 				if ( defined $update_desc{$sid} ) {
 					print $out1 $sid,"\t",$inseq->length,"\t",$inseq->desc,"\t",$inseq->version,"\t",$update_desc{$sid},"\tmanual\n";
-				} else { 
+				} else {
+					# # record abnormal host name (for manually chek)	 
+					my @hname = split(/\t/, $host_name);
+					foreach my $hname (@hname) { $manual_hname_check{$hname} = 1; }
 					$host_name =~ s/\t/,/ig;
 					print $out2 $sid,"\t",$inseq->length,"\t",$inseq->desc,"\t",$inseq->version,"\tNA\t$host_name\n";
 					print $out3 ">",$sid,"\n",$inseq->seq,"\n";
@@ -588,7 +659,7 @@ USAGE: $0 -t category input_file1 ... input_fileN
 	}
 	$outy->close;
 
-	classify_by_classified($vrl_info_unclassified, $vrl_info_classified,  $manual_desc);
+	classify_by_classified($vrl_info_unclassified, $vrl_info_classified,  $manual_desc) if $cbc;
 }
 
 #################################################################
