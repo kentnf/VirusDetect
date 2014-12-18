@@ -25,7 +25,7 @@ if	($options{'t'} eq 'download')	{ vrl_download(\%options, \@ARGV); }    # downl
 elsif	($options{'t'} eq 'category')	{ vrl_category(\%options, \@ARGV); }    # automatically classification
 elsif	($options{'t'} eq 'manually')	{ vrl_manually(\%options, \@ARGV); }	# manually classification
 elsif	($options{'t'} eq 'patch')	{ vrl_patch(\%options, \@ARGV); }	# combine the result
-elsif	($options{'t'} eq 'unique')	{ vrl_unique(\%options, \@ARGV);)}	# unique the classified virus
+elsif	($options{'t'} eq 'unique')	{ vrl_unique(\%options, \@ARGV); }	# unique the classified virus
 else	{ usage($version); }
 
 sub usage
@@ -80,37 +80,87 @@ USAGE: $0 -t unique input_file
 	die "[ERR]file not exist $input_file\n" unless -s $input_file;
 
 	# parameters
-	my $length_cutoff = 40000;
+	my $max_len_cutoff = 40000;
+	my $min_len_cutoff = 100;
 
 	# remove seq longer than 40k, the left is ordered by length 
-	my %length_sid;
-	my %sid_seq;
+	my $temp_seq = $input_file.".temp.fa";
+	my $out = IO::File->new(">".$temp_seq) || die $!;
+	my %seq_info;
 	my %uniq_seq;
-	my ($id, $seq, $length);
+	my %removed;
+	my ($id, $seq, $length, $revseq);
 	my $in = Bio::SeqIO->new(-format=>'fasta', -file=>$input_file);
 	while(my $inseq = $in->next_seq)
 	{
 		$id = $inseq->id;
 		$seq = $inseq->seq;
 		$length = $inseq->length;
-		next if $length >= $length_cutoff;
-		next if defined $uniq_seq{$seq};
-		$uniq_seq{$seq} = 1;
+		$revseq = reverse($seq);
+		$revseq =~ tr/ABCDGHMNRSTUVWXYabcdghmnrstuvwxy/TVGHCDKNYSAABWXRtvghcdknysaabwxr/;
 
-		if (defined $length_sid{$length}) {
-			$length_sid{$length}.= "\t".$id;
-		} else {
-			$length_sid{$length} = $id;
+		$seq_info{$id}{'seq'} = $seq;
+		$seq_info{$id}{'len'} = $length;
+
+		if ($length > $max_len_cutoff || $length < $min_len_cutoff) {
+			$removed{$id} = $length;
+			next;
 		}
 
-		$sid{$id} = $seq;
-	}
+		if (defined $uniq_seq{$seq}) {
+			$removed{$id} = "Dup";
+			next
+		}
 
-	foreach my $len (sort {$b<=>$a} keys %length_sid)
-	{
-		
+		$uniq_seq{$seq} = 1;
+		$uniq_seq{$revseq} = 1;
+
+		print $out ">$id\n$seq\n";	
 	}
+	$out->close;
+
+	# self blast
+	my $cmd_format = "formatdb -i $temp_seq -p F";
+	my $cmd_blast = "blastall -p blastn -i $temp_seq -d $temp_seq -a 24 -v 2 -b 2 -m 8 -o $temp_seq.blast";
+	my $blast_tool = "blastTool.pl";
+	# die "[ERR]no blastTool.pl\n" unless -s $blast_tool;
+	my $cmd_unique = "$blast_tool -t unique $temp_seq $temp_seq.blast";
+	#run_cmd($cmd_format);
+	#run_cmd($cmd_blast);
+	run_cmd($cmd_unique);
+	
+	# check the output files
+	foreach my $f (($temp_seq.".removed", $temp_seq.".unique", $temp_seq.".rmDup_table.txt")) {
+		die "[ERR]file not exist $f\n" unless -e $f;
+		#run_cmd("mv $temp_seq.removed $input_file.removed");
+		#run_cmd("mv $temp_seq.unique  $input_file.unique");
+		#run_cmd("mv $temp_seq.rmDup_table.txt $input_file.rmDup_table.txt");
+	} 
+
+	# update with pre removed sequences 
+	my $out1 = IO::File->new(">>"."$input_file.removed") || die $!;
+	my $out2 = IO::File->new(">>"."$input_file.rmDup_table.txt") || die $!;
+	
+	foreach my $id (sort keys %removed)
+	{
+		print $out1 ">".$id."\n".$seq_info{$id}{'seq'}."\n";
+		print $out2 $id."\t".$removed{$id}."\n";
+	}
+	
+	$out1->close;
+	$out2->close;
 }
+
+=head2
+ run_cmd: run other program using tophat
+=cut
+sub run_cmd
+{
+	my $cmd = shift;
+	print $cmd."\n" and return(1) if $debug;
+	system($cmd) && die "[ERR]cmd: $cmd\n";
+}
+
 
 =head2
  vrl_patch : patch the manually corrected result to update file 
