@@ -125,8 +125,8 @@ USAGE: $0 -t unique input_file
 	my $blast_tool = "blastTool.pl";
 	# die "[ERR]no blastTool.pl\n" unless -s $blast_tool;
 	my $cmd_unique = "$blast_tool -t unique $temp_seq $temp_seq.blast";
-	#run_cmd($cmd_format);
-	#run_cmd($cmd_blast);
+	run_cmd($cmd_format);
+	run_cmd($cmd_blast);
 	run_cmd($cmd_unique);
 	
 	# check the output files
@@ -368,15 +368,21 @@ sub vrl_category
 	my ($options, $files) = @_;	
 
 	my $usage = qq'
-USAGE: $0 -t category input_file1 ... input_fileN
+USAGE: $0 -t category [options] input_file1 ... input_fileN
 
+	-d previous classification info
 	-c 1 make classify by classification enable
-';
-	my $cbc = 0;
-	$cbc = 1 if defined $options{'c'};
 
+';
 	print $usage and exit unless defined $$files[0];
 	my @vrl_files = @$files;
+
+	my $cbc = 0;
+	$cbc = 1 if (defined $options{'c'} && $options{'c'} > 0);
+
+	my $pre_cat;
+	$pre_cat = $options{'b'} if defined $options{'b'};
+	die "[ERR]file not exit $pre_cat\n" unless -s $pre_cat;
 
 	# load default version
 	my $version_file = $FindBin::RealBin."/default_version";
@@ -404,6 +410,8 @@ USAGE: $0 -t category input_file1 ... input_fileN
 	}
 
 	my %division  = get_division();
+	my %rev_division = reverse %division;
+	my %pre_division = load_pre_classification($pre_cat);
 	my ($node_table, $virus_genus_taxon_id) = load_taxon_node($node_file);
 	my ($name_table, $virus_genus_taxon) = load_taxon_name($name_file, $virus_genus_taxon_id);
 	my %virus_hostdiv = load_host_div($host_info_file, $update_genus);
@@ -458,7 +466,22 @@ USAGE: $0 -t category input_file1 ... input_fileN
 			$vrl_seq_info{$sid}{'ver'} = $inseq->seq_version;
 			$vrl_seq_info{$sid}{'seq'} = $inseq->seq;
 			$vrl_seq_info{$sid}{'des'} = $inseq->desc;
-						
+
+			my %host_division = ();
+			# check if the virus was classified before
+			if (defined $pre_division{$sid}) {
+				print $out1 $pre_division{$sid}."\n";
+
+				my @m = split(/\t/, $pre_division{$sid});
+				my @dname = split(/,/, $m[5]);
+                               	foreach my $dname (@dname) {
+                                	my $div_id = $rev_division{$dname};
+                             		$host_division{$div_id} = 'manual';
+                               	}
+				$vrl_seq_info{$sid}{'host_div'} = \%host_division; # for sequence classification
+				next;
+			}
+
 			# get org taxon id or host name 
 			my ($org_taxon, $org_name, $genus_taxon, $genus_name, $genus_div, $host_taxon, $host_name, $host_div);
 			my %source; # key: org_taxon; value: host_name
@@ -498,7 +521,6 @@ USAGE: $0 -t category input_file1 ... input_fileN
 				#print "STAT$f\t$sid\tNA\tNA\tNA\tNA\tNA\tNA\tNA\tNA\n";
 			}
 
-			my %host_division = (); # key: division id; value: source
 			foreach my $otid (sort keys %source) 
 			{
 
@@ -563,6 +585,8 @@ USAGE: $0 -t category input_file1 ... input_fileN
 
 					# get host division, and put it to hash
 					if ( defined $$node_table{$host_taxon}{'division'} ) {
+						next if $$node_table{$host_taxon}{'division'} == 8; # skip unsigned
+						next if $$node_table{$host_taxon}{'division'} == 9; # skip virus
 						$host_div = "G".$$node_table{$host_taxon}{'division'};
 						$host_div = "G10" if ($host_div eq "G2" || $host_div eq "G5" || $host_div eq "G6");
 						if (  defined $host_division{$host_div} ) {
@@ -602,11 +626,13 @@ USAGE: $0 -t category input_file1 ... input_fileN
 			#$vrl_seq_info{$inseq->id}{'host_kingdom'} = $this_tax;
 			# print "$host_taxon\t$value\t$this_tax\n";
 
-			if ( scalar(keys(%host_division)) > 0 ) {	
-				$vrl_seq_info{$sid}{'host_div'} = \%host_division;
-
+			if ( scalar(keys(%host_division)) > 0 ) {
+				# output classification to file
+				my $host_div_name = '';
+				my %host_source = ();
 				foreach my $host_div_id (sort keys %host_division) {
 
+					# check the undefined host_div_id if it do not have host div name
 					unless ( defined $division{$host_div_id} ) {
 						print $host_div_id,"\n";
 						print $sid,"\n";
@@ -616,24 +642,45 @@ USAGE: $0 -t category input_file1 ... input_fileN
 						exit;
 					}
 
-					my $host_div_name = $division{$host_div_id};
-					my $host_source = $host_division{$host_div_id};
-					print $out1 $sid,"\t",$inseq->length,"\t",$inseq->desc,"\t",$inseq->version,"\t",$host_div_name,"\t",$host_source,"\n";
+					$host_div_name.=",".$division{$host_div_id};
+					$host_source{$host_division{$host_div_id}} = 1;
 				}
+				$host_div_name =~ s/^,//;
+				my $output_source = join(",", sort keys %host_source);
+				print $out1 $sid,"\t",$inseq->length,"\t",$genus_name,"\t",$inseq->desc,"\t",$inseq->version,"\t",$host_div_name,"\t",$output_source,"\n";
 
 			} else {
 				# check manually classification result
 				if ( defined $update_desc{$sid} ) {
-					print $out1 $sid,"\t",$inseq->length,"\t",$inseq->desc,"\t",$inseq->version,"\t",$update_desc{$sid},"\tmanual\n";
+					# put classification to hash for sequence classification
+					my @dname = split(/,/, $update_desc{$sid});
+					foreach my $dname (@dname) {
+						my $div_id = $rev_division{$dname};
+						$host_division{$div_id} = 'manual';
+					}
+
+					# output classification to file
+					print $out1 $sid,"\t",$inseq->length,"\t",$genus_name,"\t",$inseq->desc,"\t",$inseq->version,"\t",$update_desc{$sid},"\tmanual\n";
+
 				} else {
-					# # record abnormal host name (for manually chek)	 
+			
+					# record abnormal host name (for manually chek)	 
 					my @hname = split(/\t/, $host_name);
 					foreach my $hname (@hname) { $manual_hname_check{$hname} = 1; }
+
+					# put classification to hash for sequence classification
+					$host_division{'G8'} = 'manual';
+
+					# output classification to file
 					$host_name =~ s/\t/,/ig;
-					print $out2 $sid,"\t",$inseq->length,"\t",$inseq->desc,"\t",$inseq->version,"\tNA\t$host_name\n";
-					print $out3 ">",$sid,"\n",$inseq->seq,"\n";
+					print $out1 $sid,"\t",$inseq->length,"\t",$genus_name,"\t",$inseq->desc,"\t",$inseq->version,"\tUnassigned\tNA\n";
+
+					#print $out2 $sid,"\t",$inseq->length,"\t",$inseq->desc,"\t",$inseq->version,"\tNA\t$host_name\n";
+					#print $out3 ">",$sid,"\n",$inseq->seq,"\n";
 				}
 			}
+			$vrl_seq_info{$sid}{'host_div'} = \%host_division; # for sequence classification
+
 			#$parse_seq_num++;
 			#my $parse_percent = int(($parse_seq_num/$seq_num) * 100);
 			#if ($parse_percent % 5 == 0 && $parse_percent ne $pre_parse_percent) {
@@ -648,7 +695,7 @@ USAGE: $0 -t category input_file1 ... input_fileN
 	$out1->close;
 	$out2->close;
 
-	# output sequence for each division and uniq them by uclust
+	# output sequence for each division
 	foreach my $div_id (sort keys %division)
 	{
 		my $div_name = $division{$div_id};
@@ -672,7 +719,6 @@ USAGE: $0 -t category input_file1 ... input_fileN
 			print $fhs $vrl_seq;
 			$fhs->close;
 		}
-		# cluster by uclust
 	}
 
 	# output put manually changed file
@@ -715,6 +761,28 @@ USAGE: $0 -t category input_file1 ... input_fileN
 #################################################################
 # kentnf: subroutine						#
 #################################################################
+=head2
+ load_pre_classification
+=cut
+sub load_pre_classification
+{
+	my $pre_cat = shift;
+
+	my %pre_division;
+	
+	my $fh = IO::File->new($pre_cat) || die $!;
+	while(<$fh>)
+	{
+		chomp;
+		next if $_ =~ m/^#/;
+		my @a = split(/\t/, $_);
+		$pre_division{$a[0]} = $_;
+	}
+	$fh->close;
+	
+	return %pre_division;
+}
+
 =head2
  load_host_div : # load host info to hash (ICTV-Master-Species-List-2013_v2: http://www.mcb.uct.ac.za/tutorial/ICTV%20Species%20Lists%20by%20host.htm )
 =cut
