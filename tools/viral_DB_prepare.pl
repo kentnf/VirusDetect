@@ -26,6 +26,7 @@ elsif	($options{'t'} eq 'category')	{ vrl_category(\%options, \@ARGV); }    # au
 elsif	($options{'t'} eq 'manually')	{ vrl_manually(\%options, \@ARGV); }	# manually classification
 elsif	($options{'t'} eq 'patch')	{ vrl_patch(\%options, \@ARGV); }	# combine the result
 elsif	($options{'t'} eq 'unique')	{ vrl_unique(\%options, \@ARGV); }	# unique the classified virus
+elsif	($options{'t'} eq 'refine')	{ vrl_refine(); }			# revine manually changed classification
 else	{ usage($version); }
 
 sub usage
@@ -55,9 +56,57 @@ PIPELINE (version $version):
 6. unique the classified virus
    \$ $0 -t unique input_virus.fasta
 
+7. if the out put vrl_genbank.txt has been manually changed
+   \$ $0 -t refine [no parameters] 
+   * output is like vrl_Bacteria_all.fasta.new
+
 ';
 	print $usage;
 	exit;
+}
+
+sub vrl_refine
+{
+	my @fasta = qw/vrl_Algae_all.fasta vrl_Archaea_all.fasta vrl_Bacteria_all.fasta vrl_Fungi_all.fasta vrl_Invertebrates_all.fasta vrl_Plants_all.fasta vrl_Protozoa_all.fasta vrl_Unassigned_all.fasta vrl_Vertebrates_all.fasta vrl_Viruses_all.fasta/;
+	my $input_file = 'vrl_genbank.txt';
+
+	# load seq to hash	
+	my %seq_info;
+	my %div_fh;
+	my %div_file;
+	foreach my $f (@fasta) {
+		die "[ERR]file not exist $f\n" unless -s $f;
+		my $in = Bio::SeqIO->new(-format=>'fasta', -file=>$f);
+		while(my $inseq = $in->next_seq) {
+			next if defined $seq_info{$inseq->id};
+			$seq_info{$inseq->id} = $inseq->seq;
+		}
+
+		my $new_file = $f.".new";
+		my $div = $f;
+		$div =~ s/vrl_//; $div =~ s/_all\.fasta//;
+		my $fh = IO::File->new(">".$new_file) || die $!;
+		$div_fh{$div} = $fh;
+		$div_file{$div} = $new_file;
+	}
+
+	# load classification to hash
+	my $in = IO::File->new($input_file) || die $!;
+	while(<$in>)
+	{
+		chomp;
+		my @a = split(/\t/, $_);
+		my @b = split(/,/, $a[5]);
+		foreach my $b (@b) {
+			die "[ERR]undef div $b\n" unless defined $div_fh{$b};
+			print {$div_fh{$b}} ">".$a[0]."\n".$seq_info{$a[0]}."\n";
+		}
+	}
+	$in->close;
+
+	foreach my $div (sort keys %div_fh) {
+		$div_fh{$div}->close;
+	}
 }
 
 =head2
@@ -378,11 +427,13 @@ USAGE: $0 -t category [options] input_file1 ... input_fileN
 	my @vrl_files = @$files;
 
 	my $cbc = 0;
-	$cbc = 1 if (defined $options{'c'} && $options{'c'} > 0);
+	$cbc = 1 if (defined $$options{'c'} && $$options{'c'} > 0);
 
 	my $pre_cat;
-	$pre_cat = $options{'b'} if defined $options{'b'};
-	die "[ERR]file not exit $pre_cat\n" unless -s $pre_cat;
+	if (defined $$options{'b'}) {
+		$pre_cat = $$options{'b'};
+		die "[ERR]file not exit $pre_cat\n" unless -s $pre_cat;
+	}
 
 	# load default version
 	my $version_file = $FindBin::RealBin."/default_version";
@@ -411,7 +462,7 @@ USAGE: $0 -t category [options] input_file1 ... input_fileN
 
 	my %division  = get_division();
 	my %rev_division = reverse %division;
-	my %pre_division = load_pre_classification($pre_cat);
+	my %pre_division = load_pre_classification($pre_cat) if defined $pre_cat;
 	my ($node_table, $virus_genus_taxon_id) = load_taxon_node($node_file);
 	my ($name_table, $virus_genus_taxon) = load_taxon_name($name_file, $virus_genus_taxon_id);
 	my %virus_hostdiv = load_host_div($host_info_file, $update_genus);
