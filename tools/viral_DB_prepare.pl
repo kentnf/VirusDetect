@@ -450,8 +450,8 @@ USAGE: $0 -t category [options] input_file1 ... input_fileN
 	# # hash name_table: key: name; value: taxon id;
 	# # hash virus_genus_taxon_id: key: taxon_id; value: genus scientific name
 
-	my $node_file = $FindBin::RealBin."/nodes.dmp.gz";
-	my $name_file = $FindBin::RealBin."/names.dmp.gz";
+	my $node_file = "nodes.dmp.gz";
+	my $name_file = "names.dmp.gz";
 	my $host_info_file = $FindBin::RealBin."/ICTV_2013_genus_uniq_host_info_raw.txt";
 	my $update_hname = $FindBin::RealBin."/update_hname_table_$version.txt";
 	my $update_genus = $FindBin::RealBin."/update_genus_table_$version.txt";
@@ -482,8 +482,6 @@ USAGE: $0 -t category [options] input_file1 ... input_fileN
 
 	# parse viral sequence to database file
 	my $vrl_info_classified   = "vrl_genbank.txt";
-	my $vrl_info_unclassified = "vrl_genbank_unclassified.txt";
-	my $vrl_seq_unclassified  = "vrl_genbank_unclassified.fasta"; 
 	my $manual_hname = "manual_hname_table.txt";
 	my $manual_genus = "manual_genus_table.txt";
 	my $manual_desc  = "manual_desc_table.txt";
@@ -494,8 +492,6 @@ USAGE: $0 -t category [options] input_file1 ... input_fileN
 	my %vrl_seq_info;
 
 	my $out1 = IO::File->new(">".$vrl_info_classified) || die $!;
-	my $out2 = IO::File->new(">".$vrl_info_unclassified) || die $!;
-	my $out3 = IO::File->new(">".$vrl_seq_unclassified) || die $!;
 
 	foreach my $f (@vrl_files)
 	{
@@ -641,9 +637,9 @@ USAGE: $0 -t category [options] input_file1 ... input_fileN
 						$host_div = "G".$$node_table{$host_taxon}{'division'};
 						$host_div = "G10" if ($host_div eq "G2" || $host_div eq "G5" || $host_div eq "G6");
 						if (  defined $host_division{$host_div} ) {
-							if ( $host_division{$host_div} ne 'genbank' ) {
-								$host_division{$host_div}.=",genbank";
-							}
+							# if ( $host_division{$host_div} ne 'genbank' ) {
+							# 	$host_division{$host_div}.=",genbank";
+							# }
 						} else {
 							$host_division{$host_div} = "genbank";
 						}
@@ -725,9 +721,6 @@ USAGE: $0 -t category [options] input_file1 ... input_fileN
 					# output classification to file
 					$host_name =~ s/\t/,/ig;
 					print $out1 $sid,"\t",$inseq->length,"\t",$genus_name,"\t",$inseq->desc,"\t",$inseq->version,"\tUnassigned\tNA\n";
-
-					#print $out2 $sid,"\t",$inseq->length,"\t",$inseq->desc,"\t",$inseq->version,"\tNA\t$host_name\n";
-					#print $out3 ">",$sid,"\n",$inseq->seq,"\n";
 				}
 			}
 			$vrl_seq_info{$sid}{'host_div'} = \%host_division; # for sequence classification
@@ -744,7 +737,6 @@ USAGE: $0 -t category [options] input_file1 ... input_fileN
 	}
 
 	$out1->close;
-	$out2->close;
 
 	# output sequence for each division
 	foreach my $div_id (sort keys %division)
@@ -806,7 +798,7 @@ USAGE: $0 -t category [options] input_file1 ... input_fileN
 	}
 	$outy->close;
 
-	classify_by_classified($vrl_info_unclassified, $vrl_info_classified,  $manual_desc) if $cbc;
+	classify_by_classified($vrl_info_classified,  $manual_desc) if $cbc;
 }
 
 #################################################################
