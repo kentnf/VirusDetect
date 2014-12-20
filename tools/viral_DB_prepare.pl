@@ -36,10 +36,11 @@ sub usage
 PIPELINE (version $version):
 
 1. download viral sequnece from genbank ftp (ftp://ftp.ncbi.nih.gov/genbank/)
-   \$ $0 -t download
+   \$ $0 -t download > command.sh
+   * run the downloand command
 
 2. run viral_DB_prepare.pl script to category virus 
-   \$ $0 -t category gbvr*.gz
+   \$ $0 -t category gbvrl*.gz
 
 3. generate manually classification file
    \$ $0 -t manually
@@ -404,8 +405,14 @@ sub vrl_download
 	}
 	$ftp->quit;
 
-	print "# cmd for download vrl database\n$download_cmd\n\n";
+	#print "# cmd for download vrl database\n$download_cmd\n\n";
 	print "# cmd for download all vrl database files\n$download_cmd_all\n\n";
+	print "# cmd for dwonload taxonomy database\nwget ftp://ftp.ncbi.nih.gov/pub/taxonomy/taxdump.tar.gz\n";
+	my @del_f = qw/citations.dmp delnodes.dmp division.dmp gc.prt gencode.dmp merged.dmp readme.txt taxdump.tar.gz/;
+	my @zip_f = qw/names.dmp nodes.dmp/;
+	print "tar -xzvf taxdump.tar.gz\n";
+	print "rm ".join(" ", @del_f)."\n";
+	print "gzip ".join(" ", @zip_f)."\n";
 	exit;
 }
 
@@ -452,6 +459,7 @@ USAGE: $0 -t category [options] input_file1 ... input_fileN
 
 	my $node_file = "nodes.dmp.gz";
 	my $name_file = "names.dmp.gz";
+	die "[ERR]no taxonomy file\n" unless (-s $node_file && -s $name_file);
 	my $host_info_file = $FindBin::RealBin."/ICTV_2013_genus_uniq_host_info_raw.txt";
 	my $update_hname = $FindBin::RealBin."/update_hname_table_$version.txt";
 	my $update_genus = $FindBin::RealBin."/update_genus_table_$version.txt";
