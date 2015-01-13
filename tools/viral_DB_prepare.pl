@@ -41,6 +41,8 @@ PIPELINE (version $version):
 
 2. run viral_DB_prepare.pl script to category virus 
    \$ $0 -t category gbvrl*.gz
+   * check warning message: if there is any virus do not have taxon id. 
+                            manually chagne in sub correct_org_taxon_division 
 
 3. generate manually classification file
    \$ $0 -t manually
@@ -426,7 +428,7 @@ sub vrl_category
 	my $usage = qq'
 USAGE: $0 -t category [options] input_file1 ... input_fileN
 
-	-d previous classification info
+	-b previous classification info
 	-c 1 make classify by classification enable
 
 ';
@@ -522,7 +524,8 @@ USAGE: $0 -t category [options] input_file1 ... input_fileN
 			$vrl_seq_info{$sid}{'seq'} = $inseq->seq;
 			$vrl_seq_info{$sid}{'des'} = $inseq->desc;
 
-			my %host_division = ();
+			my %host_division = ();	# key: divID, value, classification method
+
 			# check if the virus was classified before
 			if (defined $pre_division{$sid}) {
 				print $out1 $pre_division{$sid}."\n";
@@ -538,6 +541,8 @@ USAGE: $0 -t category [options] input_file1 ... input_fileN
 			}
 
 			# get org taxon id or host name 
+			# org taxon id -- the taxon id for the virus, which could be find on the db_xref tag of feature.
+			# host name -- could be find in host tag 
 			my ($org_taxon, $org_name, $genus_taxon, $genus_name, $genus_div, $host_taxon, $host_name, $host_div);
 			my %source; # key: org_taxon; value: host_name
 			foreach my $feat_object ($inseq->get_SeqFeatures) 
@@ -545,11 +550,12 @@ USAGE: $0 -t category [options] input_file1 ... input_fileN
 				my $primary_tag = $feat_object->primary_tag;
 				next unless $primary_tag eq "source";
 
+				# get org taxon name and host name, they are two clues for classification
 				$org_taxon = 'NA'; $host_name = 'NA';
 				foreach my $tag ($feat_object->get_all_tags) { 
  					foreach my $value ($feat_object->get_tag_values($tag)) {
 						if ($tag eq 'db_xref' && $value =~ m/taxon:(\d+)/) {
-							if ( $org_taxon eq 'NA' ) { $org_taxon = $1; } else { print "[ERR]Repeat organism taxon id $sid\n"; exit; }
+							if ( $org_taxon eq 'NA' ) { $org_taxon = $1; } else { die "[ERR]Repeat organism taxon id $sid\n"; }
 						}
  
 						if ($tag eq 'host' ) { 
@@ -559,23 +565,30 @@ USAGE: $0 -t category [options] input_file1 ... input_fileN
 						}      
       					}          
    				}
-			
-				unless (defined $$node_table{$org_taxon}{'division'} && $$node_table{$org_taxon}{'division'} eq '9') {
-					my $changed_org_taxon = correct_org_taxon_division($sid);
-					$org_taxon = $changed_org_taxon unless $changed_org_taxon eq 'NA';
-				} 
 
+				# find the organism that not linked to virus through the division number is not equal to 9
+				# if get warn on screen, check the corrected virus taxon id in genbank, then change it manally in sub correct_org_taxon_division
+				unless ( defined $$node_table{$org_taxon}{'division'} ) {
+					if ( $$node_table{$org_taxon}{'division'} ne '9' ) {
+						my $changed_org_taxon = correct_org_taxon_division($sid);
+						$org_taxon = $changed_org_taxon unless $changed_org_taxon eq 'NA';
+						warn "[WARN]organism is not virus: $sid\n" if $changed_org_taxon eq 'NA';
+					}
+				}
+
+				# try next feature of the organism is not virus
 				next unless $$node_table{$org_taxon}{'division'} eq '9'; # example EF710638
 				$source{$org_taxon} = $host_name;
 			}
 
-			#$vrl_seq_info{$sid}{'taxon'} = $org_taxon;
-			#$vrl_seq_info{$sid}{'host_name'} = $host_name;
+			# find the organism that not linked to virus through the division number is not equal to 9
+			# if get warn on screen, check the corrected virus taxon id in genbank, then change it manally in sub correct_org_taxon_division
 
-			if (scalar(keys(%source)) < 1 ) {  
-				#print "STAT$f\t$sid\tNA\tNA\tNA\tNA\tNA\tNA\tNA\tNA\n";
-			}
+			#if (scalar(keys(%source)) < 1 ) {  
+			#	#print "STAT$f\t$sid\tNA\tNA\tNA\tNA\tNA\tNA\tNA\tNA\n";
+			#}
 
+			# ==== classification ====
 			foreach my $otid (sort keys %source) 
 			{
 
@@ -611,7 +624,7 @@ USAGE: $0 -t category [options] input_file1 ... input_fileN
 				foreach my $hname (@hname)
 				{
 					$host_taxon = "NA"; $host_div = 'NA';
-					# find host taxon according to host name
+					# === find host taxon ID according to host name ===
 					my $host_taxon_fixed = "NA";
 					my $lchname = lc($hname);
 					if (defined $$name_table{$lchname}) {
@@ -644,7 +657,11 @@ USAGE: $0 -t category [options] input_file1 ... input_fileN
 						next if $$node_table{$host_taxon}{'division'} == 9; # skip virus
 						$host_div = "G".$$node_table{$host_taxon}{'division'};
 						$host_div = "G10" if ($host_div eq "G2" || $host_div eq "G5" || $host_div eq "G6");
+				
 						if (  defined $host_division{$host_div} ) {
+							# notice -- disable classification using host name if the virus has already been 
+							#           classified by virus taxon id
+							#
 							# if ( $host_division{$host_div} ne 'genbank' ) {
 							# 	$host_division{$host_div}.=",genbank";
 							# }
@@ -1081,25 +1098,27 @@ sub load_update_desc
 sub classify_by_classified
 {
         # set input and output file;
-        my ($unclassified, $classified, $manual_desc) = @_;
-        print "[ERR]input file not exist\n" and exit unless (-s $unclassified && -s $classified);
+        my ($classified, $manual_desc) = @_;
+        print "[ERR]input file not exist\n" and exit unless -s $classified;
 
         ####################################################
         # ==== generate classification by description ==== #
         ####################################################
-        # load classified to hash
+        # load classified to hash, unclassified to array
+	my @unclassified = ();
         my %vrl_cat;
         my $fh1 = IO::File->new($classified) || die $!;
         while(<$fh1>)
         {
-                # CY151054        2270    Influenza B virus (B/Brisbane/11/2002) polymerase PA (PA) gene, complete cds.   1       Vertebrates     ICTV,genbank
+                # CY151054        2270	influenza b	Influenza B virus (B/Brisbane/11/2002) polymerase PA (PA) gene, complete cds.   1       Vertebrates     ICTV,genbank
                 chomp;
                 my @a = split(/\t/, $_);
-                if (defined $vrl_cat{$a[0]}) {
-                        $vrl_cat{$a[0]}.="\t".$a[4];
-                } else {
-                        $vrl_cat{$a[0]} = $a[4];
-                }
+
+		if ($a[5] eq 'Unassigned') {
+			push(@unclassified, $_);
+		} else {
+                        $vrl_cat{$a[0]} = $a[5];
+		}
         }
         $fh1->close;
 
@@ -1108,13 +1127,12 @@ sub classify_by_classified
 
         # check unclassfied
         my $out3 = IO::File->new(">".$manual_desc) || die $!;
-        my $fh2 = IO::File->new($unclassified) || die $!;
-        while(<$fh2>)
-        {
+	foreach my $line ( @unclassified )
+	{
                 # MTSCA   322     Lucerne transient streak virus satellite RNA, complete sequence.        1       NA      NA
                 chomp;
-                my @a = split(/\t/, $_);
-                my ($id, $desc) = ($a[0], $a[2]);
+                my @a = split(/\t/, $line);
+                my ($id, $desc) = ($a[0], $a[3]);
                 my @b = split(/ /, $desc);
 
                 my $length = scalar(@b);
@@ -1125,7 +1143,7 @@ sub classify_by_classified
                         last if defined $temp_cat{$subdesc}; # check previous result
 
                         # get the best match of desc, the find the best classification
-                        my $match_content = `grep \"$subdesc\" $classified`;
+                        my $match_content = `grep \"$subdesc\" $classified | grep -v Unassigned`;
                         my %freq_cat = ();
                         if (defined $match_content && $match_content =~ m/\S+/)
                         {
@@ -1176,7 +1194,6 @@ sub classify_by_classified
                         #exit;
                 }
         }
-        $fh2->close;
         $out3->close;
 }
 
