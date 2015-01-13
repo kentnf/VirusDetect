@@ -44,9 +44,32 @@ PIPELINE (version $version):
    * check warning message: if there is any virus do not have taxon id. 
                             manually chagne in sub correct_org_taxon_division 
 
+	>> Steps
+	\$ grep WARN nohup.out
+	search the ID in WARN in genbank to find correct taxon id
+	open file $0
+	add the correct taxon id to correct_org_taxon_division subroutine
+	* then run the category again until there is no WARN message
+
 3. generate manually classification file
    \$ $0 -t manually
    * manually change the genus and hname file
+
+	>> Steps
+	open file manual_hname_table.txt 
+	search the abnormal name using google and genbank
+	add the correct to behind the abnormal name 
+
+	\$ perl $0 -t patch 
+	check the updated file in current folder
+	1. update_genus_table_v205.txt
+		old :   
+			Alphapermutotetravirus	NA	NA
+		update: # patch v205
+			Alphapermutotetravirus  G1      Invertebrates
+		Then remove the line on old file
+	2. update_hname_table_v205.txt
+		The manually changed name should be in the end of this file
 
 4. run viral_DB_prepare.pl script to category virus again using manually changed file
    \$ $0 -t category -c 1 gbvr*.gz
@@ -276,9 +299,9 @@ sub vrl_patch
 		foreach my $a (@a) {
 			my @b = split(/,/, $a);
 			die "[ERR]patch genus: $_\n" unless (scalar @b == 3);
-			die "[ERR]patch genus div: $_\n" unless (defined $division{$$b[0]});
+			die "[ERR]patch genus div: $_\t$b[0]\n" unless (defined $division{$b[0]});
 			push(@div_id, $b[0]);
-			push(@div_name, $division{$$b[0]});
+			push(@div_name, $division{$b[0]});
 		}
 		$genus_cat.= $genus. "\t" . join(",", @div_id) . "\t" . join(",", @div_name) . "\n";
 		$genus_patch_num++;
@@ -318,6 +341,7 @@ sub vrl_patch
 		chomp;
 		next if $_ =~ m/^#/;
 		my @a = split(/\t/, $_);
+		next unless $a[2];
 		next if $a[2] eq 'NA-CAT';
 		$manual_cat.= $_."\n";	
 		$desc_patch_num++;
@@ -1130,7 +1154,7 @@ sub classify_by_classified
 	foreach my $line ( @unclassified )
 	{
                 # MTSCA   322     Lucerne transient streak virus satellite RNA, complete sequence.        1       NA      NA
-                chomp;
+                chomp($line);
                 my @a = split(/\t/, $line);
                 my ($id, $desc) = ($a[0], $a[3]);
                 my @b = split(/ /, $desc);
