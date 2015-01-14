@@ -1125,6 +1125,78 @@ sub classify_by_classified
         my ($classified, $manual_desc) = @_;
         print "[ERR]input file not exist\n" and exit unless -s $classified;
 
+	####################################################
+	# ==== generate classification by blast	========== #
+	####################################################
+	
+	# create hash for store classification by blast
+	# key: vrl_i, div, identify, match, mismatch, gap
+	# value: divname, 
+	my %vid_cat;
+
+	my $s_file = 'vrl_Unassigned_all.fasta';
+	if (-s $s_file) 
+	{
+		# format s_file database;
+		my $seq_num = 0;
+		my $in = Bio::SeqIO->new(-format=>'fasta', -file=>$s_file); 
+		while(my $inseq = $in->next_seq) { $seq_num++;}
+		return 1 if $seq_num == 0;
+	
+		my $format = 0;
+		foreach my $f ( ("$s_file.nhr", "$s_file.nhr", "$s_file.nhr") ) {
+			$format = 1 unless -s $f;
+		}
+		run_cmd("formatdb -i $s_file -p F") if $format == 1;
+	
+		# hash for query
+		# key: file, value: division
+		my %q_files;
+		$q_files{'vrl_Algae_all.fasta'} = 'Algae';
+		$q_files{'vrl_Archaea_all.fasta'} = 'Archaea';
+		$q_files{'vrl_Bacteria_all.fasta'} = 'Bacteria';
+		$q_files{'vrl_Fungi_all.fasta'} = 'Fungi';
+		$q_files{'vrl_Invertebrates_all.fasta'} = 'Invertebrates';
+		$q_files{'vrl_Plants_all.fasta'} = 'Plants';
+		$q_files{'vrl_Protozoa_all.fasta'} = 'Protozoa';
+		$q_files{'vrl_Vertebrates_all.fasta'} = 'Vertebrates';
+
+		# bast to get best div
+		foreach my $q_f (sort keys %q_files) {
+			next unless -s $q_f;
+			my $div = $q_files{$q_f};
+			my $blast_file = "vrl_".$div.".blast";
+			print "blastall -i $q_f -d $s_file -p blastn -m 8 -e 1e-5 -F F -a 24 -v 5 -b 5 -o $blast_file\n";
+			run_cmd("blastall -i $q_f -d $s_file -p blastn -m 8 -e 1e-5 -F F -a 24 -v 5 -b 5 -o $blast_file");
+
+			my $bfh = IO::File->new($blast_file) || die $!;
+			while(<$bfh>) {
+				chomp;
+				next if $_ =~ m/^#/;
+				my @a = split(/\t/, $_);
+				next if scalar(@a) < 12;
+				# AB000709        SLLCP   100.00  33      0       0       6219    6251    919     951     1e-09   65.9
+				my ($qid, $sid, $iden, $match, $mismatch, $gap, $evalue, $score) = @a[0,1,2,3,4,5,10,11];
+				$match = $match - $mismatch - $gap;
+				if (defined $vid_cat{$sid}) {
+					if ( $match > $vid_cat{$sid}{'match'} && $iden > $vid_cat{$sid}{'iden'} && $score > $vid_cat{$sid}{'score'} ) {
+						$vid_cat{$sid}{'qid'} = $qid;
+						$vid_cat{$sid}{'div'} = $div;
+						$vid_cat{$sid}{'match'} = $match;
+						$vid_cat{$sid}{'iden'} = $iden;
+						$vid_cat{$sid}{'score'} = $score;
+					}
+				} else {
+					$vid_cat{$sid}{'qid'} = $qid;
+					$vid_cat{$sid}{'div'} = $div;
+					$vid_cat{$sid}{'match'} = $match;
+					$vid_cat{$sid}{'iden'} = $iden;
+					$vid_cat{$sid}{'score'} = $score;
+				}
+			}
+		} 
+	}
+
         ####################################################
         # ==== generate classification by description ==== #
         ####################################################
@@ -1164,7 +1236,7 @@ sub classify_by_classified
                 for(my $i=0; $i<$length-1; $i++) {
                         pop @b;
                         $subdesc = join(" ", @b);
-                        last if defined $temp_cat{$subdesc}; # check previous result
+                        last if defined $temp_cat{$subdesc}; # get div using previous result
 
                         # get the best match of desc, the find the best classification
                         my $match_content = `grep \"$subdesc\" $classified | grep -v Unassigned`;
@@ -1206,18 +1278,25 @@ sub classify_by_classified
                         }
                 }
 
+		#warn "[WARN]undef blast for $id\n" unless $vid_cat{$id}{'qid'};
+		my $blast_info = 'NA-BLAST';
+		if ( defined $vid_cat{$id}{'qid'} ) {
+			$blast_info = $vid_cat{$id}{'div'}."\t".$vid_cat{$id}{'qid'}."\t".$vid_cat{$id}{'match'}."\t".$vid_cat{$id}{'iden'}."\t".$vid_cat{$id}{'score'};
+		}
+
                 # output result
                 if (defined $temp_cat{$subdesc}) {
-                        print $out3 "$id\t$desc\t$subdesc\t$temp_cat{$subdesc}\n";
+                        print $out3 "$id\t$desc\t$subdesc\t$temp_cat{$subdesc}\t$blast_info\n";
                 } elsif (defined $best_cat) {
                         $best_ratio = sprintf("%.2f", $best_ratio * 100);
-                        print $out3 "$id\t$desc\t$subdesc\t$best_cat\t$best_freq\t$best_ratio\t$cat_ids\n";
+                        print $out3 "$id\t$desc\t$subdesc\t$best_cat\t$best_freq\t$best_ratio\t$cat_ids\t$blast_info\n";
                         $temp_cat{$subdesc} = "$best_cat\t$best_freq\t$best_ratio\t$cat_ids" unless defined $temp_cat{$subdesc};
                 } else {
-                        print $out3 "$id\t$desc\tNA-CAT\n";
+                        print $out3 "$id\t$desc\tNA-CAT\t\t\t\t\t$blast_info\n";
                         #exit;
                 }
         }
         $out3->close;
 }
+
 
