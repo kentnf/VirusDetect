@@ -788,24 +788,24 @@ USAGE: $0 -t category [options] input_file1 ... input_fileN
 	$out1->close;
 
 	# output sequence for each division
-	foreach my $div_id (sort keys %division)
-	{
-		my $div_name = $division{$div_id};
-		$div_name =~ s/ /_/ig;
-		my $vrl_seq_file = "vrl_".$div_name."_all.fasta";
-		my $vrl_seq = '';
-		foreach my $id (sort keys %vrl_seq_info)
-		{
-			my $host_division = $vrl_seq_info{$id}{'host_div'} if defined $vrl_seq_info{$id}{'host_div'};
-			foreach my $host_div_id (sort keys %$host_division)
-			{
-				if ($host_div_id eq $div_id)
-				{
-					$vrl_seq.=">$id\n$vrl_seq_info{$id}{'seq'}\n";
-				}
+	my %out_div_seq;	
+	foreach my $id (sort keys %vrl_seq_info) {
+		my $host_division = $vrl_seq_info{$id}{'host_div'} if defined $vrl_seq_info{$id}{'host_div'};
+		foreach my $host_div_id (sort keys %$host_division) {
+			die "[ERR]undef div id $host_div_id\n" unless defined $division{$host_div_id};
+			my $div_name = $division{$host_div_id};
+			if (defined $out_div_seq{$div_name}) {
+				$out_div_seq{$div_name}.= ">$id\n$vrl_seq_info{$id}{'seq'}\n";
+			} else {
+				$out_div_seq{$div_name} = ">$id\n$vrl_seq_info{$id}{'seq'}\n";
 			}
 		}
+	}
 
+	foreach my $div_name (sort keys %out_div_seq) {
+		$div_name =~ s/ /_/ig;
+		my $vrl_seq_file = "vrl_".$div_name."_all.fasta";
+		my $vrl_seq = $out_div_seq{$div_name};
 		if ($vrl_seq) {
 			my $fhs = IO::File->new(">".$vrl_seq_file) || die $!;
 			print $fhs $vrl_seq;
