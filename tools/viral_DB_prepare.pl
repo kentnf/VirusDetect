@@ -42,7 +42,7 @@ PIPELINE (version $version):
 2. run viral_DB_prepare.pl script to category virus 
    \$ $0 -t category gbvrl*.gz
    * check warning message: if there is any virus do not have taxon id. 
-                            manually chagne in sub correct_org_taxon_division 
+                            manually chagne it in [sub correct_org_taxon_division]
 
 	>> Steps
 	\$ grep WARN nohup.out
@@ -53,36 +53,30 @@ PIPELINE (version $version):
 
 3. generate manually classification file
    \$ $0 -t manually
-   * manually change the genus and hname file
-
-	>> Steps
-	open file manual_hname_table.txt 
-	search the abnormal name using google and genbank
-	add the correct to behind the abnormal name 
-
-	\$ perl $0 -t patch 
-	check the updated file in current folder
-	1. update_genus_table_v205.txt
-		old :   
-			Alphapermutotetravirus	NA	NA
-		update: # patch v205
-			Alphapermutotetravirus  G1      Invertebrates
-		Then remove the line on old file
-	2. update_hname_table_v205.txt
-		The manually changed name should be in the end of this file
+   \$ $0 -t patch
+   * there is no process in this step, a guide about how to manually change the 
+     classification is print on screen
+   * after manually change, please patch the changed files to previous file
 
 4. run viral_DB_prepare.pl script to category virus again using manually changed file
    \$ $0 -t category -c 1 gbvr*.gz
    \$ $0 -t manually
-   * manually change the desc file
-
-5. combine the result (patch the manually to update file)
    \$ $0 -t patch
+   * manually change the desc file, then patch it
+
+   === notice === 
+   step 3, and 4 could be combined into one. Before generate and apply patched genes table,
+   the step to generate desc table using word search method will take very long time. After 
+   apply patched genus table, only ~8000 unclassified virus need to be search using word search
+   and blast search method (about half day) 
+
+5. move the patched file into bin folder, then run classification again
+   \$ $0 -t category -c 1 gbvr*.gz
 
 6. unique the classified virus
    \$ $0 -t unique input_virus.fasta
 
-7. if the out put vrl_genbank.txt has been manually changed
+*7.if the output vrl_genbank.txt has been manually changed
    \$ $0 -t refine [no parameters] 
    * output is like vrl_Bacteria_all.fasta.new
 
@@ -372,16 +366,24 @@ sub vrl_manually
 {
 	print qq'
 Please manually check and update these files: 
-	1. manual_hname_table.txt
+
+	1. manual_hname_table.txt 
 	   one abnormal name per line, please search the abnormal name using google, genbank taxon database, and iciba 
 	   to infer the correct name, this correct name must be include in genbank taxon database (in name.dmp.gz), 
 	   then append the correct name to the abnormal name in one line: 
   	   abnormal name [tab] correct name [return]
 
+	>> Steps
+        A. open file manual_hname_table.txt 
+        B. search the abnormal name using google and genbank
+        C. add the correct to behind the abnormal name
+
 	2. manual_genus_table.txt
 	   one genus & classification perl line. If the genus has one division, that is pretty good result. If genus 
 	   has more than one division, make it to keep one or more according frequency of each division, or searching
 	   background of this genus to make correct decision.
+	
+	>> usually ignore this steps 
 
 	3. manual_desc_table.txt
 	   The format of manual_desc:
@@ -392,13 +394,40 @@ Please manually check and update these files:
 	   5 - No. of same: 1       
 	   6 - Freq of same: 100.00
 	   7 - ID of same: GFLRNA1
+	   8 - Div name by blast
+	   9 - best hit of blast
+	   10- match length of blast
+	   11- percentage identity
+	   12- match score
 
 	   The script seach the same description of unclassified virus against classified virus, then brorrow the info 
 	   of classification to the unclassified. Just check the 2nd, 3rd, and 4th column. If it does not make sense, 
 	   correct them manually. Please also concern the 5th and 6th column, the error usually happens to the record 
 	   without 100% freq. 
+	   
+	   Beside correction with word search method, we also blast the unclassified virus against the classified virus
+	   (col 8-12). Most of word search result and blast search result are same, less the 100 of them are diff. So 
+	   manually corret the different part will saving a lot of time
+	
+	>> Steps
+	A. sort to find different in word search and blast search (col 4 and 8).
+	B. check the blast match length, identify. Lower than 100 match base, 90% identity show low blast clue for classification
+	C. check the word search column 3, 5, 6, and 7. 
+	D. assign a correct div to column 4 for the virus 
 
 	After correction, please save the correction in same file with same format.
+   	then patch the changed files to previous file using:
+      	  \$ perl $0 -t patch
+
+        check the updated file in current folder
+        1. update_genus_table_v205.txt
+                old :   
+                        Alphapermutotetravirus  NA      NA
+                update: # patch v205
+                        Alphapermutotetravirus  G1      Invertebrates
+                Then remove the line on old file
+        2. update_hname_table_v205.txt
+                The manually changed name should be in the end of this file
 
 ';
 	exit

@@ -1,0 +1,2 @@
+#ID	Description	sub Description	Division	total	%div	top
+ADRARNA	Adenovirus VA RNA with an La antigen binding site.	Adenovirus	Vertebrates	152	100	EU603438
