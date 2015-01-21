@@ -149,7 +149,7 @@ sub load_virus_info
 		$virus_info{$a[0]}{'verison'} 	= $a[4];
 		$virus_info{$a[0]}{'host_type'} = $a[5];
 	}
-	close(FH);
+	close($fh);
 	return %virus_info;
 }
 

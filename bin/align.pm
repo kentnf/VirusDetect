@@ -188,7 +188,14 @@ sub pileup_filter
 
 	# put plant virus sequence length to hash
 	my %seq_len;
-	my $fh1 = IO::File->new($virus_seq_info) || die $!;
+
+	my $fh1;
+	if ($virus_seq_info =~ m/\.gz$/) {
+		open($fh1, "gunzip -c $virus_seq_info | ") || die $!;
+	} else {
+		open($fh1, $virus_seq_info) || die $!; 
+	}
+
 	while(<$fh1>) {
 		chomp;
 		next if $_ =~ m/^#/;
@@ -197,7 +204,7 @@ sub pileup_filter
 		my @a = split(/\t/, $_);
 		$seq_len{$a[0]} = $a[1];
 	}
-	$fh1->close;
+	close($fh1);
 
 	# filter the pileup file by coverage length
 	my $pre_id;

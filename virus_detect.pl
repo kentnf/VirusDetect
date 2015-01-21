@@ -174,7 +174,7 @@ foreach my $sample (@ARGV)
 	my $BIN_DIR       = ${FindBin::RealBin}."/bin";			# set script folder 
 	my $TEMP_DIR      = $WORKING_DIR."/".$sample_base."_temp";	# set temp folder
 	$reference	  = $DATABASE_DIR."/".$reference;		# set reference
-	my $seq_info	  = $DATABASE_DIR."/vrl_genbank.info";		# set vrl info
+	my $seq_info	  = $DATABASE_DIR."/vrl_genbank.info.gz";		# set vrl info
 	print "Working: $WORKING_DIR\nDatabase: $DATABASE_DIR\nBin: $BIN_DIR\nTemp: $TEMP_DIR\n" if $debug;
 
 	# create temp folder and create link for sample
