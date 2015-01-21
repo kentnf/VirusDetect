@@ -8245,56 +8245,267 @@ Y18915	TT virus ORF1 DNA, isolate Ch_Sy2.	TT virus ORF1	Vertebrates
 Z14310	Human endogenous retrovirus mRNA for tripartite fusion transcript PLA2L.	Human endogenous retrovirus mRNA for	Vertebrates
 Z47975	Rotavirus I321 mRNA for open reading frame.	Rotavirus	Vertebrates
 Z83324	Phocid herpesvirus 2 HVS-2 ORF25-like gene.	Phocid herpesvirus 2	Vertebrates
-AY854644	Charleville virus strain Ch 9824 polymerase mRNA, partial cds.	Charleville virus strain Ch	Invertebrates
-AY854672	Charleville virus strain Ch9847 polymerase mRNA, partial cds.	Charleville virus strain	Invertebrates
-EU078325	Barkedji virus isolate ArD86177 polyprotein gene, partial cds.	Barkedji virus isolate	Invertebrates
+GU722196	Hyperthermophilic Archaeal Virus 1, complete genome.	NA-CAT	Archaea
+AB537968	Aeropyrum pernix bacilliform virus 1 DNA, segment 1, complete sequence.	NA-CAT	Archaea
+X54154	Yeast K2 type killer virus Kil-k2 gene for the K2 killer toxin precursor.	NA-CAT	Fungi
+KVSM121M	Killer virus of S.cerevisiae (class M1, type 1), M1-2 region mRNA fragment.	NA-CAT	Fungi
+KVSMD1	Killer virus of Yeast (S.cerevisiae), MD-1 RNA 3' terminal region.	NA-CAT	Fungi
+KVSMD2	Killer virus of Yeast (S.cerevisiae), MD-2 RNA 3' terminal region.	NA-CAT	Fungi
+KVSS31	Killer virus of S.cerevisiae defective interfering particle S3, 5' terminus of positive strand.	NA-CAT	Fungi
+EF120984	Curvularia thermal tolerance virus segment RNA 1 putative replicase genes, complete cds.	NA-CAT	Fungi
+EF120985	Curvularia thermal tolerance virus segment RNA 2 unknown genes.	NA-CAT	Fungi
+KVS5END	Killer virus of S.cerevisiae 5' end.	NA-CAT	Fungi
+KVSS32	Killer virus of S.cerevisiae defective interfering particle S3, 3' terminus of positive strand.	NA-CAT	Fungi
 KC807172	Kamphang Phet virus strain KP84-0156, complete genome.	by blast	Invertebrates
 KC807173	Kamphang Phet virus strain KP84-0192, complete genome.	by blast	Invertebrates
 KC807174	Kamphang Phet virus strain KP84-0344, complete genome.	by blast	Invertebrates
 KJ676450	Sucra jujuba nucleopolyhedrovirus isolate 473, complete genome.	Sucra jujuba	Invertebrates
+DQ286292	Rosy apple aphid virus, complete genome.	NA-CAT	Invertebrates
+AY158658	Sciaenops ocellatus virus ATPase gene, partial cds.	NA-CAT	Invertebrates
+GQ857534	Elagatis bipinnulata iridovirus isolate g-120 major capsid protein gene, partial cds.	NA-CAT	Invertebrates
+AY854644	Charleville virus strain Ch 9824 polymerase mRNA, partial cds.	Charleville virus strain Ch	Invertebrates
+AY854672	Charleville virus strain Ch9847 polymerase mRNA, partial cds.	Charleville virus strain	Invertebrates
+EU078325	Barkedji virus isolate ArD86177 polyprotein gene, partial cds.	Barkedji virus isolate	Invertebrates
+AF024514	Acyrthosiphon pisum virus protein P1 gene, complete cds; and protein P2 gene, partial cds.	NA-CAT	Invertebrates
+AF063866	Melanoplus sanguinipes entomopoxvirus, complete genome.	NA-CAT	Invertebrates
+AF461742	Euprosterna elaeasa virus, complete genome.	NA-CAT	Invertebrates
+AY534885	Venturia canescens picorna-like virus RNA-dependent RNA polymerase (RdRp) mRNA, partial cds.	NA-CAT	Invertebrates
+HZ1LAPR	Hz-1 insect virus late gene, complete cds.	NA-CAT	Invertebrates
+X77616	M.melolontha Entomopoxvirus Fusolin gene.	NA-CAT	Invertebrates
+DQ457099	Kotonkon virus nucleoprotein (N) mRNA, partial cds.	NA-CAT	Invertebrates
+GU265561	Courdo virus CE11 nonfunctional B-family DNA polymerase gene, partial sequence.	NA-CAT	Invertebrates
+HQ223094	Courdo11 virus tyrosyl-tRNA synthetase (tyrS) gene, partial cds.	NA-CAT	Invertebrates
+HQ223097	Courdo11 virus GTP-binding protein 1-like protein gene, partial cds.	NA-CAT	Invertebrates
+JF979163	Courdo11 virus B-family DNA polymerase gene, partial cds.	NA-CAT	Invertebrates
+JF979165	Marseilleviridae Montpellier B-family DNA polymerase gene, partial cds.	NA-CAT	Invertebrates
+JF979171	Mamavirus AC-2012 B-family DNA polymerase gene, complete cds.	NA-CAT	Invertebrates
+KF493702	Courdo11 virus VV A18 helicase gene, complete cds.	NA-CAT	Invertebrates
+KF493703	Courdo11 virus VV A32 virion packaging ATPase gene, complete cds.	NA-CAT	Invertebrates
+X77052	Entomopoxvirus gene for spherulin.	NA-CAT	Invertebrates
 KJ938716	Ancient caribou feces associated virus, complete genome.	Ancient	Invertebrates
-AF480452	Unidentified geminivirus replication protein AC4 (Rep) gene, partial cds.	geminivirus, Geminiviridae	Plants
-AF480453	Unidentified geminivirus coat protein (CP) gene, partial cds.	geminivirus, Geminiviridae	Plants
-CHYSATS1	Chicory yellow mottle virus satellite RNA gene for hypothetical protein, complete cds.	Chicory yellow mottle	Plants
-CHYTSSR	Chicory yellow mottle virus satellite RNA genomic RNA, hammerhead structure region.	Chicory yellow mottle	Plants
-JN204350	Manawatu river virus capsid protein-like gene, partial sequence.	Manawatu	Plants
-JN204351	Manawatu river virus p33 replication protein-like gene, partial sequence.	Manawatu	Plants
-KF471410	Satellite phage RS1 RstR (rstR), RstA (rstA), RstB (rstB), and RstC (rstC) genes, complete cds.	Satellite	Plants
-KF664569	Satellite phage RS1 isolate recombinant RS1-RS1 RstR (rstR), RstA (rstA), RstB (rstB), RstC (rstC), RstR (rstR), RstA (rstA), RstB (rstB), and RstC (rstC) genes, complete cds.	Satellite	Plants
+AF242294	Anacridium aegyptium entomopoxvirus spheroidin gene, complete cds; and unknown gene.	NA-CAT	Invertebrates
+AF356189	Eimeria brunetti RNA virus 1, complete genome.	NA-CAT	Invertebrates
+AF403769	Oedaleus asiaticus entomopoxvirus spheroidin gene, complete cds.	NA-CAT	Invertebrates
+AY464569	Calliptamus italicus entomopoxvirus spheroidin gene, complete cds.	NA-CAT	Invertebrates
+AY464570	Gomphocerus sibiricus entomopoxvirus spheroidin gene, complete cds.	NA-CAT	Invertebrates
+ENURDRP	Eimeria nieschulzi virus RNA-dependent RNA polymerase gene, partial cds.	NA-CAT	Invertebrates
+JN857324	Dicistroviridae SC3842 putative nonstructural protein precursor, gene, partial cds.	NA-CAT	Invertebrates
+JN857325	Dicistroviridae SC4317 putative RNA-dependent RNA polymerase gene, partial cds.	NA-CAT	Invertebrates
+JN857326	Dicistroviridae SC3921 putative structural polyprotein gene, partial cds.	NA-CAT	Invertebrates
+JN857327	Dicistroviridae SC2803 putative nonstructural protein precursor, gene, partial cds.	NA-CAT	Invertebrates
+JN857328	Dicistroviridae SC2638 putative replicase polyprotein gene, partial cds.	NA-CAT	Invertebrates
 LC006862	Persimmon viroid genomic RNA, complete genome.	Persimmon viroid genomic RNA, complete	Plants
 LN626993	Cherry necrotic rusty mottle virus CP gene for Coat Protein, segment CP, isolate HPWR27.	Cherry necrotic rusty mottle virus CP gene for Coat Protein, segment CP, isolate	Plants
-S63911	(B.5.15)=satellite RNA [tobacco ringspot virus satellite RNA sTobRV RNA, mutant B-15, Genomic RNA Mutant, 54 nt].	tobacco ringspot virus	Plants
-S68164	transport protein, capsid protein [Tobamovirus, host: cruciferous plants, Genomic, 1537 nt].	host: cruciferous plants	Plants
+AF480452	Unidentified geminivirus replication protein AC4 (Rep) gene, partial cds.	Unidentified	Plants
+AF480453	Unidentified geminivirus coat protein (CP) gene, partial cds.	Unidentified	Plants
+S68164	transport protein, capsid protein [Tobamovirus, host: cruciferous plants, Genomic, 1537 nt].	transport protein,	Plants
+JN204350	Manawatu river virus capsid protein-like gene, partial sequence.	Manawatu	Plants
+JN204351	Manawatu river virus p33 replication protein-like gene, partial sequence.	Manawatu	Plants
+AM494977	Digera arvensis yellow vein disease-associated DNA beta, complete sequence, clone tan1.	NA-CAT	Plants
+AM494978	Digera arvensis yellow vein disease-associated DNA beta, complete sequence, clone tan41.	NA-CAT	Plants
+AM494979	Digera arvensis yellow vein disease-associated DNA beta, complete sequence, clone tan43.	NA-CAT	Plants
+AM494980	Digera arvensis yellow vein disease-associated DNA beta, complete sequence, clone tan38.	NA-CAT	Plants
+CHYSATS1	Chicory yellow mottle virus satellite RNA gene for hypothetical protein, complete cds.	NA-CAT	Plants
+CHYTSSR	Chicory yellow mottle virus satellite RNA genomic RNA, hammerhead structure region.	NA-CAT	Plants
+S63911	(B.5.15)=satellite RNA [tobacco ringspot virus satellite RNA sTobRV RNA, mutant B-15, Genomic RNA Mutant, 54 nt].	NA-CAT	Plants
+Y13463	Galinsoga mosaic virus, complete genome.	NA-CAT	Plants
+AY836366	Begomovirus-associated DNA-II satellite, complete sequence.	NA-CAT	Plants
+JN204349	Turitea creek virus capsid protein-like gene, partial sequence.	NA-CAT	Plants
+JN204352	Turitea creek virus p33 replication associated protein-like gene, partial sequence.	NA-CAT	Plants
+JN204356	Pohangina river virus capsid protein-like gene, partial sequence.	NA-CAT	Plants
+KF471410	Satellite phage RS1 RstR (rstR), RstA (rstA), RstB (rstB), and RstC (rstC) genes, complete cds.	Satellite	Plants
+KF664569	Satellite phage RS1 isolate recombinant RS1-RS1 RstR (rstR), RstA (rstA), RstB (rstB), RstC (rstC), RstR (rstR), RstA (rstA), RstB (rstB), and RstC (rstC) genes, complete cds.	Satellite	Plants
+AB012756	Sclerophthora macrospora virus B genes for polyprotein and coat protein, complete cds.	NA-CAT	Plants
+AB083060	Sclerophthora macrospora virus A gene for putative RNA dependent RNA polymerase, hypothetical protein, complete cds.	NA-CAT	Plants
+AB083061	Sclerophthora macrospora virus A gene for coat protein, complete cds.	NA-CAT	Plants
+AB083062	Sclerophthora macrospora virus A gene for satellite like RNA region.	NA-CAT	Plants
+AB193726	Aurantiochytrium single-stranded RNA virus genomic RNA, complete genome.	NA-CAT	Plants
+AB218608	Heterocapsa circularisquama RNA virus DNA, complete genome, isolate: HcRNAV34.	NA-CAT	Plants
+AB218609	Heterocapsa circularisquama RNA virus DNA, complete genome, isolate: HcRNAV109.	NA-CAT	Plants
+AB505427	Heterocapsa circularisquama DNA virus 01 DPOL gene for DNA polymerase, complete cds.	NA-CAT	Plants
+AB522601	Heterocapsa circularisquama DNA virus 01 hnhE1, hnhE2, PolB genes for HNH endonuclease, HNH endonuclease, type B DNA polymerase, complete cds.	NA-CAT	Plants
+AB522602	Heterocapsa circularisquama DNA virus 01 rnaP gene for DNA-directed RNA polymerase subunit, partial cds.	NA-CAT	Plants
+AB587728	Heterocapsa circularisquama DNA virus 01 MutS gene for DNA mismatch repair protein, complete cds.	NA-CAT	Plants
+AM933578	Cardiospermum yellow leaf curl virus satellite DNA, complete genome.	NA-CAT	Plants
+CHYCLSR	Chicory yellow mottle virus large satellite RNA gene for hypothetical protein, complete cds.	NA-CAT	Plants
+CHYSATL1	Chicory yellow mottle virus large satellite RNA gene for hypothetical protein, complete cds.	NA-CAT	Plants
+GU265574	Lentille virus CL nonfunctional B-family DNA polymerase gene, partial sequence.	NA-CAT	Plants
+HQ332136	Dunaliella viridis virus SI2 genomic sequence.	NA-CAT	Plants
+HQ332143	Tetraselmis viridis virus S1 genomic sequence.	NA-CAT	Plants
+HQ632857	Tetraselmis viridis virus S20 genomic sequence.	NA-CAT	Plants
+HQ632858	Tetraselmis viridis virus SI1 genomic sequence.	NA-CAT	Plants
+KM015260	Soybean-associated bicistronic virus isolate North Dakota capsid protein precursor and nonstructural polyprotein genes, complete cds.	NA-CAT	Plants
+S63888	(D80.2)=satellite RNA [tobacco ringspot virus satellite RNA sTobRV RNA, D-94, Genomic RNA Mutant, 72 nt].	NA-CAT	Plants
+S63895	(D80.3)=satellite RNA [tobacco ringspot virus satellite RNA sTobRV RNA, D-94, Genomic RNA Mutant, 69 nt].	NA-CAT	Plants
+S63896	(D80.4)=satellite RNA [tobacco ringspot virus satellite RNA sTobRV RNA, D-94, Genomic RNA Mutant, 72 nt].	NA-CAT	Plants
+S63897	(D83.2)=satellite RNA [tobacco ringspot virus satellite RNA sTobRV RNA, D-94, Genomic RNA Mutant, 68 nt].	NA-CAT	Plants
+S63903	(E.8)=satellite RNA [tobacco ringspot virus satellite RNA sTobRV RNA, D-16, Genomic RNA Mutant, 122 nt].	NA-CAT	Plants
+S63904	(E.59)=satellite RNA [tobacco ringspot virus satellite RNA sTobRV RNA, D-16, Genomic RNA Mutant, 77 nt].	NA-CAT	Plants
+S63907	(J63.B1)=satellite RNA [tobacco ringspot virus satellite RNA sTobRV RNA, D-16, Genomic RNA Mutant, 72 nt].	NA-CAT	Plants
+S63908	(J63.A1)=satellite RNA [tobacco ringspot virus satellite RNA sTobRV RNA, D-16, Genomic RNA Mutant, 82 nt].	NA-CAT	Plants
+S62744	{clone C001} [Trichomonas vaginalis virus TVV, T5, Genomic RNA, 382 nt].	{clone	Protozoa
+HQ223099	Terra1 virus tyrosyl-tRNA synthetase (tyrS) gene, partial cds.	NA-CAT	Protozoa
+HQ223102	Terra1 virus GTP-binding protein 1-like protein gene, partial cds.	NA-CAT	Protozoa
 GU265562	Terra virus 2 TAO-TJA B-family DNA polymerase gene, complete cds.	Terra	Protozoa
 GU265563	Terra virus 1 TAO-TE1 nonfunctional B-family DNA polymerase gene, partial sequence.	Terra	Protozoa
-HQ223099	Terra1 virus tyrosyl-tRNA synthetase (tyrS) gene, partial cds.	Terra1 virus	Protozoa
-HQ223102	Terra1 virus GTP-binding protein 1-like protein gene, partial cds.	Terra1 virus	Protozoa
-S62744	{clone C001} [Trichomonas vaginalis virus TVV, T5, Genomic RNA, 382 nt].	Trichomonas vaginalis virus	Protozoa
-AF016281	Recombinant PIV3/PIV1 virus fusion glycoprotein (F) and hemagglutinin (HN) genes, complete cds; and RNA dependent RNA polymerase (L) gene, partial cds.	Recombinant	Vertebrates
-AF179612	Hepatitis GB virus B polyprotein gene, complete cds.	Hepatitis GB virus B	Vertebrates
-AY993988	Broome reovirus major inner capsid protein sigma 1 gene, complete cds.	Broome	Vertebrates
-AY993989	Broome reovirus nonstructural protein sigma NS gene, complete cds.	Broome	Vertebrates
-AY993990	Broome reovirus major outer capsid protein sigma 2 gene, complete cds.	Broome	Vertebrates
+HQ223098	Terra1 virus cysteinyl-tRNA synthetase (cysS) gene, partial cds.	NA-CAT	Protozoa
+HQ223100	Terra1 virus methionyl-tRNA synthetase (metG) gene, partial cds.	NA-CAT	Protozoa
+HQ223101	Terra1 virus arginyl-tRNA synthetase (argS) gene, partial cds.	NA-CAT	Protozoa
 GU065387	Kenya bat coronavirus BtKY113 RNA-dependent RNA polymerase gene, partial cds.	Kenya bat coronavirus	Vertebrates
 GU065425	Kenya bat coronavirus BtKY81 RNA-dependent RNA polymerase gene, partial cds.	Kenya bat coronavirus	Vertebrates
-GU265564	Bus virus RTM2 nonfunctional B-family DNA polymerase gene, partial sequence.	Bus	Vertebrates
-GU265569	CHER virus nonfunctional B-family DNA polymerase gene, partial sequence.	CHER	Vertebrates
-GU991616	Providence virus isolate vFLM1, complete genome.	Providence	Vertebrates
 HQ660113	Bat Paramyxovirus Pteropodidae/RCA-P19/RCA/2008 isolate BatPV/Pteropodidae/RCA-P19/RCA/2008 RNA-dependent RNA polymerase (L) gene, partial cds.	Bat Paramyxovirus	Vertebrates
-JQ697837	Salem virus, complete genome.	Salem virus, horse	Vertebrates
 KC519324	Hybrid snakehead virus isolate C1207, complete genome.	snakehead is fish	Vertebrates
 KF437372	Giant Blood Marseillevirus strain 27725 DNA polymerase B family gene, partial cds.	Marseillevirus	Vertebrates
 KF437373	Giant Blood Marseillevirus strain 27725 D6/D11 helicase gene, complete cds.	Marseillevirus	Vertebrates
 KF582418	Giant Blood Marseillevirus strain 27725 VV A18 helicase gene, complete cds.	Marseillevirus	Vertebrates
 KF582419	Giant Blood Marseillevirus strain 27725 very late transcription factor gene, complete cds.	Marseillevirus	Vertebrates
 KF582420	Giant Blood Marseillevirus strain 27725 D5 helicase primase gene, complete cds.	Marseillevirus	Vertebrates
+AF179612	Hepatitis GB virus B polyprotein gene, complete cds.	Hepatitis GB virus B	Vertebrates
 KM595078	Cotia virus strain SPAn880, complete genome.	Cotia virus	Vertebrates
-S59394	{5' long terminal repeat} [Intracisternal A-type particle IAP, Other Genetic Material, 352 nt].	{5'	Vertebrates
+JQ697837	Salem virus, complete genome.	Salem	Vertebrates
+JQ898337	Casa astrovirus isolate AstV-Casa ORF1b gene, partial cds.	Casa	Vertebrates
+AY854650	Le Dantec virus strain DakHD 763 polymerase mRNA, partial cds.	Le	Vertebrates
+AY854651	Fukuoka virus strain FUK-11 polymerase mRNA, partial cds.	Fukuoka	Vertebrates
+AF016281	Recombinant PIV3/PIV1 virus fusion glycoprotein (F) and hemagglutinin (HN) genes, complete cds; and RNA dependent RNA polymerase (L) gene, partial cds.	Recombinant	Vertebrates
+AY993988	Broome reovirus major inner capsid protein sigma 1 gene, complete cds.	Broome	Vertebrates
+AY993989	Broome reovirus nonstructural protein sigma NS gene, complete cds.	Broome	Vertebrates
+AY993990	Broome reovirus major outer capsid protein sigma 2 gene, complete cds.	Broome	Vertebrates
 S67430	M segment: glycoprotein G1 [hantavirus, Hantaan serotype, Genomic RNA, 282 nt].	M	Vertebrates
 S67445	M segment: glycoprotein G1 [hantavirus, Puumala serotype, Genomic RNA, 291 nt].	M	Vertebrates
 S68035	precursor glycoprotein gene {M segment} [Hantavirus, R22 strain, Genomic RNA, 3655 nt].	precursor glycoprotein	Vertebrates
 S83235	viral protein {clone HT3-ED} [non-A, non-B hepatitis virus ET-NANBHV, Genomic RNA, 339 nt].	viral protein	Vertebrates
 S83237	{clone HT3-1B} [non-A, non-B hepatitis virus ET-NANBHV, Genomic RNA, 336 nt].	{clone	Vertebrates
 S83239	{clone HT3-3A} [non-A, non-B hepatitis virus ET-NANBHV, Genomic RNA, 177 nt].	{clone	Vertebrates
+AF141887	Tapirus terrestris gammaherpesvirus 1 glycoprotein B and DNA-dependent DNA polymerase genes, partial cds.	NA-CAT	Vertebrates
+AF213353	Chimeric human parainfluenza virus rPIV3-2 strain 2CT chimeric fusion glycoprotein (F) and hemagglutinin-neuraminidase glycoprotein (HN) genes, complete cds.	NA-CAT	Vertebrates
+AF213354	Chimeric human parainfluenza virus rPIV3-2 strain 2TM fusion glycoprotein (F) and hemagglutinin-neuraminidase glycoprotein (HN) genes, complete cds.	NA-CAT	Vertebrates
+AJ236110	Bitis arietans retrovirus partial pol and pro genes isolate RV-Puff adder.	NA-CAT	Vertebrates
+AJ236112	Bothrops jararaca retrovirus partial pol and pro genes isolate RV-Pit viper.	NA-CAT	Vertebrates
+AJ236119	Tachyglossus aculeatus retrovirus partial pol and pro genes isolate RV-Echidna.	NA-CAT	Vertebrates
+AJ236122	Phascolarctos cinereus retrovirus partial pol and pro genes isolate RV-Koala.	NA-CAT	Vertebrates
+AY081956	Aurochs papillomavirus isolate AAA1 major capsid protein (L1) gene, partial cds.	NA-CAT	Vertebrates
+AY197559	Hexaprotodon liberiensis gammaherpesvirus 1 glycoprotein B (gB) and DNA polymerase (DPOL) genes, partial cds.	NA-CAT	Vertebrates
+AY197560	Diceros bicornis gammaherpesvirus 1 glycoprotein B (gB) and DNA polymerase (DPOL) genes, partial cds.	NA-CAT	Vertebrates
+AY236869	Iguanid herpesvirus 2 DNA-dependent DNA polymerase (pol) gene, partial cds.	NA-CAT	Vertebrates
+AY971632	Aids-associated retrovirus isolate TON01001 reverse transcriptase (pol) gene, partial cds.	NA-CAT	Vertebrates
+AY971633	Aids-associated retrovirus isolate TON01004 reverse transcriptase (pol) gene, partial cds.	NA-CAT	Vertebrates
+AY971634	Aids-associated retrovirus isolate TON01005 reverse transcriptase (pol) gene, partial cds.	NA-CAT	Vertebrates
+AY971635	Aids-associated retrovirus isolate TON02001 reverse transcriptase (pol) gene, partial cds.	NA-CAT	Vertebrates
+AY971636	Aids-associated retrovirus isolate TON03002 reverse transcriptase (pol) gene, partial cds.	NA-CAT	Vertebrates
+AY971637	Aids-associated retrovirus isolate TON03004 reverse transcriptase (pol) gene, partial cds.	NA-CAT	Vertebrates
+AY971638	Aids-associated retrovirus isolate TON03006 reverse transcriptase (pol) gene, partial cds.	NA-CAT	Vertebrates
+AY971639	Aids-associated retrovirus isolate TON03007 reverse transcriptase (pol) gene, partial cds.	NA-CAT	Vertebrates
+AY971640	Aids-associated retrovirus isolate TON03009 reverse transcriptase (pol) gene, partial cds.	NA-CAT	Vertebrates
+AY971641	Aids-associated retrovirus isolate TON03010 reverse transcriptase (pol) gene, partial cds.	NA-CAT	Vertebrates
+AY971642	Aids-associated retrovirus isolate TON04002 reverse transcriptase (pol) gene, partial cds.	NA-CAT	Vertebrates
+AY971643	Aids-associated retrovirus isolate TON04004 reverse transcriptase (pol) gene, partial cds.	NA-CAT	Vertebrates
+AY971644	Aids-associated retrovirus isolate TON04006 reverse transcriptase (pol) gene, partial cds.	NA-CAT	Vertebrates
+AY971645	Aids-associated retrovirus isolate TON04008 reverse transcriptase (pol) gene, partial cds.	NA-CAT	Vertebrates
+AY971646	Aids-associated retrovirus isolate TON05001 reverse transcriptase (pol) gene, partial cds.	NA-CAT	Vertebrates
+AY971647	Aids-associated retrovirus isolate TON05004 reverse transcriptase (pol) gene, partial cds.	NA-CAT	Vertebrates
+AY971648	Aids-associated retrovirus isolate TON05005 reverse transcriptase (pol) gene, partial cds.	NA-CAT	Vertebrates
+AY971649	Aids-associated retrovirus isolate TON05008 reverse transcriptase (pol) gene, partial cds.	NA-CAT	Vertebrates
+AY971650	Aids-associated retrovirus isolate TON06002 reverse transcriptase (pol) gene, partial cds.	NA-CAT	Vertebrates
+AY971651	Aids-associated retrovirus isolate TON08002 reverse transcriptase (pol) gene, partial cds.	NA-CAT	Vertebrates
+AY971652	Aids-associated retrovirus isolate TON08004 reverse transcriptase (pol) gene, partial cds.	NA-CAT	Vertebrates
+AY971653	Aids-associated retrovirus isolate TON10001 reverse transcriptase (pol) gene, partial cds.	NA-CAT	Vertebrates
+AY971654	Aids-associated retrovirus isolate TON10002 reverse transcriptase (pol) gene, partial cds.	NA-CAT	Vertebrates
+DQ174772	Phascolarctos cinereus retrovirus isolate D-B envelope glycoprotein (env) gene, complete cds.	NA-CAT	Vertebrates
+DQ286503	Aids-associated retrovirus isolate TON01001W12 reverse transcriptase (pol) gene, partial cds.	NA-CAT	Vertebrates
+DQ286504	Aids-associated retrovirus isolate TON01001W24 reverse transcriptase (pol) gene, partial cds.	NA-CAT	Vertebrates
+DQ286505	Aids-associated retrovirus isolate TON01004W12 reverse transcriptase (pol) gene, partial cds.	NA-CAT	Vertebrates
+DQ286506	Aids-associated retrovirus isolate TON01004W24 reverse transcriptase (pol) gene, partial cds.	NA-CAT	Vertebrates
+DQ286507	Aids-associated retrovirus isolate TON01005W12 reverse transcriptase (pol) gene, partial cds.	NA-CAT	Vertebrates
+DQ286508	Aids-associated retrovirus isolate TON02001W12 reverse transcriptase (pol) gene, partial cds.	NA-CAT	Vertebrates
+DQ286509	Aids-associated retrovirus isolate TON02001W24 reverse transcriptase (pol) gene, partial cds.	NA-CAT	Vertebrates
+DQ286510	Aids-associated retrovirus isolate TON03002W12 reverse transcriptase (pol) gene, partial cds.	NA-CAT	Vertebrates
+DQ286511	Aids-associated retrovirus isolate TON03002W24 reverse transcriptase (pol) gene, partial cds.	NA-CAT	Vertebrates
+DQ286512	Aids-associated retrovirus isolate TON03006W12 reverse transcriptase (pol) gene, partial cds.	NA-CAT	Vertebrates
+DQ286513	Aids-associated retrovirus isolate TON03007W12 reverse transcriptase (pol) gene, partial cds.	NA-CAT	Vertebrates
+DQ286514	Aids-associated retrovirus isolate TON03007W24 reverse transcriptase (pol) gene, partial cds.	NA-CAT	Vertebrates
+DQ286515	Aids-associated retrovirus isolate TON03009W12 reverse transcriptase (pol) gene, partial cds.	NA-CAT	Vertebrates
+DQ286516	Aids-associated retrovirus isolate TON03010W12 reverse transcriptase (pol) gene, partial cds.	NA-CAT	Vertebrates
+DQ286517	Aids-associated retrovirus isolate TON04006W12 reverse transcriptase (pol) gene, partial cds.	NA-CAT	Vertebrates
+DQ286518	Aids-associated retrovirus isolate TON04008W24 reverse transcriptase (pol) gene, partial cds.	NA-CAT	Vertebrates
+DQ286519	Aids-associated retrovirus isolate TON05004W12 reverse transcriptase (pol) gene, partial cds.	NA-CAT	Vertebrates
+DQ286520	Aids-associated retrovirus isolate TON05008W12 reverse transcriptase (pol) gene, partial cds.	NA-CAT	Vertebrates
+DQ286521	Aids-associated retrovirus isolate TON08002W12 reverse transcriptase (pol) gene, partial cds.	NA-CAT	Vertebrates
+DQ286522	Aids-associated retrovirus isolate TON08004W12 reverse transcriptase (pol) gene, partial cds.	NA-CAT	Vertebrates
+DQ286523	Aids-associated retrovirus isolate TON10002W12 reverse transcriptase (pol) gene, partial cds.	NA-CAT	Vertebrates
+DQ377804S1	Squirrelpox virus 1296/99, partial genome.	NA-CAT	Vertebrates
+DQ377804S2	Squirrelpox virus 1296/99, partial genome.	NA-CAT	Vertebrates
+EF536349	Ursus maritimus papillomavirus type 1, complete genome.	NA-CAT	Vertebrates
+EF584905	Masked palm civet coronavirus Guangxi/D728/2005 replicase polyprotein gene, partial cds.	NA-CAT	Vertebrates
+EF584907	Flying squirrel coronavirus Guangxi/E001/2006 replicase polyprotein gene, partial cds.	NA-CAT	Vertebrates
+EU085379	Elephas maximus gammaherpesvirus 1 glycoprotein B and DNA polymerase genes, partial cds.	NA-CAT	Vertebrates
+EU188799	Francolinus leucoscepus papillomavirus 1, complete genome.	NA-CAT	Vertebrates
+GQ857525	Trachinocephalus myops iridovirus isolate g-58 major capsid protein gene, partial cds.	NA-CAT	Vertebrates
+HQ913600	Titi monkey adenovirus ECC-2011, complete genome.	NA-CAT	Vertebrates
+JF705864	Elephas maximus gammaherpesvirus 2 isolate 4705 DNA polymerase gene, partial cds.	NA-CAT	Vertebrates
+JF705865	Procavia capensis gammaherpesvirus 2 isolate 5297 glycoprotein B and DNA polymerase genes, partial cds.	NA-CAT	Vertebrates
+KJ547625	Sewage-associated circular DNA virus-14 isolate SaCV-14_NZ-BS4064-2012, complete genome.	NA-CAT	Vertebrates
+KJ547633	Sewage-associated circular DNA virus-9 isolate SaCV-9_NZ-BS3681-2012, complete genome.	NA-CAT	Vertebrates
+MMCIEP	Macacca mulatta cytomegalovirus immediate early protein genes, complete cds.	NA-CAT	Vertebrates
+X59001	Leukemogenic retrovirus T3651/B env gene.	NA-CAT	Vertebrates
+X59002	Leukemogenic retrovirus T1223/B env gene.	NA-CAT	Vertebrates
+AF078727	Rangiferine herpesvirus 1 strain Salla 82 glycoprotein B gene, complete cds.	NA-CAT	Vertebrates
+AF078733	Rangiferine herpesvirus 1 Salla 82 glycoprotein D precursor, gene, partial cds.	NA-CAT	Vertebrates
+AF139909	Rangiferine herpesvirus 1 glycoprotein C gene, partial cds.	NA-CAT	Vertebrates
+JX027297	Bufavirus-2 strain BF.39 NS1, putative VP1, hypothetical protein, and VP2 genes, complete cds.	NA-CAT	Vertebrates
+MUVFPHG	Murayama virus genes for fusion protein and hemagglutinin, complete cds.	NA-CAT	Vertebrates
+PXRIL1XX	Poxvirus interleukin-1 binding protein (IL1) gene, complete cds.	NA-CAT	Vertebrates
+X51587	Non-A non-B Hepatitis virus DNA for C8-2 antigen.	NA-CAT	Vertebrates
+X69125	Louping-ill-like virus structural gene encoding capsid, pre-membrane, membrane, and envelope proteins.	NA-CAT	Vertebrates
+Z48235	Malacky virus RNA for nucleocapsid protein, genotype Tula, strain Ma32/94.	NA-CAT	Vertebrates
+Z68191	Malacky virus RNA for nucleocapsid protein, strain Ma370/94.	NA-CAT	Vertebrates
+REOMU2A	Reoviridae sp. MU2 protein (M1) dsRNA, deletion mutant of serotype 1 breaking/joining region.	NA-CAT	Vertebrates
+REOMU2B	Reoviridae sp. MU2 protein (M1) dsRNA, deletion mutant of serotype 1 breaking/joining region.	NA-CAT	Vertebrates
+REOMU2D	Reoviridae sp. MU2 protein (M1) dsRNA, deletion mutant of serotype 1 breaking/joining region.	NA-CAT	Vertebrates
+REOMU2E	Reoviridae sp. MU2 protein (M1) dsRNA, deletion mutant of serotype 1 breaking/joining region.	NA-CAT	Vertebrates
+REOMU2F	Reoviridae sp. MU2 protein (M1) dsRNA, deletion mutant of serotype 1 breaking/joining region.	NA-CAT	Vertebrates
+REOMU2G	Reoviridae sp. MU2 protein (M1) dsRNA, deletion mutant of serotype 1 breaking/joining region.	NA-CAT	Vertebrates
+REOMU2I	Reoviridae sp. MU2 protein (M1) dsRNA, deletion mutant of serotype 1 breaking/joining region.	NA-CAT	Vertebrates
+REOMU2J	Reoviridae sp. MU2 protein (M1) dsRNA, deletion mutant of serotype 1 breaking/joining region.	NA-CAT	Vertebrates
+REOMU2K	Reoviridae sp. MU2 protein (M1) dsRNA, deletion mutant of serotype 1 breaking/joining region.	NA-CAT	Vertebrates
+REOMU2L	Reoviridae sp. MU2 protein (M1) dsRNA, deletion mutant of serotype 1 breaking/joining region.	NA-CAT	Vertebrates
+REOMU2M	Reoviridae sp. MU2 protein (M1) dsRNA, deletion mutant of serotype 1 breaking/joining region.	NA-CAT	Vertebrates
+DQ100461	Beilong virus, complete genome.	NA-CAT	Vertebrates
+GU265564	Bus virus RTM2 nonfunctional B-family DNA polymerase gene, partial sequence.	Bus	Vertebrates
+GU265569	CHER virus nonfunctional B-family DNA polymerase gene, partial sequence.	CHER	Vertebrates
+GU991616	Providence virus isolate vFLM1, complete genome.	Providence	Vertebrates
+S59394	{5' long terminal repeat} [Intracisternal A-type particle IAP, Other Genetic Material, 352 nt].	{5'	Vertebrates
 X78053	K28 killer virus negative RNA strand.	K28	Vertebrates
 X78054	K28 killer virus preprotoxin RNA strand.	K28	Vertebrates
+AJ225209	RV-Brook trout partial mRNA for polyprotein.	NA-CAT	Vertebrates
+AJ225210	RV-Brown trout partial mRNA for polyprotein.	NA-CAT	Vertebrates
+AJ225211	RV-Common possum partial mRNA for polyprotein.	NA-CAT	Vertebrates
+AJ225212	RV-Edible frog partial mRNA for polyprotein.	NA-CAT	Vertebrates
+AJ225214	RV-Freshwater houting partial mRNA for polyprotein.	NA-CAT	Vertebrates
+AJ225215	RV-Gharial partial mRNA for polyprotein.	NA-CAT	Vertebrates
+AJ225216	RV-Horse partial mRNA for polyprotein.	NA-CAT	Vertebrates
+AJ225217	RV-Iberian frog partial mRNA for polyprotein.	NA-CAT	Vertebrates
+AJ225218	RV-Leopard frog partial mRNA for polyprotein.	NA-CAT	Vertebrates
+AJ225219	RV-Painted frog partial mRNA for polyprotein.	NA-CAT	Vertebrates
+AJ225220	RV-Palmate newtI partial mRNA for polyprotein.	NA-CAT	Vertebrates
+AJ225221	RV-Palmate newtII partial mRNA for polyprotein.	NA-CAT	Vertebrates
+AJ225222	RV-Pit viper partial mRNA for polyprotein.	NA-CAT	Vertebrates
+AJ225223	RV-Pufferfish partial mRNA for polyprotein.	NA-CAT	Vertebrates
+AJ225224	RV-Rhinatremid caecilianI partial mRNA for polyprotein.	NA-CAT	Vertebrates
+AJ225225	RV-Rhinatremid caecilianII partial mRNA for polyprotein.	NA-CAT	Vertebrates
+AJ225226	RV-Rocket frog partial mRNA for polyprotein.	NA-CAT	Vertebrates
+AJ225227	RV-Slider turtleI partial mRNA for polyprotein.	NA-CAT	Vertebrates
+AJ225228	RV-Slider turtleII partial mRNA for polyprotein.	NA-CAT	Vertebrates
+AJ225229	RV-Stickleback partial mRNA for polyprotein.	NA-CAT	Vertebrates
+AJ225230	RV-Stripe faced dunnartI partial mRNA for polyprotein.	NA-CAT	Vertebrates
+AJ225231	RV-Stripe faced dunnartII partial mRNA for polyprotein.	NA-CAT	Vertebrates
+AJ225232	RV-Tiger salamanderI partial mRNA for polyprotein.	NA-CAT	Vertebrates
+AJ225233	RV-Tiger salamanderII partial mRNA for polyprotein.	NA-CAT	Vertebrates
+AJ225234	RV-Tiger salamanderIII partial mRNA for polyprotein.	NA-CAT	Vertebrates
+AJ225235	RV-Tinamou partial mRNA for polyprotein.	NA-CAT	Vertebrates
+AJ225236	RV-Tuatara partial mRNA for polyprotein.	NA-CAT	Vertebrates
+AJ236134	Troglodytes troglodytes retrovirus partial pol and pro genes isolate RV-Wren.	NA-CAT	Vertebrates
+AY043182	Damselfish virus-like agent from Stegastes partitus extrachromosomal sequence.	NA-CAT	Vertebrates
+GQ857523	Uranoscopus japonicus iridovirus isolate g-52 major capsid protein gene, partial cds.	NA-CAT	Vertebrates
+GQ857524	Dentex tumifrons iridovirus isolate g-54 major capsid protein gene, partial cds.	NA-CAT	Vertebrates
+S52616	env-related transmembrane protein [human endogenous retrovirus ERV9, Genomic, 64 nt].	NA-CAT	Vertebrates
+S81230	UL52' helicase-primase complex homolog [phocid herpesvirus type-2 PhHV-2, host=Phoca vitulina, isolate 7848, Genomic, 788 nt].	NA-CAT	Vertebrates
