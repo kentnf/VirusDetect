@@ -129,8 +129,15 @@ sub load_virus_info
 {
 	my $file = shift;
 	my %virus_info;
-	open(FH, $file) || die $!;
-	while(<FH>)
+
+	my $fh;	
+	if  ($file =~ m/\.gz$/) {
+		open($fh, "gunzip -c $file |") || die $!;
+	} else {
+		open($fh, $file) || die $!;
+	}
+
+	while(<$fh>)
 	{
 		chomp;
 		next if $_ =~ m/^#/;
