@@ -145,7 +145,7 @@ main: {
 
 	# create result folder according to sample name, copy contig to result folder
 	my $sample_base = basename($sample);
-	my $sample_dir = $result_dir."_".$sample_base."_new";
+	my $sample_dir = $result_dir."_".$sample_base;
 	Util::process_cmd("mkdir $sample_dir", $debug) unless -e $sample_dir;
 	Util::process_cmd("cp $contig $sample_dir/contig_sequences.fa", $debug);
 
