@@ -28,7 +28,7 @@ sub align_to_reference
 		my $log = $temp_folder."/bwa.log";
 		my $bwa_mhit_param = "-n $mhit_num";
 		if ($mhit_num > 1 ) { $bwa_mhit_param = "-n $mhit_num";  }
-		Util::process_cmd("$align_program index -p $reference -a bwtsw $reference 2> $log", $debug) unless -s "$reference.amb";
+		Util::process_cmd("$align_program index -p $reference -a bwtsw $reference 1> $log 2>> $log", $debug) unless -s "$reference.amb";
 		Util::process_cmd("$align_program aln $parameters $reference $input_file 1> $sai 2>> $log", $debug);
 		Util::process_cmd("$align_program samse $bwa_mhit_param $reference $sai $input_file 1> $output_file 2>> $log", $debug);
 		Util::xa2multi($output_file);
@@ -78,6 +78,8 @@ sub generate_unmapped_reads
 	$ratio = sprintf("%.2f", $ratio);
 	$ratio = $ratio."%";
 	
+	Util::print_user_submessage("$num_unmapped_reads reads aligned");
+
 	return ($num_unmapped_reads, $ratio);
 }
 
@@ -111,12 +113,11 @@ sub filter_SAM
         }
         #my ($total_count, $kept_align) = (0,0);
 	my $kept_align = 0;
+
         $in->close;
         $out->close;
         Util::process_cmd("mv $temp_SAM $input_SAM");
         #print STDERR "This program filtered $filtered_count out of $total_count reads (" . sprintf("%.2f", $filtered_count / $total_count * 100) . ") as unmapped reads, only for BWA\n";
-
-
 
         $in  = IO::File->new($input_SAM) || die $!;
         $out = IO::File->new(">".$temp_SAM) || die $!;
@@ -126,6 +127,7 @@ sub filter_SAM
                 if ($_ =~ m/^@/) { 
 			next; #print $out $_."\n"; next; 
 		}
+
                 my @a = split(/\t/, $_);
 
                 my $query_name = $a[$query_col];
@@ -172,9 +174,21 @@ sub filter_SAM
         }
         $out->close;
         $filtered_count = $total_count - $kept_align;
-
 	Util::process_cmd("mv $temp_SAM $input_SAM");	
 
+	# get the number of mapped reads
+	my %mapped_reads;
+	my $fh = IO::File->new($input_SAM) || die $!;
+	while(<$fh>) {
+		chomp;
+		next if $_ =~ s/^@//;
+		my @a = split(/\t/, $_);
+		$mapped_reads{$a[0]} = 1;
+	}
+	$fh->close;
+	my $mapped_num = scalar(keys(%mapped_reads));
+
+	Util::print_user_submessage("$mapped_num reads aligned");
         #print STDERR "This program filtered $filtered_count out of $total_count reads (" . sprintf("%.2f", $filtered_count / $total_count * 100) . ") as 2ndhits reads, only for BWA\n";
 }
 
@@ -723,7 +737,7 @@ sub remove_redundancy
 		Util::print_user_submessage("$after_contig_num of uniq contigs were generated");
 	} elsif ($after_contig_num == 1) {
 		Util::print_user_submessage("$after_contig_num of uniq contig was generated");
-	} elsif ($after_contig_num == 0) {
+	} else {
 		Util::print_user_submessage("None of uniq contig was generated");
 	}
 
@@ -759,7 +773,7 @@ sub base_correction
 	my $log = $temp_dir."/bwa.log";
 	my $parameters = "-n 1 -o 1 -e 1 -i 0 -l 15 -k 1 -t $cpu_num";
 	my $bwa_mhit_param = "-n 10000";
-	Util::process_cmd("$bin_dir/bwa index -p $contig_file -a bwtsw $contig_file 2> $log", $debug);
+	Util::process_cmd("$bin_dir/bwa index -p $contig_file -a bwtsw $contig_file 1> $log 2>> $log", $debug);
 	Util::process_cmd("$bin_dir/bwa aln $parameters $contig_file $read_file 1> $sai 2>> $log", $debug);
 	Util::process_cmd("$bin_dir/bwa samse $bwa_mhit_param $contig_file $sai $read_file 1> $read_file.sam 2>> $log", $debug);
 	Util::xa2multi("$read_file.sam");

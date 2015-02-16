@@ -46,6 +46,26 @@ sub detect_FileType {
 	return $file_type;
 }
 
+sub detect_seqNum {
+	my $file = shift;
+	die "[ERR]Undef $file\n" unless -s $file;
+	my $seq_num = 0;
+	my $file_type;
+	open(FH, $file) || die $!;
+	while(<FH>)
+	{
+		my $id = $_;
+		if      ($id =~ m/^>/) { $file_type = 'fasta'; }
+		elsif   ($id =~ m/^@/) { $file_type = 'fastq'; }
+		else    { die "[ERR], can not detect the file type for file: $file\n"; }
+		<FH>;
+		$seq_num++;
+		if ($file_type eq 'fastq') { <FH>; <FH>; }
+	}
+	close(FH);
+	return $seq_num;
+}
+
 sub print_user_message {
 	my @message = @_;
 	#print "\n";

@@ -413,7 +413,7 @@ sub get_contig_mapped_depth
 	my $log = $sample."_bwa.log";
 	my $parameters = "-n 1 -o 1 -e 1 -i 0 -l 15 -k 1 -t $cpu_num";
 	my $bwa_mhit_param = "-n 10000";
-	Util::process_cmd("$BIN_DIR/bwa index -p $contig -a bwtsw $contig 2> $log", $debug);
+	Util::process_cmd("$BIN_DIR/bwa index -p $contig -a bwtsw $contig 1> $log 2>> $log", $debug);
 	Util::process_cmd("$BIN_DIR/bwa aln $parameters $contig $sample 1> $sai 2>> $log", $debug);
 	Util::process_cmd("$BIN_DIR/bwa samse $bwa_mhit_param $contig $sai $sample 1> $sample.sam 2>> $log", $debug);
 	Util::xa2multi("$sample.sam");

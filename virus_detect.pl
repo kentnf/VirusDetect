@@ -151,13 +151,12 @@ if (scalar(@ARGV) < 1 ) {
 
 # check host 
 if ( $host_reference ) {
-
 	if (-s $host_reference ) {
 		# nothing to do with the reference	
 	} elsif ( -s ${FindBin::RealBin}."/databases/$host_reference" ) {
 		$host_reference = ${FindBin::RealBin}."/databases/$host_reference"; # change the reference address
 	} else {
-		$host_reference = "";	# set reference as blank to skip host reference remove if can not find it
+		die "[ERR]reference not exist: $host_reference\n";
 	}
 } 
 
@@ -166,6 +165,7 @@ foreach my $sample (@ARGV)
 {
 	die $usage unless -s $sample;
 	my $file_type = Util::detect_FileType($sample);
+	my $seq_num = Util::detect_seqNum($sample);
 	my $sample_base = basename($sample);
 
 	# set path and folder folder
@@ -194,7 +194,7 @@ foreach my $sample (@ARGV)
 
 	print "Align Program: $align_program\nAlign Parameters: $align_parameters\nAlign Input File: $sample\nAlign Output File: $sample.sam\n" if $debug;
 
-	print ("####################################################################\nprocess sample $sample_base\n");
+	print ("####################################################################\nprocess sample $sample_base (total read: $seq_num)\n");
 	Util::print_user_message("Align reads to reference virus sequence database");
 	align::align_to_reference($align_program, $sample, $reference, "$sample.sam", $align_parameters, 10000, $TEMP_DIR, $debug);
 	align::filter_SAM($sample.".sam");	# filter out unmapped, 2nd hits, only keep the best hit
@@ -211,7 +211,8 @@ foreach my $sample (@ARGV)
 	# part B: 1. remove host related reads  2. de novo assembly 3. remove redundancy contigs
 	# parameter for velvet: $sample, $output_contig, $kmer_start, $kmer_end, $coverage_start, $coverage_end, $objective_type, $bin_dir, $temp_dir, $debug
 	if( $host_reference ){
-		Util::print_user_message("Align reads to host reference sequences");
+		my $host_reference_base = $host_reference; $host_reference_base =~ s/.*\///;
+		Util::print_user_message("Align reads to host ($host_reference_base) reference sequences");
 		align::align_to_reference($align_program, $sample, $host_reference, "$sample.sam", $align_parameters, 1, $TEMP_DIR, $debug);
 		align::generate_unmapped_reads("$sample.sam", "$sample.unmapped");
 		Util::print_user_message("De novo assembly");
@@ -222,12 +223,21 @@ foreach my $sample (@ARGV)
 		Util::print_user_message("De novo assembly");
 		align::velvet_optimiser_combine($sample, "$sample.assembled", 9, 19, 5, 25, $objective_type, $BIN_DIR, $TEMP_DIR, $debug);
 	}
-	align::remove_redundancy("$sample.assembled", $sample, $rr_blast_parameters, $max_end_clip, $min_overlap, 'ASSEMBLED',$BIN_DIR, $TEMP_DIR, $debug) if -s "$sample.assembled";
-	
+
+	if (-s "$sample.assembled") {
+		align::remove_redundancy("$sample.assembled", $sample, $rr_blast_parameters, $max_end_clip, $min_overlap, 'ASSEMBLED',$BIN_DIR, $TEMP_DIR, $debug) if -s "$sample.assembled";
+	} else {
+		Util::print_user_submessage("None of uniq contig was generated");
+	}
+
 	# combine the known and unknown virus, remove redundancy of combined results, it must be using strand_specific parameter
 	Util::print_user_message("Remove redundancies in virus contigs");
 	Util::process_cmd("cat $sample.aligned $sample.assembled > $sample.combined", $debug);
-	align::remove_redundancy("$sample.combined", $sample, $rr_blast_parameters, $max_end_clip, $min_overlap, 'CONTIG', $BIN_DIR, $TEMP_DIR, $debug) if -s "$sample.combined";
+	if (-s "$sample.combined") {
+		align::remove_redundancy("$sample.combined", $sample, $rr_blast_parameters, $max_end_clip, $min_overlap, 'CONTIG', $BIN_DIR, $TEMP_DIR, $debug);
+	} else {
+		Util::print_user_submessage("None of uniq contig was generated");
+	}
 
 	# identify the virus
 	Util::print_user_message("Virus identification");
