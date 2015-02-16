@@ -77,8 +77,9 @@ sub generate_unmapped_reads
 	$ratio = ( $num_unmapped_reads / ($num_unmapped_reads + scalar(keys %mapped_reads))) * 100;
 	$ratio = sprintf("%.2f", $ratio);
 	$ratio = $ratio."%";
-	
-	Util::print_user_submessage("$num_unmapped_reads reads aligned");
+
+	my $mapped_num = scalar(keys %mapped_reads);
+	Util::print_user_submessage("$mapped_num reads aligned");
 
 	return ($num_unmapped_reads, $ratio);
 }
@@ -190,6 +191,8 @@ sub filter_SAM
 
 	Util::print_user_submessage("$mapped_num reads aligned");
         #print STDERR "This program filtered $filtered_count out of $total_count reads (" . sprintf("%.2f", $filtered_count / $total_count * 100) . ") as 2ndhits reads, only for BWA\n";
+
+	return $mapped_num;
 }
 
 =head2
