@@ -54,8 +54,6 @@ my $usage = <<_EOUSAGE_;
 #  --coverage_cutoff	Coverage cutoff of a reported virus reference 
 #                        sequences by assembled virus contigs [0.1] 
 #  --depth_cutoff	Depth cutoff of a reported virus reference [5]
-#
-#  --depth_norm		Depth normalization by library size
 ########################################################################
 _EOUSAGE_
 ;

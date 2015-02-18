@@ -57,7 +57,7 @@ my $usage = <<_EOUSAGE_;
 #
 #  --coverage_cutoff	The coverage cutoff for final ouput [0.1] 
 #  --depth_cutoff	The depth cutoff for final ouput    [5]
-#  --depth_norm		Normalization depth by library size [off]
+#  --depth_norm		Normalized depth by library size [off]
 #
 ###########################################################################################
 
@@ -213,7 +213,9 @@ main: {
 
 	# 5. align read to contigs get depth, then compute reference depth using contig depth
 	# %contig_depth -> key: contig ID, depth, cover; value: depth, coverage
-	# %known_depth  -> key: ref_ID; value: depth
+	# %known_depth  -> key1: ref_ID; 
+	# 		   key2; depth, norm
+	# 		   value: raw depth, normalized depth
 	# filter the depth and coverage by depth cutoff and coverage cutoff, save the file
 	my %contig_depth = get_contig_mapped_depth($contig, $sample, $cpu_num, $file_type);
 	my %known_depth  = correct_depth($known_identified, \%contig_depth, \%contig_info, $sample, $depth_norm); # input sample will provide lib_size for depth normalization
@@ -368,24 +370,26 @@ sub arrange_col2
 
 	foreach my $line (@a)
 	{
-		# 0 - virus seq ID
-		# 1 - virus seq length
-		# 2 - virus seq cover length
-		# 3 - coverage (cover_length/seq_length: col3/col2)
-		# 4 - contigs
-		# 5 - contig number
-		# 6 - depth (read depth, from pileup file)
+		# 0 [col1] - virus seq ID
+		# 1 [col2] - virus seq length
+		# 2 [col3] - virus seq cover length
+		# 3 [col4] - coverage (cover_length/seq_length: col3/col2)
+		# 4 [col5] - contigs
+		# 5 [col6] - contig number
+		# 6 [col7] - raw depth (read depth, from pileup file)
+		# 7 [col8] - normalized depth
 
 		my @ta = split(/\t/, $line);
 		#my $coverage= 1.0 * $a[7] / $a[1];					# get coverage, shan's method
 		my $coverage = $ta[2] / $ta[1];						# changed by kentnf
 		my $depth = $ta[6];
-		my $genus = $$virus_info{$ta[0]}{'genus'};				# col 8 
-		my $desc  = $$virus_info{$ta[0]}{'desc'};				# col 9 
-		push(@all_data, [@ta[0,1,2],$coverage,@ta[4,5,6],$genus,$desc]); 	# re-order the data, then put them to array 
+		my $norm_depth = $ta[7];
+		my $genus = $$virus_info{$ta[0]}{'genus'};				# col 9
+		my $desc  = $$virus_info{$ta[0]}{'desc'};				# col 10
+		push(@all_data, [@ta[0,1,2],$coverage,@ta[4,5,6,7],$genus,$desc]); 	# re-order the data, then put them to array 
 	}
 	
-	@all_data = sort { ($a->[7] cmp $b->[7]) || ($b->[2] cmp $a->[2])} @all_data; # sort according to Genus and read_cov(bp)
+	@all_data = sort { ($a->[8] cmp $b->[8]) || ($b->[2] cmp $a->[2])} @all_data; # sort according to Genus and read_cov(bp)
 
 	my $output_identified = '';
 
@@ -464,6 +468,7 @@ sub correct_depth
 
 	# convert contig depth to reference depth
 	my %known_depth;
+	my %known_depth_norm;
 
 	chomp($known_identified);
 	my @l = split(/\n/, $known_identified);
@@ -493,11 +498,8 @@ sub correct_depth
 		my $norm_depth = (1e+6 * $total_len) / ($contig_len * $lib_size);
 
 		# select depth by user provided parameters	
-		if ($ref_depth_norm) {
-			$known_depth{$a[0]} = $norm_depth;
-		} else {
-			$known_depth{$a[0]} = $ref_depth;
-		}
+		$known_depth{$a[0]}{'norm'} = $norm_depth;
+		$known_depth{$a[0]}{'depth'} = $ref_depth;
 	}
 	
 	return %known_depth;
@@ -521,10 +523,10 @@ sub filter_by_coverage_depth
                 my @ta = split(/\t/, $line);
 	
                 if ($ta[3] > $coverage_cutoff) {
-			die "[ERR]Undef depth for $ta[0]\n" unless defined $$known_depth{$ta[0]};
-                        if ( $$known_depth{$ta[0]} > $depth_cutoff) 
+			die "[ERR]Undef depth for $ta[0]\n" unless defined $$known_depth{$ta[0]}{'norm'};
+                        if ( $$known_depth{$ta[0]}{'norm'} > $depth_cutoff) 
 			{
-                               $output_identified.=$line."\t".$$known_depth{$ta[0]}."\n";
+                               $output_identified.=$line."\t".$$known_depth{$ta[0]}{'depth'}."\t".$$known_depth{$ta[0]}{'norm'}."\n";
                         }
                 }
         }

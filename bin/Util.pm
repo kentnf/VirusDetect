@@ -1044,16 +1044,29 @@ sub plot_result
 	{
 		next if $line =~ m/^#/;
 		$line_number++;
+
 		my @ta = split(/\t/, $line);
-		die "[ERR]Num of cols: $line\n" unless scalar @ta == 9;
-		my ($ref, $len, $cov_base, $coverage, $contig, $contig_num, $depth, $genus, $desc) = @ta;
+		# 0 [col1] - virus seq ID
+                # 1 [col2] - virus seq length
+                # 2 [col3] - virus seq cover length
+                # 3 [col4] - coverage (cover_length/seq_length: col3/col2)
+                # 4 [col5] - contigs
+                # 5 [col6] - contig number
+                # 6 [col7] - raw depth (read depth, from pileup file)
+                # 7 [col8] - normalized depth
+		# 8 [col9] - genus
+		# 9 [col10]- desc
+
+		die "[ERR]Num of cols: $line\n" unless scalar @ta == 10;
+		my ($ref, $len, $cov_base, $coverage, $contig, $contig_num, $raw_depth, $norm_depth, $genus, $desc) = @ta;
 
 		$all_hits{$ref} = 1; 
 		$index{$ref} = $line_number;
 
 		my $link = $type."_references/".$ref.".html";
 		$coverage = sprintf("%.3f", $coverage) * 100;
-		$depth = sprintf("%.1f", $depth);
+		$raw_depth = sprintf("%.1f", $raw_depth);
+		$norm_depth = sprintf("%.1f", $norm_depth);
 
 		$out_table .= qq' 
    <tr>
@@ -1061,7 +1074,8 @@ sub plot_result
         <td>$len</td>
         <td>$cov_base ($coverage)</td>
         <td>$contig_num</td>	
-        <td>$depth</td>
+        <td>$raw_depth</td>
+	<td>$norm_depth</td>
         <td>$genus</td>	
 	<td width="50%">$desc</td>	
    </tr>';	
@@ -1082,6 +1096,7 @@ td,th
     <th>Coverage(%)</th>
     <th>#contig</th>
     <th>Depth</th>
+    <th>Depth(Norm)</th>
     <th>Genus</th>
     <th width="50%">Description</th>
   </tr>
