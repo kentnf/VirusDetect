@@ -11,7 +11,6 @@ use Util;
 
 
 # our @ISA = qw( Exporter );
-
 # our @EXPORT_OK = qw( renameFasta bwa_remove removeRedundancy filter_SAM files_combine2 );
 
 =head2
