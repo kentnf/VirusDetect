@@ -224,9 +224,9 @@ main: {
 
 	my ($known_contig_table, $known_contig_blast_table, $known_reference) =  combine_table1($known_identified, $known_blast_table, \%contig_info, \%virus_info, \%reference_info);
 	my $known_contig_blast_sam = Util::blast_table_to_sam($known_contig_blast_table);
-	Util::save_file($known_contig_table, "$sample_dir/$sample_base.new.known.xls");
-	Util::save_file($known_reference, "$sample_dir/new.known.reference.fa");
-	Util::save_file($known_contig_blast_sam, "$sample_dir/$sample_base.new.known.sam");
+	Util::save_file($known_contig_table, "$sample_dir/$sample_base.known.xls");
+	Util::save_file($known_reference, "$sample_dir/known.reference.fa");
+	Util::save_file($known_contig_blast_sam, "$sample_dir/$sample_base.known.sam");
 	
 	my $known_num = 0; ($known_num, $known_identified) = arrange_col2($known_identified, \%virus_info);
 	
@@ -283,9 +283,9 @@ main: {
 		# combine
 		my ($novel_contig_table, $novel_contig_blast_table, $novel_reference) =  combine_table1($novel_identified, $blast_novel_table, \%contig_info, \%virus_info, \%reference_info);
 		my $novel_contig_blast_sam = Util::blast_table_to_sam($novel_contig_blast_table);
-		Util::save_file($novel_contig_table, "$sample_dir/$sample_base.new.novel.xls");
-		Util::save_file($novel_reference, "$sample_dir/new.novel.reference.fa");
-        	Util::save_file($novel_contig_blast_sam, "$sample_dir/$sample_base.new.novel.sam");
+		Util::save_file($novel_contig_table, "$sample_dir/$sample_base.novel.xls");
+		Util::save_file($novel_reference, "$sample_dir/novel.reference.fa");
+        	Util::save_file($novel_contig_blast_sam, "$sample_dir/$sample_base.novel.sam");
 
 		my $novel_num = 0; ($novel_num, $novel_identified) = arrange_col2($novel_identified, \%virus_info);
 

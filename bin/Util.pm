@@ -92,9 +92,11 @@ sub get_time {
 
 sub save_file {
 	my ($content, $file) = @_;
-	open(FH, ">".$file) || die $!;
-	print FH $content;
-	close(FH);
+	if (defined $content && length($content) > 1) {
+		open(FH, ">".$file) || die $!;
+		print FH $content;
+		close(FH);
+	}
 }
 
 =head2

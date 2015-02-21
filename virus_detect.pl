@@ -260,7 +260,7 @@ foreach my $sample (@ARGV)
 	$cmd_identify .= "--word_size $word_size --exp_value $exp_value --identity_percen $percent_identity ";
 	$cmd_identify .= "--cpu_num $thread_num --mis_penalty $mis_penalty_b --gap_cost $gap_cost_b --gap_extension $gap_extension_b ";
 	$cmd_identify .= "--hsp_cover $hsp_cover --diff_ratio $diff_ratio --diff_contig_cover $diff_contig_cover --diff_contig_length $diff_contig_length ";
-	$cmd_identify .= "--coverage_cutoff $coverage_cutoff --depth_cutoff $depth_cutoff --depth_norm $sample $sample.combined ";
+	$cmd_identify .= "--coverage_cutoff $coverage_cutoff --depth_cutoff $depth_cutoff --depth_norm --novel-check $sample $sample.combined ";
 	$cmd_identify .= "-d" if $debug;
 	if (-s "$sample.combined") {
 		Util::process_cmd($cmd_identify, $debug);
