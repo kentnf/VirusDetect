@@ -123,6 +123,9 @@ USAGE: $0 -t extProt -i input_seq gbvrl1.seq.gz gbvrl2.seq.gz ... gbvrlN.seq.gz
                 while(my $inseq = $seqin->next_seq)
                 {
                         my $sid = $inseq->id;
+			my $acc = $inseq->accession;
+			print "$sid\t$acc\n";
+
 			my $pid;
 			next unless defined $select_id{$sid};
 
@@ -134,8 +137,8 @@ USAGE: $0 -t extProt -i input_seq gbvrl1.seq.gz gbvrl2.seq.gz ... gbvrlN.seq.gz
 					foreach my $value ($feat_object->get_tag_values($tag)) {
 						$pid = $value if ($tag eq 'protein_id');
 						if ($tag eq 'translation' && length($value) > 0) {
-							print $out1 ">".$pid."\n".$value."\n";
-							print $out2 "$sid\t$pid\n";
+							#print $out1 ">".$pid."\n".$value."\n";
+							#print $out2 "$sid\t$acc\t$pid\n";
 						}
 					}
 				}
