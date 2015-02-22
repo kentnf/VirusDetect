@@ -27,6 +27,7 @@ elsif	($options{'t'} eq 'manually')	{ vrl_manually(\%options, \@ARGV); }	# manua
 elsif	($options{'t'} eq 'patch')	{ vrl_patch(\%options, \@ARGV); }	# combine the result
 elsif	($options{'t'} eq 'unique')	{ vrl_unique(\%options, \@ARGV); }	# unique the classified virus
 elsif	($options{'t'} eq 'refine')	{ vrl_refine(); }			# revine manually changed classification
+elsif	($options{'t'} eq 'extProt')	{ vrl_extract_protein(\%options, \@ARGV); }	# extract protein sequence
 else	{ usage($version); }
 
 sub usage
@@ -83,6 +84,67 @@ PIPELINE (version $version):
 ';
 	print $usage;
 	exit;
+}
+
+sub vrl_extract_protein
+{
+	my ($options, $files) = @_;
+	my $usage = qq'
+USAGE: $0 -t extProt -i input_seq gbvrl1.seq.gz gbvrl2.seq.gz ... gbvrlN.seq.gz 
+
+';
+	print $usage and exit unless defined $$files[0];
+	foreach my $f (@$files) { 
+		die "[ERR]file not exist: $f\n" unless -s $f;
+	}
+	print $usage and exit unless defined $$options{'i'};
+	my $input_seq = $$options{'i'};
+	die "[ERR]file not exist: $input_seq\n" unless -s $input_seq;
+
+	# get sequence id
+	my %select_id;
+	my $in = Bio::SeqIO->new(-format=>'fasta', -file=>$input_seq);
+	while(my $inseq = $in->next_seq) {
+		$select_id{$inseq->id} = 1;
+	}
+
+	my $output_prefix = $input_seq;
+	$output_prefix =~ s/\.fasta//;
+	my $output_protein = $output_prefix."_prot";
+	my $output_table   = $output_prefix."_tab";
+
+	# extract_protein_seq
+	my $out1 = IO::File->new(">".$output_protein) || die $!;
+	my $out2 = IO::File->new(">".$output_table) || die $!;
+
+	foreach my $f (@$files)
+	{
+		my $seqin = Bio::SeqIO->new(-format => 'GenBank', -file => "gunzip -c $f |" );
+                while(my $inseq = $seqin->next_seq)
+                {
+                        my $sid = $inseq->id;
+			my $pid;
+			next unless defined $select_id{$sid};
+
+			foreach my $feat_object ($inseq->get_SeqFeatures)
+                        {
+				my $primary_tag = $feat_object->primary_tag;
+				next unless $primary_tag eq "CDS";
+				foreach my $tag ($feat_object->get_all_tags) {
+					foreach my $value ($feat_object->get_tag_values($tag)) {
+						$pid = $value if ($tag eq 'protein_id');
+						if ($tag eq 'translation' && length($value) > 0) {
+							print $out1 ">".$pid."\n".$value."\n";
+							print $out2 "$sid\t$pid\n";
+						}
+					}
+				}
+			}
+		}
+	}
+	
+	$out1->close;
+	$out2->close;
 }
 
 sub vrl_refine

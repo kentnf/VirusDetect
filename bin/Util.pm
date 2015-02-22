@@ -149,9 +149,27 @@ sub xa2multi
 =cut
 sub load_virus_info
 {
-	my $file = shift;
-	my %virus_info;
+	my ($file, $prot_tab) = @_;
 
+	# load protein tab info to hash
+	my %vid_pid; # key: virus ID, value: pid1 # pid2 # ... # pidN
+	if (defined $prot_tab && -s $prot_tab) {
+		my $fh1 = IO::File->new($prot_tab) || die $!;
+		while(<$fh1>) {
+			chomp;
+			next if $_ =~ m/^#/;
+			my @a = split(/\t/, $_);
+			if ( defined $vid_pid{$a[0]} ) {
+				$vid_pid{$a[0]}.= "#".$a[1];
+			} else {
+				$vid_pid{$a[0]} = $a[1];
+			}
+		}
+		$fh1->close;
+	}
+
+	# load virus info to hash
+	my %virus_info;
 	my $fh;	
 	if  ($file =~ m/\.gz$/) {
 		open($fh, "gunzip -c $file |") || die $!;
@@ -170,6 +188,17 @@ sub load_virus_info
 		$virus_info{$a[0]}{'desc'} 	= $a[3];
 		$virus_info{$a[0]}{'verison'} 	= $a[4];
 		$virus_info{$a[0]}{'host_type'} = $a[5];
+
+		if (defined $vid_pid{$a[0]}) {
+			my @b = split(/#/, $vid_pid{$a[0]});
+			foreach my $pid (@b) {
+				$virus_info{$pid}{'length'}    = $a[1];
+				$virus_info{$pid}{'genus'}     = $a[2];
+				$virus_info{$pid}{'desc'}      = $a[3];
+				$virus_info{$pid}{'verison'}   = $a[4];
+				$virus_info{$pid}{'host_type'} = $a[5];
+			}
+		}
 	}
 	close($fh);
 	return %virus_info;
@@ -207,6 +236,7 @@ sub parse_blast_to_table
 	my $blast = '';
 	if    ($program =~ m/megablast/ || $program =~ m/blastn/) { $blast = 'blastn'; }
 	elsif ($program =~ m/tblastx/) { $blast = 'tblastx'; }
+	elsif ($program =~ m/blastx/)  { $blast = 'blastx'; }
 	else  {die "[ERR]Undef blast program $program\n"; }
 
 	# output table title
@@ -312,6 +342,13 @@ sub parse_blast_to_table
                 	if ( $a =~ /\+/ ) { $query_strand = 1;} else { $query_strand = -1;}
                 	if ( $b =~ /\+/ ) { $hit_strand = 1;} else { $hit_strand = -1;}
         	}
+		
+		elsif (/\s+Frame = (\S+)/ && $hsp_count >= 1)
+		{
+			die "[ERR]Unmatch blast:$blast\t$_\n" if $blast ne 'blastx';
+			my $a = $1;
+			if ( $a =~ /\+/ ) { $strand = 1;} else { $strand = -1;}
+		}
 
 		elsif (/Query\:\s(\d+)\s+(\S+)\s(\d+)/ && $hsp_count >= 1) 		# query sequence, && aligned string
 		{
@@ -385,7 +422,7 @@ sub filter_blast_table
 	# param will be 1 for megablastn/blastn, param will be 5 for tblastx
 	my $param;
 	if ( $blast_program =~ m/megablast/ || $blast_program =~ m/blastn/ ) { $param = 1; }
-	elsif ($blast_program =~ m/tblastx/) { $param = 3; }
+	elsif ($blast_program =~ m/tblastx/ || $blast_program =~ m/blastx/) { $param = 3; }
 	else  { die "[ERR]blast program: $blast_program\n"; }
 
 	my $output_blast_table = '';

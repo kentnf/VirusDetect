@@ -76,6 +76,7 @@ my $tf = $WORKING_DIR."/temp";				# temp folder
 
 my $DATABASE_DIR = ${FindBin::RealBin}."/../databases";	# database folder
 my $seq_info = $DATABASE_DIR."/vrl_genbank.info.gz";	# virus sequence info
+my $prot_tab = $DATABASE_DIR."/vrl_plant_prot_table";	# virus protein table
 my $reference = $DATABASE_DIR."/vrl_plant";       	# virus sequence
 Util::process_cmd("$BIN_DIR/formatdb -i $reference -p F") unless (-e "$reference.nhr");
 
@@ -152,10 +153,11 @@ main: {
 	# load contig info to hash; key: seqID, seq, length; value: seq, length
 	my %contig_info = Util::load_seq($contig);
 	my %reference_info = Util::load_seq($reference);
+	my %reference_prot_info = Util::load_seq($reference."_prot");
 
 	# load virus seqinfo to hash
 	# key: seqID, Length, type, desc, version, host_type
-	my %virus_info = Util::load_virus_info($seq_info);
+	my %virus_info = Util::load_virus_info($seq_info, $prot_tab);
 
 	# Part A
 	# 1. blast contigs against reference, parse and filter blast results to table format (NOT USE SEARCH::IO)
@@ -253,9 +255,10 @@ main: {
 		$fh->close;
 	
 		$blast_output = "$sample.novel.paired";
-		$blast_program = $BIN_DIR."/blastall -p tblastx";
+		$blast_program = $BIN_DIR."/blastall -p blastx";
 		$blast_param = "-F $filter_query -a $cpu_num -e $exp_value";				
-		Util::process_cmd("$blast_program -i $novel_contig -d $reference -o $blast_output $blast_param", $debug) unless -s $blast_output;
+		my $reference_prot = $reference."_prot"; 
+		Util::process_cmd("$blast_program -i $novel_contig -d $reference_prot -o $blast_output $blast_param", $debug) unless -s $blast_output;
 		my $blast_novel_table = Util::parse_blast_to_table($blast_output, $blast_program);
 		my $mm1 = Util::line_num($blast_novel_table);
 		   $blast_novel_table = Util::filter_blast_table($blast_novel_table, 0, $drop_off, $blast_program);
@@ -281,7 +284,7 @@ main: {
 		$novel_identified = filter_by_coverage_depth($novel_identified, \%novel_depth, $coverage_cutoff, $depth_cutoff);	
 		
 		# combine
-		my ($novel_contig_table, $novel_contig_blast_table, $novel_reference) =  combine_table1($novel_identified, $blast_novel_table, \%contig_info, \%virus_info, \%reference_info);
+		my ($novel_contig_table, $novel_contig_blast_table, $novel_reference) =  combine_table1($novel_identified, $blast_novel_table, \%contig_info, \%virus_info, \%reference_prot_info);
 		my $novel_contig_blast_sam = Util::blast_table_to_sam($novel_contig_blast_table);
 		Util::save_file($novel_contig_table, "$sample_dir/$sample_base.novel.xls");
 		Util::save_file($novel_reference, "$sample_dir/novel.reference.fa");
