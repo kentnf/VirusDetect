@@ -194,10 +194,6 @@ main: {
 
 	my ($known_contig, $known_blast_table) = Util::find_known_contig($blast_table, 60, 50);
 
-	open(FHA, ">"."$sample.known.contigs") || die $!;	# checking files
-	foreach my $cid (sort keys %$known_contig) { print FHA $cid."\n"; } 
-	close(FHA);
-
 	unlink($blast_output) unless $debug;
 	if (scalar(keys(%$known_contig)) == 0) { system("touch $sample_dir/no_virus_detected"); exit; } 
 
@@ -235,6 +231,9 @@ main: {
 	my %known_depth  = correct_depth($known_identified, \%contig_depth, \%contig_info, $sample, $depth_norm); # input sample will provide lib_size for depth normalization
 
 	# 7 the known identified table was filter again using depth and coverage
+	#   define coverage: query contig cov / total viral seq, 
+	#   define depth:
+	#   if the coverage meet cutoff, and raw & normalized depth meet the cutoff, identified virus will reported (final table)
 	$known_identified = filter_by_coverage_depth($known_identified, \%known_depth, $coverage_cutoff, $depth_cutoff);
 	Util::save_file($known_identified, "$sample.known.identified_with_depth");
 
@@ -249,32 +248,48 @@ main: {
 	my %final_known_contig;	
 	if ( length($known_identified) > 1 ) { 
 		Util::plot_result($known_identified, $known_contig_blast_table, $sample_dir, 'known'); 
-		chomp($known_identified);
-		my @line = split(/\n/, $known_identified);
+
+		# put final known contig to hash	
+		chomp($known_identified); my @line = split(/\n/, $known_identified);
 		foreach my $m (@line) {
 			my @a = split(/\t/,$m);	my @b = split(/,/, $a[4]);
 			foreach my $b (@b) { $final_known_contig{$b} = 1; }
 		}
+
 	} else {
 		unlink "$sample_dir/$sample_base.known.xls" if -e "$sample_dir/$sample_base.known.xls";
 	}
 	
 	Util::print_user_submessage("$known_num of known virus has been identified");
 
-	if ( $novel_check )
+	# output final-known/half-knwon/novel contigs;
+	#    final-known contigs: contigs in final result known.xls
+	#    half-known contigs : contigs not in final result, but meet the cutoff of 60% identity to virus, and 50% coverage of itself
+	#			  --- it include contig also pass remove redundancy, but failed on coverage and depth filter
+	#    novel contigs : need re-define 
+	my $known_contig = "$sample.known.contigs";
+	my $novel_contig = "$sample.novel.contigs";
+	my $half_known_contig = "$sample.unconsidered.contigs";
+	my $fh1 = IO::File->new(">".$known_contig) || die $!;
+	my $fh2 = IO::File->new(">".$novel_contig) || die $!;
+	my $fh3 = IO::File->new(">".$half_known_contig) || die $!;
+                
+	foreach my $cid (sort keys %contig_info) {
+		if (defined $final_known_contig{$cid}) {
+			print $fh1 ">$cid\n$contig_info{$cid}{'seq'}\n";
+		} elsif (defined $$known_contig{$cid} ) {
+			print $fh3 ">$cid\n$contig_info{$cid}{'seq'}\n";
+		} else {
+			print $fh2 ">$cid\n$contig_info{$cid}{'seq'}\n";
+		}
+	}
+	$fh1->close;
+	$fh2->close;
+	$fh3->close;
+
+	if ( $novel_check && -s $novel_contig )
 	{
 		# compare noval contigs against virus database using tblastx
-		my $novel_contig = "$sample.novel.contigs";
-		my $fh = IO::File->new(">".$novel_contig) || die $!;
-		foreach my $cid (sort keys %contig_info) {
-			if ( $debug_force ) {
-				print $fh ">$cid\n$contig_info{$cid}{'seq'}\n" if defined $$known_contig{$cid};
-			} else {
-				print $fh ">$cid\n$contig_info{$cid}{'seq'}\n" unless defined $final_known_contig{$cid};
-			}
-		}
-		$fh->close;
-	
 		$blast_output = "$sample.novel.paired";
 		$blast_program = $BIN_DIR."/blastall -p blastx";
 		$blast_param = "-F $filter_query -a $cpu_num -e $exp_value";				
