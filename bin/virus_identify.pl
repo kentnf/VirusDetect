@@ -548,7 +548,7 @@ sub filter_by_coverage_depth
 	
                 if ($ta[3] > $coverage_cutoff) {
 			die "[ERR]Undef depth for $ta[0]\n" unless defined $$known_depth{$ta[0]}{'norm'};
-                        if ( $$known_depth{$ta[0]}{'norm'} > $depth_cutoff) 
+                        if ( $$known_depth{$ta[0]}{'norm'} > $depth_cutoff || $$known_depth{$ta[0]}{'depth'} > $depth_cutoff ) 
 			{
                                $output_identified.=$line."\t".$$known_depth{$ta[0]}{'depth'}."\t".$$known_depth{$ta[0]}{'norm'}."\n";
                         }
