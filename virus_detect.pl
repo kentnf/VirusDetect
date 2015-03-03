@@ -206,14 +206,20 @@ foreach my $sample (@ARGV)
 
 		# parameter fo pileup_to_contig: input, output, min_len, min_depth, prefix
 		align::pileup_to_contig("$sample.pileup", "$sample.aligned", 40, 0, 'ALIGNED') if -s "$sample.pileup";
-		system("touch $sample.aligned") unless -s "$sample.pileup";
-		align::remove_redundancy("$sample.aligned", $sample, $rr_blast_parameters, $max_end_clip, $min_overlap, 'ALIGNED', $BIN_DIR, $TEMP_DIR, $debug) if -s "$sample.aligned";
-	} 
-	else
-	{
+
+		if (-s "$sample.pileup") {
+			align::remove_redundancy("$sample.aligned", $sample, $rr_blast_parameters, $max_end_clip, $min_overlap, 'ALIGNED', $BIN_DIR, $TEMP_DIR, $debug);
+			my $align_num = align::count_seq("$sample.aligned");
+			if ($align_num == 0) {
+				Util::print_user_submessage("None of uniq contig was generated");
+			}
+		} else {
+			system("touch $sample.aligned");
+			Util::print_user_submessage("None of uniq contig was generated");
+		}
+	} else {
 		Util::print_user_submessage("None of uniq contig was generated");
 	}
-	
 	
 	# part B: 1. remove host related reads  2. de novo assembly 3. remove redundancy contigs
 	# parameter for velvet: $sample, $output_contig, $kmer_start, $kmer_end, $coverage_start, $coverage_end, $objective_type, $bin_dir, $temp_dir, $debug

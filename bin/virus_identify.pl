@@ -161,18 +161,22 @@ main: {
 
 	# Part A
 	# 1. blast contigs against reference, parse and filter blast results to table format (NOT USE SEARCH::IO)
-	#    please check util::filter_blast_table for filter rules
+	#    please check util::filter_blast_table for filter rules ($hsp_cover: 0.75, $drop_off: 5)
+	#    hsp_cover/query_len >= 0.75 || hsp_cover/hit_len >= 0.75
+	#    for each contig, if the best identity hit to viral seq is 90%, the min identify for other hits viral seq
+	#    should be 85% (90% - 5%). that is 5 dropoff works
 	#
 	#    output blast table format:
 	#    query_name \t query_length \t hit_name \t hit_length \t hsp_length \t identity \t evalue \t score \t strand \t
 	#    query_start \t query_end \t hit_start \t hit_end \t identity2 \t aligned_query \t aligned_hit \t aligned_string\n
 	# 
-	# 2. then find known contig according to blast results
+	# 2. then find known contig according to blast results, using identify and ratio as cutoff
 	#    key: contig_id; value: 1
 	#    1. get the all the hsps with > 60 identity for one query
-	#    2. combine all the hsps for one query
-	#    3. get ratio of combined hsp and query
-	#    4. get know if ratio, other is novel
+	#    2. combine overlapped hsp for each query, then get total coverage from non-overlapped hsp of each query
+	#       this total cov means number of base in query contig could aligned to viral seqs
+	#    3. get ratio of hsp = total cov / query length * 100, if the ratio > 50%, the contig was as known
+	#    4. get know blast result with known contigs
 	#
 	# 3. exit if known contig identified
 	my $blast_program = $BIN_DIR."/megablast";
@@ -195,7 +199,7 @@ main: {
 	close(FHA);
 
 	unlink($blast_output) unless $debug;
-	if (scalar(keys(%$known_contig)) == 0) { system("touch $sample_dir/no_virus_detected"); exit; }
+	if (scalar(keys(%$known_contig)) == 0) { system("touch $sample_dir/no_virus_detected"); exit; } 
 
 	# report information for error checking:
 	if ($debug) {
@@ -204,16 +208,24 @@ main: {
 		print "Blast Table for known contig: ".Util::line_num($known_blast_table)."\n";
 	}
 
-	# 4. get hit coverage information, then remove redundancy hit 
+	# 4. get hit coverage information, then remove redundancy hit
+	#    this function looks redundance, it has save filter compared to step 3, but the filtered
+	#    result only works on known coverage and block computation
 	my ($known_coverage, $known_block) = Util::get_hit_coverage($known_blast_table, 60, 0.5, 1);
 
 	Util::save_file($known_coverage, "$sample.known.cov");  # checking files
 
+	# 5. remove redundancy hit.
+	#    after remove redundancy, the similar viral seq will be removed
+	#    Diff_ratio : 
+	#    Diff_contig_cover : 
+	#    Diff_contig_length : 
+	#    the output file is known identified
 	my $known_identified = Util::remove_redundancy_hit($known_coverage, $known_blast_table, $diff_ratio, $diff_contig_cover, $diff_contig_length);
 
 	Util::save_file($known_identified, "$sample.known.identified");
 
-	# 5. align read to contigs get depth, then compute reference depth using contig depth
+	# 6. align read to contigs get depth, then compute reference depth using contig depth
 	# %contig_depth -> key: contig ID, depth, cover; value: depth, coverage
 	# %known_depth  -> key1: ref_ID; 
 	# 		   key2; depth, norm
@@ -221,6 +233,8 @@ main: {
 	# filter the depth and coverage by depth cutoff and coverage cutoff, save the file
 	my %contig_depth = get_contig_mapped_depth($contig, $sample, $cpu_num, $file_type);
 	my %known_depth  = correct_depth($known_identified, \%contig_depth, \%contig_info, $sample, $depth_norm); # input sample will provide lib_size for depth normalization
+
+	# 7 the known identified table was filter again using depth and coverage
 	$known_identified = filter_by_coverage_depth($known_identified, \%known_depth, $coverage_cutoff, $depth_cutoff);
 	Util::save_file($known_identified, "$sample.known.identified_with_depth");
 
@@ -231,9 +245,16 @@ main: {
 	Util::save_file($known_contig_blast_sam, "$sample_dir/$sample_base.known.sam");
 	
 	my $known_num = 0; ($known_num, $known_identified) = arrange_col2($known_identified, \%virus_info);
-	
+
+	my %final_known_contig;	
 	if ( length($known_identified) > 1 ) { 
 		Util::plot_result($known_identified, $known_contig_blast_table, $sample_dir, 'known'); 
+		chomp($known_identified);
+		my @line = split(/\n/, $known_identified);
+		foreach my $m (@line) {
+			my @a = split(/\t/,$m);	my @b = split(/,/, $a[4]);
+			foreach my $b (@b) { $final_known_contig{$b} = 1; }
+		}
 	} else {
 		unlink "$sample_dir/$sample_base.known.xls" if -e "$sample_dir/$sample_base.known.xls";
 	}
@@ -249,7 +270,7 @@ main: {
 			if ( $debug_force ) {
 				print $fh ">$cid\n$contig_info{$cid}{'seq'}\n" if defined $$known_contig{$cid};
 			} else {
-				print $fh ">$cid\n$contig_info{$cid}{'seq'}\n" unless defined $$known_contig{$cid};
+				print $fh ">$cid\n$contig_info{$cid}{'seq'}\n" unless defined $final_known_contig{$cid};
 			}
 		}
 		$fh->close;

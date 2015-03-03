@@ -726,6 +726,11 @@ sub remove_redundancy
 	my ($before_contig_num, $after_contig_num);
 	$before_contig_num = count_seq($contig_file);	# get the seq number before remove redundancy
 	$after_contig_num  = $before_contig_num - 1;	# this is seq number after remove redundancy	
+
+	if ($before_contig_num == 0) {
+		Util::print_user_submessage("None of uniq contig was generated");
+		return 1;
+	}
 	
 	# if the new contig number != old contig number, continue remove redundancy
 	while( $after_contig_num != $before_contig_num )

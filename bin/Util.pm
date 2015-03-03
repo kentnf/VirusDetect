@@ -434,6 +434,8 @@ sub filter_blast_table
         my $high_identity;
         my $current_identity;
 
+	print $input_blast_table;
+
 	chomp($input_blast_table);
 	my @a = split("\n", $input_blast_table);
 	foreach my $line ( @a )
@@ -496,11 +498,11 @@ sub find_known_contig
 	# %blk ->
 	# key: query ID
 	# value: [Query start, Query End], [Query start, Query End] ....
-	# %query_length -> kek: query ID, value: query length
-	# %known -> key: query ID
+	# %query_length -> keu: query ID, value: query length
+	# %known -> key: virus ref ID, value: 1
 	my %blk;
 	my %query_len;
-	my %known;
+	my %known;	
 
 	chomp($input_blast_table);
 	my @a = split(/\n/, $input_blast_table);
@@ -512,7 +514,7 @@ sub find_known_contig
 		
 		if ($ta[5]>=$identity)
 		{
-			push(@{$blk{$ta[0]}}, [@ta[9,10]]); 				# create blk hash for query ID and [query_start,query_end]
+			push(@{$blk{$ta[0]}}, [@ta[9,10]]); 				# create blk hash for query ID and [query_start,query_end], query is contig
 			defined $query_len{$ta[0]} or $query_len{$ta[0]} = $ta[1];
 		}
 	}

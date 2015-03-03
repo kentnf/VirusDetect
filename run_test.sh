@@ -1,3 +1,6 @@
 
-perl virus_detect.pl --host_reference databases/tomato --thread_num 24 --coverage_cutoff 0.3 --depth_cutoff 10 test_data
+perl virus_detect.pl --thread_num 24 --coverage_cutoff 0.3 --depth_cutoff 10 KLL97
+
+#perl virus_detect.pl --host_reference databases/tomato --thread_num 24 --coverage_cutoff 0.3 --depth_cutoff 10 MX > report_MX.txt &
+
 
