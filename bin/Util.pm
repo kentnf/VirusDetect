@@ -434,8 +434,6 @@ sub filter_blast_table
         my $high_identity;
         my $current_identity;
 
-	print $input_blast_table;
-
 	chomp($input_blast_table);
 	my @a = split("\n", $input_blast_table);
 	foreach my $line ( @a )

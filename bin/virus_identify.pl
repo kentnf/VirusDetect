@@ -234,7 +234,8 @@ main: {
 	#   define coverage: query contig cov / total viral seq, 
 	#   define depth:
 	#   if the coverage meet cutoff, and raw & normalized depth meet the cutoff, identified virus will reported (final table)
-	$known_identified = filter_by_coverage_depth($known_identified, \%known_depth, $coverage_cutoff, $depth_cutoff);
+	my ($final_known_ctgs, $removed_ctgs);
+	($known_identified, $final_known_ctgs, $removed_ctgs) = filter_by_coverage_depth($known_identified, \%known_depth, $coverage_cutoff, $depth_cutoff);
 	Util::save_file($known_identified, "$sample.known.identified_with_depth");
 
 	my ($known_contig_table, $known_contig_blast_table, $known_reference) =  combine_table1($known_identified, $known_blast_table, \%contig_info, \%virus_info, \%reference_info);
@@ -245,17 +246,8 @@ main: {
 	
 	my $known_num = 0; ($known_num, $known_identified) = arrange_col2($known_identified, \%virus_info);
 
-	my %final_known_contig;	
 	if ( length($known_identified) > 1 ) { 
 		Util::plot_result($known_identified, $known_contig_blast_table, $sample_dir, 'known'); 
-
-		# put final known contig to hash	
-		chomp($known_identified); my @line = split(/\n/, $known_identified);
-		foreach my $m (@line) {
-			my @a = split(/\t/,$m);	my @b = split(/,/, $a[4]);
-			foreach my $b (@b) { $final_known_contig{$b} = 1; }
-		}
-
 	} else {
 		unlink "$sample_dir/$sample_base.known.xls" if -e "$sample_dir/$sample_base.known.xls";
 	}
@@ -267,18 +259,22 @@ main: {
 	#    half-known contigs : contigs not in final result, but meet the cutoff of 60% identity to virus, and 50% coverage of itself
 	#			  --- it include contig also pass remove redundancy, but failed on coverage and depth filter
 	#    novel contigs : need re-define 
-	my $known_contig = "$sample.known.contigs";
+	my $known_contig_f = "$sample.known.contigs";
 	my $novel_contig = "$sample.novel.contigs";
-	my $half_known_contig = "$sample.unconsidered.contigs";
-	my $fh1 = IO::File->new(">".$known_contig) || die $!;
+	my $half_known_contig_f = "$sample.unconsidered.contigs";
+	my $fh1 = IO::File->new(">".$known_contig_f) || die $!;
 	my $fh2 = IO::File->new(">".$novel_contig) || die $!;
-	my $fh3 = IO::File->new(">".$half_known_contig) || die $!;
+	my $fh3 = IO::File->new(">".$half_known_contig_f) || die $!;
                 
 	foreach my $cid (sort keys %contig_info) {
-		if (defined $final_known_contig{$cid}) {
+		if (defined $$final_known_ctgs{$cid}) {
 			print $fh1 ">$cid\n$contig_info{$cid}{'seq'}\n";
 		} elsif (defined $$known_contig{$cid} ) {
-			print $fh3 ">$cid\n$contig_info{$cid}{'seq'}\n";
+			if (defined $$removed_ctgs{$cid}) {
+				print $fh2 ">$cid\n$contig_info{$cid}{'seq'}\n";
+			} else {
+				print $fh3 ">$cid\n$contig_info{$cid}{'seq'}\n";
+			}
 		} else {
 			print $fh2 ">$cid\n$contig_info{$cid}{'seq'}\n";
 		}
@@ -286,6 +282,10 @@ main: {
 	$fh1->close;
 	$fh2->close;
 	$fh3->close;
+
+	Util::process_cmd("cp $known_contig_f $sample_dir/contig_sequences.known.fa");
+	Util::process_cmd("cp $novel_contig   $sample_dir/contig_sequences.novel.fa");
+	Util::process_cmd("cp $half_known_contig_f $sample_dir/contig_sequences.unconsidered.fa");
 
 	if ( $novel_check && -s $novel_contig )
 	{
@@ -317,7 +317,7 @@ main: {
 
 		# 5. get depth 
 		my %novel_depth  = correct_depth($novel_identified, \%contig_depth, \%contig_info, $sample, $depth_norm);
-		$novel_identified = filter_by_coverage_depth($novel_identified, \%novel_depth, $coverage_cutoff, $depth_cutoff);	
+		($novel_identified, $final_known_ctgs, $removed_ctgs) = filter_by_coverage_depth($novel_identified, \%novel_depth, $coverage_cutoff, $depth_cutoff);	
 		
 		# combine
 		my ($novel_contig_table, $novel_contig_blast_table, $novel_reference) =  combine_table1($novel_identified, $blast_novel_table, \%contig_info, \%virus_info, \%reference_prot_info);
@@ -553,24 +553,41 @@ sub filter_by_coverage_depth
 {
 	my ($known_identified, $known_depth, $coverage_cutoff, $depth_cutoff) = @_;
 
-	my $output_identified = '';
+	my $output_identified = '';	# output identified content
+	my %known_contigs;		# known contigs after filter
+	my %removed_contigs;		# removed contigs for novel
 
 	chomp($known_identified);
         my @a = split(/\n/, $known_identified);
         foreach my $line (@a)
         {
                 my @ta = split(/\t/, $line);
+		my @tb = split(/,/, $ta[4]);
+		die "[ERR]no support contig: $line\n" if scalar @tb < 1;
 	
                 if ($ta[3] > $coverage_cutoff) {
 			die "[ERR]Undef depth for $ta[0]\n" unless defined $$known_depth{$ta[0]}{'norm'};
-                        if ( $$known_depth{$ta[0]}{'norm'} > $depth_cutoff || $$known_depth{$ta[0]}{'depth'} > $depth_cutoff ) 
-			{
+                        if ( $$known_depth{$ta[0]}{'norm'} > $depth_cutoff || $$known_depth{$ta[0]}{'depth'} > $depth_cutoff ) {
                                $output_identified.=$line."\t".$$known_depth{$ta[0]}{'depth'}."\t".$$known_depth{$ta[0]}{'norm'}."\n";
-                        }
-                }
+				foreach my $ctg (@tb) { $known_contigs{$ctg} = 1; }
+                        } else {
+				foreach my $ctg (@tb) { $removed_contigs{$ctg} = 1; }
+			}
+                } else {
+			foreach my $ctg (@tb) { $removed_contigs{$ctg} = 1; }
+		}
         }
 
-	return $output_identified;
+	my $org_removed_num = scalar(keys(%removed_contigs));
+	my $org_known_num   = scalar(keys(%known_contigs));
+	my $ccn = 0;	# correct contig num
+	# check if removed contigs has knwon one, then delete it from removed
+	foreach my $ctg (sort keys %removed_contigs) {
+		delete $removed_contigs{$ctg} and $ccn++ if defined $known_contigs{$ctg};
+			
+	}
+	print "removed:$org_removed_num\tknown:$org_known_num\tcorrect:$ccn\n";
+	return ($output_identified, \%known_contigs, \%removed_contigs);
 }
 =head2 
 
