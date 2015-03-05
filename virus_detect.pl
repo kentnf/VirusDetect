@@ -142,7 +142,7 @@ GetOptions(
 	'coverage_cutoff=f' =>	\$coverage_cutoff,
 	'depth_cutoff=f' =>	\$depth_cutoff,
 	'depth_norm'	 =>	\$depth_norm,
-	'novel_len_cutoff' =>   \$novel_len_cutoff
+	'novel_len_cutoff=i' =>   \$novel_len_cutoff
 );
 
 # check input file
@@ -269,7 +269,7 @@ foreach my $sample (@ARGV)
 	$cmd_identify .= "--word_size $word_size --exp_value $exp_value --identity_percen $percent_identity ";
 	$cmd_identify .= "--cpu_num $thread_num --mis_penalty $mis_penalty_b --gap_cost $gap_cost_b --gap_extension $gap_extension_b ";
 	$cmd_identify .= "--hsp_cover $hsp_cover --diff_ratio $diff_ratio --diff_contig_cover $diff_contig_cover --diff_contig_length $diff_contig_length ";
-	$cmd_identify .= "--coverage_cutoff $coverage_cutoff --depth_cutoff $depth_cutoff --depth_norm --novel-check $sample $sample.combined ";
+	$cmd_identify .= "--coverage_cutoff $coverage_cutoff --depth_cutoff $depth_cutoff --depth_norm --novel-check ";
 	$cmd_identify .= "--novel_len_cutoff $novel_len_cutoff ";
 	$cmd_identify .= "-d " if $debug;
 	$cmd_identify .= "$sample $sample.combined ";
@@ -282,7 +282,7 @@ foreach my $sample (@ARGV)
 
 	# delete temp files and log files 
 	unlink("error.log", "formatdb.log");
-	# system("rm -r $TEMP_DIR") if -s $TEMP_DIR;
+	system("rm -r $TEMP_DIR") if -s $TEMP_DIR;
 
 	Util::print_user_message("Finished");
 	print ("####################################################################\n\n");

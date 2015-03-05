@@ -129,7 +129,7 @@ GetOptions(
 	'coverage_cutoff=f'	=> \$coverage_cutoff,
 	'depth_cutoff=f'	=> \$depth_cutoff,
 	'depth_norm'		=> \$depth_norm,
-	'novel_len_cutoff'      => \$novel_len_cutoff,
+	'novel_len_cutoff=i'    => \$novel_len_cutoff,
 	'd|debug'		=> \$debug,
 	'f|force'		=> \$debug_force,
 	'n|novel-check'		=> \$novel_check,
@@ -590,7 +590,7 @@ sub filter_by_coverage_depth
 		delete $removed_contigs{$ctg} and $ccn++ if defined $known_contigs{$ctg};
 			
 	}
-	print "removed:$org_removed_num\tknown:$org_known_num\tcorrect:$ccn\n";
+	#print "removed:$org_removed_num\tknown:$org_known_num\tcorrect:$ccn\n";
 	return ($output_identified, \%known_contigs, \%removed_contigs);
 }
 =head2 
