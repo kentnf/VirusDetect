@@ -58,7 +58,7 @@ my $usage = <<_EOUSAGE_;
 #  --coverage_cutoff	The coverage cutoff for final ouput [0.1] 
 #  --depth_cutoff	The depth cutoff for final ouput    [5]
 #  --depth_norm		Normalized depth by library size [off]
-#
+#  --novel_len_cutoff	Force unconsidered contig longer than this cutoff as novel contigs [1000]
 ###########################################################################################
 
 _EOUSAGE_
@@ -94,6 +94,7 @@ my $diff_contig_length = 100;	# for hit filter
 my $coverage_cutoff = 0.1;	# coverage cutoff for final result
 my $depth_cutoff = 5;		# depth cutoff for final result
 my $depth_norm = 0;		# normalization depth by library size
+my $novel_len_cutoff = 1000;	# 
 
 my $word_size = 11;
 my $cpu_num = 8;		# megablast: thread number
@@ -128,6 +129,7 @@ GetOptions(
 	'coverage_cutoff=f'	=> \$coverage_cutoff,
 	'depth_cutoff=f'	=> \$depth_cutoff,
 	'depth_norm'		=> \$depth_norm,
+	'novel_len_cutoff'      => \$novel_len_cutoff,
 	'd|debug'		=> \$debug,
 	'f|force'		=> \$debug_force,
 	'n|novel-check'		=> \$novel_check,
@@ -271,6 +273,8 @@ main: {
 			print $fh1 ">$cid\n$contig_info{$cid}{'seq'}\n";
 		} elsif (defined $$known_contig{$cid} ) {
 			if (defined $$removed_ctgs{$cid}) {
+				print $fh2 ">$cid\n$contig_info{$cid}{'seq'}\n";
+			} elsif ($contig_info{$cid}{'length'} >= $novel_len_cutoff) { 
 				print $fh2 ">$cid\n$contig_info{$cid}{'seq'}\n";
 			} else {
 				print $fh3 ">$cid\n$contig_info{$cid}{'seq'}\n";

@@ -54,6 +54,7 @@ my $usage = <<_EOUSAGE_;
 #  --coverage_cutoff	Coverage cutoff of a reported virus reference 
 #                        sequences by assembled virus contigs [0.1] 
 #  --depth_cutoff	Depth cutoff of a reported virus reference [5]
+#  --novel_len_cutoff
 ########################################################################
 _EOUSAGE_
 ;
@@ -95,6 +96,7 @@ my $hsp_cover = 0.75;
 my $coverage_cutoff = 0.1;			# coverage cutoff for final result
 my $depth_cutoff = 5;				# depth cutoff for final result
 my $depth_norm = 0;				# depth normalized by library size
+my $novel_len_cutoff = 1000;
 
 # disabled parameters or used as fixed value
 my $coverage = 0.3;  				# √øÃı≤Œøº–Ú¡–»Áπ˚±ªreads∏≤∏«µƒ≤ø∑÷’º»´≥§±»¿˝µƒ„–÷µ
@@ -139,7 +141,8 @@ GetOptions(
 
 	'coverage_cutoff=f' =>	\$coverage_cutoff,
 	'depth_cutoff=f' =>	\$depth_cutoff,
-	'depth_norm'	 =>	\$depth_norm
+	'depth_norm'	 =>	\$depth_norm,
+	'novel_len_cutoff' =>   \$novel_len_cutoff
 );
 
 # check input file
@@ -267,7 +270,10 @@ foreach my $sample (@ARGV)
 	$cmd_identify .= "--cpu_num $thread_num --mis_penalty $mis_penalty_b --gap_cost $gap_cost_b --gap_extension $gap_extension_b ";
 	$cmd_identify .= "--hsp_cover $hsp_cover --diff_ratio $diff_ratio --diff_contig_cover $diff_contig_cover --diff_contig_length $diff_contig_length ";
 	$cmd_identify .= "--coverage_cutoff $coverage_cutoff --depth_cutoff $depth_cutoff --depth_norm --novel-check $sample $sample.combined ";
-	$cmd_identify .= "-d" if $debug;
+	$cmd_identify .= "--novel_len_cutoff $novel_len_cutoff ";
+	$cmd_identify .= "-d " if $debug;
+	$cmd_identify .= "$sample $sample.combined ";
+
 	if (-s "$sample.combined") {
 		Util::process_cmd($cmd_identify, $debug);
 	} else {
