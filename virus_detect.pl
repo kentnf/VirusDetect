@@ -191,7 +191,7 @@ foreach my $sample (@ARGV)
 	# set parameters for remove reduncancy (rr)
 	my $rr_blast_word_size = int($min_overlap/3);
 	my $rr_hits_returns = 10;
-	my $rr_blast_parameters = "-F F -a $thread_num -W $rr_blast_word_size -p $min_identity -q $mis_penalty -G $gap_cost -E $gap_extension -b $rr_hits_returns";
+	my $rr_blast_parameters = "-F F -a $thread_num -W $rr_blast_word_size -q $mis_penalty -G $gap_cost -E $gap_extension -b $rr_hits_returns";
 	if ($strand_specific) { $rr_blast_parameters .=" -S 1"; }
 
 	# part A: 1. align reads to plant virus; 2. extract aligned seqs; 3. remove redundancy contigs
