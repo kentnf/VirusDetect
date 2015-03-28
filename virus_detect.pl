@@ -35,6 +35,8 @@ my $usage = <<_EOUSAGE_;
 #  --min_overlap	The minimum overlap length between two 
 #                        contigs to be combined [30]
 #  --max_end_clip	The maximum length of end clips [6]
+#  --min_identity	The minimum identity between two contigs to be 
+#  			 combined [97]
 #  --mis_penalty	Penalty for a nucleotide mismatch [-1]
 #  --gap_cost		Cost to open a gap [2] 
 #  --gap_extension	Cost to extend a gap [1] 
@@ -75,6 +77,7 @@ my $dist_seed = 1; 				# bwa seed max edit distance
 my $strand_specific;  				# switch for strand specific transcriptome data? 
 my $min_overlap = 30; 				# minimum overlap for hsp combine
 my $max_end_clip = 6; 				# max end clip for hsp combine
+my $min_identity = 97;				# mininum identity for remove redundancy contigs
 my $mis_penalty = -1;     			# megablast mismatch penlty, minus integer
 my $gap_cost = 2;         			# megablast gap open cost, plus integer
 my $gap_extension = 1;    			# megablast gap extension cost, plus integer
@@ -108,41 +111,43 @@ my $debug;
 
 # get input paras #
 GetOptions(
-	'r|reference=s'		=> 	\$reference,
-	'h|host_reference=s'	=> 	\$host_reference,
-	't|thread_num=i'	=> 	\$thread_num,
-	'd|debug'		=>	\$debug,
+	'r|reference=s'		=> \$reference,
+	'h|host_reference=s'	=> \$host_reference,
+	't|thread_num=i'	=> \$thread_num,
+	'd|debug'		=> \$debug,
 
-	'max_dist=i' => 	\$max_dist,
-	'max_open=i' => 	\$max_open,
-	'max_extension=i' => 	\$max_extension,
-	'len_seed=i' => 	\$len_seed,
-	'dist_seed=i' => 	\$dist_seed,			 
+	'max_dist=i' 		=> \$max_dist,
+	'max_open=i' 		=> \$max_open,
+	'max_extension=i' 	=> \$max_extension,
+	'len_seed=i' 		=> \$len_seed,
+	'dist_seed=i' 		=> \$dist_seed,			 
 		
-	'strand_specific!' => 	\$strand_specific,
-	'min_overlap=i' => 	\$min_overlap,
-	'max_end_clip=i' => 	\$max_end_clip,
+	'strand_specific!' 	=> \$strand_specific,
+	'min_overlap=i' 	=> \$min_overlap,
+	'max_end_clip=i' 	=> \$max_end_clip,
+	'min_identity=i'	=> \$min_identity,
+
 	'cpu_num=i' 		=> \$cpu_num,
-	'mis_penalty=i' => 	\$mis_penalty,
-	'gap_cost=i' => 	\$gap_cost,
-	'gap_extension=i' => 	\$gap_extension,
+	'mis_penalty=i' 	=> \$mis_penalty,
+	'gap_cost=i' 		=> \$gap_cost,
+	'gap_extension=i' 	=> \$gap_extension,
 	
-	'word_size=i' =>  	\$word_size,
-	'exp_value-s' =>  	\$exp_value,
-	'percent_identity=s' => 	\$percent_identity,
-	'mis_penalty_b=i' => 	\$mis_penalty_b,
-	'gap_cost_b=i' => 	\$gap_cost_b,
-	'gap_extension_b=i' => 	\$gap_extension_b,
+	'word_size=i' 		=> \$word_size,
+	'exp_value-s' 		=> \$exp_value,
+	'percent_identity=s' 	=> \$percent_identity,
+	'mis_penalty_b=i' 	=> \$mis_penalty_b,
+	'gap_cost_b=i' 		=> \$gap_cost_b,
+	'gap_extension_b=i' 	=> \$gap_extension_b,
 
-	'hsp_cover=s' =>	\$hsp_cover,
-	'diff_ratio=s' => 	\$diff_ratio,
-	'diff_contig_cover=s' =>\$diff_contig_cover,
-	'diff_contig_length=s'=>\$diff_contig_length,
+	'hsp_cover=s' 		=> \$hsp_cover,
+	'diff_ratio=s' 		=> \$diff_ratio,
+	'diff_contig_cover=s' 	=> \$diff_contig_cover,
+	'diff_contig_length=s'	=> \$diff_contig_length,
 
-	'coverage_cutoff=f' =>	\$coverage_cutoff,
-	'depth_cutoff=f' =>	\$depth_cutoff,
-	'depth_norm'	 =>	\$depth_norm,
-	'novel_len_cutoff=i' =>   \$novel_len_cutoff
+	'coverage_cutoff=f' 	=> \$coverage_cutoff,
+	'depth_cutoff=f' 	=> \$depth_cutoff,
+	'depth_norm'	 	=> \$depth_norm,
+	'novel_len_cutoff=i' 	=> \$novel_len_cutoff
 );
 
 # check input file
@@ -186,7 +191,7 @@ foreach my $sample (@ARGV)
 	# set parameters for remove reduncancy (rr)
 	my $rr_blast_word_size = int($min_overlap/3);
 	my $rr_hits_returns = 10;
-	my $rr_blast_parameters = "-F F -a $thread_num -W $rr_blast_word_size -q $mis_penalty -G $gap_cost -E $gap_extension -b $rr_hits_returns";
+	my $rr_blast_parameters = "-F F -a $thread_num -W $rr_blast_word_size -p $min_identity -q $mis_penalty -G $gap_cost -E $gap_extension -b $rr_hits_returns";
 	if ($strand_specific) { $rr_blast_parameters .=" -S 1"; }
 
 	# part A: 1. align reads to plant virus; 2. extract aligned seqs; 3. remove redundancy contigs
@@ -211,7 +216,7 @@ foreach my $sample (@ARGV)
 		align::pileup_to_contig("$sample.pileup", "$sample.aligned", 40, 0, 'ALIGNED') if -s "$sample.pileup";
 
 		if (-s "$sample.aligned") {
-			align::remove_redundancy("$sample.aligned", $sample, $rr_blast_parameters, $max_end_clip, $min_overlap, 'ALIGNED', $BIN_DIR, $TEMP_DIR, $debug);
+			align::remove_redundancy("$sample.aligned", $sample, $rr_blast_parameters, $max_end_clip, $min_overlap, $min_identity, 'ALIGNED', $BIN_DIR, $TEMP_DIR, $debug);
 			my $align_num = align::count_seq("$sample.aligned");
 			if ($align_num == 0) {
 				Util::print_user_submessage("None of uniq contig was generated");
@@ -241,7 +246,7 @@ foreach my $sample (@ARGV)
 	}
 
 	if (-s "$sample.assembled") {
-		align::remove_redundancy("$sample.assembled", $sample, $rr_blast_parameters, $max_end_clip, $min_overlap, 'ASSEMBLED',$BIN_DIR, $TEMP_DIR, $debug) if -s "$sample.assembled";
+		align::remove_redundancy("$sample.assembled", $sample, $rr_blast_parameters, $max_end_clip, $min_overlap, $min_identity, 'ASSEMBLED',$BIN_DIR, $TEMP_DIR, $debug) if -s "$sample.assembled";
 	} else {
 		Util::print_user_submessage("None of uniq contig was generated");
 	}
@@ -258,7 +263,7 @@ foreach my $sample (@ARGV)
 	}
 
 	if (-s "$sample.combined") {
-		align::remove_redundancy("$sample.combined", $sample, $rr_blast_parameters, $max_end_clip, $min_overlap, 'CONTIG', $BIN_DIR, $TEMP_DIR, $debug);
+		align::remove_redundancy("$sample.combined", $sample, $rr_blast_parameters, $max_end_clip, $min_overlap, $min_identity, 'CONTIG', $BIN_DIR, $TEMP_DIR, $debug);
 	} else {
 		Util::print_user_submessage("None of uniq contig was generated");
 	}

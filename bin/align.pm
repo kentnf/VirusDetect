@@ -715,9 +715,7 @@ sub contigStats
 =cut
 sub remove_redundancy
 {
-	my ($contig_file, $read_file, $parameters, $max_end_clip, $min_overlap, $perfix, $bin_dir, $temp_dir, $debug) = @_;
-
-	my $min_identity = '';	# pass this value to other subroutine for furture functions
+	my ($contig_file, $read_file, $parameters, $max_end_clip, $min_overlap, $min_identity, $perfix, $bin_dir, $temp_dir, $debug) = @_;
 
 	# step 1. remove low complexity sequence using dust, 2 remov XN reads
 	trim_XNseq($contig_file, 0.8, 40, $bin_dir, $debug);
@@ -995,7 +993,6 @@ sub ifRedundant
 	# using process_cmd() could debug ouput result
 	system("$bin_dir/formatdb -i $hit_seq_file -p F");
 	my $blast_program = $bin_dir."/megablast";
-
 	my $blast_param = "-i $query_seq_file -d $hit_seq_file -o $blast_output $blast_parameters";
 	system($blast_program." ".$blast_param) && die "Error at blast command: $blast_param\n";
 	
@@ -1065,15 +1062,16 @@ sub findRedundancy
 					my $hit_to_end = $hit_length - $hit_end;
 					my $hit_to_start = $hit_length - $hit_start;
 
-					# set min identity for different hsp length
-					$identity =~ s/%//;
-					if($hsp_length <= 50) {$min_identity = 95;}
-					elsif($hsp_length > 50 && $hsp_length <= 100) {$min_identity = 96;}
-					else{$min_identity = 97;}
-                    
 					# the if-eles order is importent (below)
 					# The query-subject are not redundancy if the identitiy is low
-					next if ($identity < $min_identity); 
+					$identity =~ s/%//;
+					if ($hsp_length <= 50) {
+						next if $identity < $min_identity-2;	# 95% if set min identity to 97%
+					} elsif ($hsp_length > 50 && $hsp_length <= 100) {
+						next if $identity < $min_identity-1;	# 96% if set min identity to 97%
+					} else {
+						next if $identity < $min_identity;	# 97% for default
+					}
 
 					# the query is included in subject
 					if ($query_start -1 <= $max_end_clip  && $query_to_end <= $max_end_clip)  
