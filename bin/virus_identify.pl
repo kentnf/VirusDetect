@@ -43,7 +43,7 @@ my $usage = <<_EOUSAGE_;
 # blast-related options(7):
 #  --word_size [11] 
 #  --exp_value [1e-5]
-#  --identity_percen [80] 
+#  --identity_percen [25] 
 #  --cpu_num         Number of processors to use [8] 
 #  --mis_penalty     Penalty for a nucleotide mismatch [-1]
 #  --gap_cost        Cost to open a gap [2] 

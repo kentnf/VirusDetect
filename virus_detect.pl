@@ -45,7 +45,7 @@ my $usage = <<_EOUSAGE_;
 #  database for virus identification):
 #  --word_size	     	[11] 
 #  --exp_value	     	[1e-5]
-#  --percent_identity 	[80] 
+#  --percent_identity 	[25] 
 #  --mis_penalty_b   	Penalty for a nucleotide mismatch [-1]
 #  --gap_cost_b      	Cost to open a gap [2] 
 #  --gap_extension_b 	Cost to extend a gap [1]
