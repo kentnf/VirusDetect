@@ -56,10 +56,15 @@ my $usage = <<_EOUSAGE_;
 #  --coverage_cutoff	Coverage cutoff of a reported virus reference 
 #                        sequences by assembled virus contigs [0.1] 
 #  --depth_cutoff	Depth cutoff of a reported virus reference [5]
-#  --novel_len_cutoff
+#  --novel_len_cutoff	Length cutoff of a contig categorized as novel
+#  			 when it is not reported as known, but it may 
+#  			 shows similarity with the reference virus 
+#  			 sequences. The default is 100bp [100]
 ########################################################################
 _EOUSAGE_
 ;
+
+if (scalar(@ARGV) < 1 ) { print $usage; exit; }
 
 # basic options
 my $reference= "vrl_plant";			# virus sequence
@@ -99,7 +104,7 @@ my $hsp_cover = 0.75;
 my $coverage_cutoff = 0.1;			# coverage cutoff for final result
 my $depth_cutoff = 5;				# depth cutoff for final result
 my $depth_norm = 0;				# depth normalized by library size
-my $novel_len_cutoff = 1000;
+my $novel_len_cutoff = 100;
 
 # disabled parameters or used as fixed value
 my $coverage = 0.3;  				# √øÃı≤Œøº–Ú¡–»Áπ˚±ªreads∏≤∏«µƒ≤ø∑÷’º»´≥§±»¿˝µƒ„–÷µ
@@ -149,11 +154,6 @@ GetOptions(
 	'depth_norm'	 	=> \$depth_norm,
 	'novel_len_cutoff=i' 	=> \$novel_len_cutoff
 );
-
-# check input file
-if (scalar(@ARGV) < 1 ) {
-	print $usage; exit;
-}
 
 # check host 
 if ( $host_reference ) {
