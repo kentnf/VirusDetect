@@ -16,10 +16,11 @@ my $usage = <<_EOUSAGE_;
 # virus_detect.pl [option] --reference reference input1 input2 ...
 #  
 # Basic Options:
-#  --reference		The name of a fasta file containing the virus 
-#                       reference sequences  [vrl_plant]
-#  --host_reference	Name of host reference file for subtraction [Null]
-#  --thread_num		Number of threads (multi-threading mode) [8] 
+#  --reference		Name of the reference virus sequences database 
+#                        [vrl_plant]
+#  --host_reference	Name of Name of the host reference database used 
+#                        to subtract sRNA sequences of host origin [Null]
+#  --thread_num		Number of CPUs used for alignments [8] 
 # 
 # BWA-related options (align sRNA to reference virus database or host 
 #  sequences):
@@ -31,22 +32,22 @@ my $usage = <<_EOUSAGE_;
 # 
 # Megablast-related options (remove redundancy within virus contigs):
 #  --strand_specific	Only for sequences assembled from strand-
-#                        specific RNA-seq  [Not selected]
+#                        specific RNA-seq [false]
 #  --min_overlap	The minimum overlap length between two 
 #                        contigs to be combined [30]
 #  --max_end_clip	The maximum length of end clips [6]
 #  --min_identity	The minimum identity between two contigs to be 
 #  			 combined [97]
-#  --mis_penalty	Penalty for a nucleotide mismatch [-1]
+#  --mis_penalty	Penalty score for a nucleotide mismatch [-1]
 #  --gap_cost		Cost to open a gap [2] 
 #  --gap_extension	Cost to extend a gap [1] 
 #
 # Megablast-related options (align virus contigs to reference virus 
 #  database for virus identification):
-#  --word_size	     	[11] 
-#  --exp_value	     	[1e-5]
-#  --percent_identity 	[25] 
-#  --mis_penalty_b   	Penalty for a nucleotide mismatch [-1]
+#  --word_size	     	Minimum word size - length of best perfect match [11] 
+#  --exp_value	     	Maximum Expectation value [1e-5]
+#  --percent_identity 	Minimum identity percentage for the alignment [25] 
+#  --mis_penalty_b   	Penalty score for a nucleotide mismatch [-1]
 #  --gap_cost_b      	Cost to open a gap [2] 
 #  --gap_extension_b 	Cost to extend a gap [1]
 #
@@ -130,7 +131,7 @@ GetOptions(
 	'strand_specific!' 	=> \$strand_specific,
 	'min_overlap=i' 	=> \$min_overlap,
 	'max_end_clip=i' 	=> \$max_end_clip,
-	'min_identity=i'	=> \$min_identity,
+	'min_identity=s'	=> \$min_identity,
 
 	'cpu_num=i' 		=> \$cpu_num,
 	'mis_penalty=i' 	=> \$mis_penalty,
