@@ -2,15 +2,15 @@
 Virus Classification Pipeline (version 0.1)
 --------------------------------------------
 
-##1. download viral sequneces and taxnomy database from GenBank ftp (ftp://ftp.ncbi.nih.gov/genbank/)
+####1. download viral sequneces and taxnomy database from GenBank ftp (ftp://ftp.ncbi.nih.gov/genbank/)
 
 `$ viral_DB_prepare.pl -t download > download.sh  
 $ bash ./download.sh `
 
-   * the 1st command only generate download commands, and the 2nd command will execute the download
-     commands to download all viral sequences and taxonomy database.
+* the 1st command only generate download commands, and the 2nd command will execute the download
+commands to download all viral sequences and taxonomy database.
 
-##2. run viral_DB_prepare.pl script to category virus
+####2. run viral_DB_prepare.pl script to category virus
    
 	$ viral_DB_prepare.pl -t category gbvrl*.gz 1>report.txt 2>&1
    
