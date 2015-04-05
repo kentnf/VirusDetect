@@ -1131,6 +1131,7 @@ sub correct_org_taxon_division
 	my $seq_id = shift;
 	
 	my %sid_org_taxon = (
+		'KC244112' => 1600283,
 		'KF178708' => 750074,
 		'KF178710' => 750074,
 		'KF178712' => 750074,
