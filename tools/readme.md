@@ -29,13 +29,13 @@ these virus taxon id in the script viral_DB_prepare.pl, sorry for that I did not
 
 ######2.2 search the ID in WARN in genbank to find correct taxon id
 
-![img01](http://http://kentnf.github.io/tools/img/vcp_p1.png)
+![img01](http://kentnf.github.io/tools/img/vcp_p1.png)
 
-![img02](http://http://kentnf.github.io/tools/img/vcp_p2.png)
+![img02](http://kentnf.github.io/tools/img/vcp_p2.png)
 
 ######2.3 open file viral_DB_prepare.pl, add the correct taxon id to subroutine correct_org_taxon_division
        
-![img03](http://http://kentnf.github.io/tools/img/vcp_p3.png)
+![img03](http://kentnf.github.io/tools/img/vcp_p3.png)
  
 ######2.4 re-run the viral_DB_prepare.pl until there is no WARN message
 
