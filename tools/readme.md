@@ -10,38 +10,49 @@ Virus Classification Pipeline (version 0.1)
 \* the 1st command only generate download commands, and the 2nd command will execute the download
 commands to download all viral sequences and taxonomy database.
 
-####2. run viral_DB_prepare.pl script to category virus
+####2. run viral_DB_prepare.pl script to classify virus
    
 	$ perl viral_DB_prepare.pl -t category gbvrl*.gz 1>report.txt 2>&1
    
-   * There will be several virus do not have taxon id in download files, but they may have correct taxon id on 
-     GenBank website (I guess the website update more frequently than ftp). To make 	 we need manually update 
-     these virus taxon id in the pipline. 
+There will be several virus do not have taxon id in download files, but they may have correct taxon id on 
+GenBank website. So I guess the website update more frequently than ftp. To generate accurate classification, we need manually update 
+these virus taxon id in the script viral_DB_prepare.pl, sorry for that I did not make it as a automatically process.
 
    * check warning message: if there is any virus do not have taxon id.
                             manually chagne it in [sub correct_org_taxon_division]
 
-   2.1 the file "report.txt" records these virus without taxon id, 
-	$ grep "WARN" report.txt
+   2.1 the file "report.txt" records these virus without taxon id like this:
 
-   2.2 search the ID in WARN in genbank to find correct taxon id (img)
+	$ grep "WARN" report.txt
+	[WARN]organism is not virus: KC244112
+	[WARN]organism is not virus: KC244113
+	[WARN]organism is not virus: AF050065
+	[WARN]organism is not virus: AF101979
+	... 
+
+   2.2 search the ID in WARN in genbank to find correct taxon id
         
    2.3 open file viral_DB_prepare.pl, add the correct taxon id to subroutine correct_org_taxon_division
         
    2.3 re-run the viral_DB_prepare.pl until there is no WARN message
-	 $ viral_DB_prepare.pl -t category gbvrl*.gz 1>report.txt 2>&1
+	 $ perl viral_DB_prepare.pl -t category gbvrl*.gz 1>report.txt 2>&1
 
 ####3. generate manually classification file
-   $ viral_DB_prepare.pl -t manually
-   $ viral_DB_prepare.pl -t patch
-   * there is no process in this step, a guide about how to manually change the
-     classification is print on screen
-   * after manually change, please patch the changed files to previous file
+
+	$ viral_DB_prepare.pl -t manually
+	$ viral_DB_prepare.pl -t patch
+   
+There is no process in this step, a guide about how to manually change the
+     	classification is print on screen
+
+After manually change, please patch the changed files to previous file
 
 ####4. run viral_DB_prepare.pl script to category virus again using manually changed file
-   $ viral_DB_prepare.pl -t category -c 1 gbvr*.gz
-   $ viral_DB_prepare.pl -t manually
-   $ viral_DB_prepare.pl -t patch
+
+	$ viral_DB_prepare.pl -t category -c 1 gbvr*.gz
+	$ viral_DB_prepare.pl -t manually
+	$ viral_DB_prepare.pl -t patch
+
    * manually change the desc file, then patch it
 
    === notice ===
@@ -50,8 +61,11 @@ commands to download all viral sequences and taxonomy database.
    apply patched genus table, only ~8000 unclassified virus need to be search using word search
    and blast search method (about half day)
 
-####5. move the patched file into bin folder, then run classification again
-   $ viral_DB_prepare.pl -t category -c 1 gbvr*.gz
+####5. append the patched files
+
+After manually correct all errors in classication, please move three patch files into tools folder of VirusDetect (the step remind me again Virus Classification Pipeline is just a tool of VirusDetect). Then do the same thing as before, but I promise it is the last time for you to run it.
+
+	$ perl  viral_DB_prepare.pl -t category -c 1 gbvr*.gz
 
 ####6. unique the classified virus
 
@@ -60,15 +74,12 @@ commands to download all viral sequences and taxonomy database.
 This is the last step of classication of virus, the unique virus sequences could be used as reference
 of VirusDetect program after create index for bwa and blast
 
-####7.if the output vrl_genbank.txt has been manually changed
+####7. manually update the classification
 
 The classification result of this pipline may contain very limited errors. For any specific reason or specific project, user may need to correct or update the classication for only several virus. 
-First, just correct the classification information in vrl_genbank.txt. Then run script:
+First, just correct the classification information in vrl_genbank.txt. Then run this command:
 
-	$ viral_DB_prepare.pl -t refine
+	$ perl viral_DB_prepare.pl -t refine
 
 The sequence file will be updated according to vrl_genbank.txt, and the updated sequences will be named like 'vrl_Bacteria_all.fasta.new'.
-
-
-
 
