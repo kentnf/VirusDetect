@@ -162,10 +162,7 @@ Suggestion method:
 
 -D. assign a correct div to column 4 for the virus
 
->**step 3, and 4 could be combined into one. Before generate and apply patched genes table,**
->**the step to generate desc table using word search method will take very long time. After**
->**apply patched genus table, only ~8000 unclassified virus need to be search using word search**
->**and blast search method (about half day)**
+**Directly perfrom step 3.4 will take very long time due to lot of virus have not been classified after step 3.3. It is better to perform step 3.5 to update two manually correct files after step 3.4. About 8,000 unclassified virus need to be analyzed in step 3.4, and it will save lot of time.**
 
 
 #####3.5 update the manually correct file to classification
