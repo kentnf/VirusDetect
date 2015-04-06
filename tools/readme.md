@@ -33,7 +33,7 @@ these virus taxon id in the script viral_DB_prepare.pl, sorry for that I did not
 
 The warnings message means virus sequence, take KC244112 as a example, does not have correct taxon id.
 
-########3.1.2 search the ID in WARN in genbank to find correct taxon id
+######3.1.2 search the ID in WARN in genbank to find correct taxon id
 
 In GenBank website, the KC244112 has correct taxon id 1600283.
 
@@ -45,17 +45,17 @@ Obviously, the taxon id 1600283 belong to Influenza B virus
 ![img02](http://kentnf.github.io/tools/img/vcp_p2.png)
 
 
-########3.1.3 open file viral_DB_prepare.pl, add the correct taxon id to subroutine correct_org_taxon_division
+######3.1.3 open file viral_DB_prepare.pl, add the correct taxon id to subroutine correct_org_taxon_division
 
 Add the correct virus locus id and taxon id to subroutine correct_org_taxon_division as below:
        
 ![img03](http://kentnf.github.io/tools/img/vcp_p3.png)
  
-########3.1.4 re-run the viral_DB_prepare.pl until there is no WARN message
+######3.1.4 re-run the viral_DB_prepare.pl until there is no WARN message
 
 	$ perl viral_DB_prepare.pl -t category gbvrl*.gz 1>report.txt 2>&1
 
-######3.2 manually corret host name
+#####3.2 manually corret host name
 
         1. manual_hname_table.txt
            one abnormal name per line, please search the abnormal name using google, genbank taxon database, and iciba
@@ -68,7 +68,7 @@ Add the correct virus locus id and taxon id to subroutine correct_org_taxon_divi
         B. search the abnormal name using google and genbank
         C. add the correct to behind the abnormal name
 
-######3.3 manually check the virus genus and classification 
+#####3.3 manually check the virus genus and classification 
 
 manual_genus_table.txt
 
@@ -79,7 +79,7 @@ background of this genus to make correct decision.
 If you are not familiar with virus genus classification system, please skip this step. That means you trust
 the genus & classification information from GenBank.
 
-######3.4 manually classification using virus description
+#####3.4 manually classification using virus description
 
 manual_desc_table.txt
 
@@ -106,7 +106,7 @@ Beside correction with word search method, we also blast the unclassified virus 
 (col 8-12). Most of word search result and blast search result are same, less the 100 of them are diff. So
 manually corret the different part will saving a lot of time
 
->> Steps
+> Steps
 -A. sort to find different in word search and blast search (col 4 and 8).
 -B. check the blast match length, identify. Lower than 100 match base, 90% identity show low blast clue for classification
 -C. check the word search column 3, 5, 6, and 7.
@@ -128,7 +128,7 @@ then patch the changed files to previous file using:
         2. update_hname_table_v205.txt
                 The manually changed name should be in the end of this file
 
-######3.5 appned the manually correct file to classification
+#####3.5 appned the manually correct file to classification
 
 	$ perl viral_DB_prepare.pl -t patch
    
