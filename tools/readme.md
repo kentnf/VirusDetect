@@ -107,6 +107,7 @@ background of this genus to make correct decision.
 If you are not familiar with virus genus classification system, please skip this step. That means you trust
 the genus & classification information from GenBank.
 
+**Directly perfrom step 3.4 will take very long time due to lot of virus have not been classified after step 3.3. It is better to perform step 3.5 to update two manually correct files after step 3.4. About 8,000 unclassified virus need to be analyzed in step 3.4, and it will save lot of time.**
 
 #####3.4 manually classification using virus description
 
@@ -161,8 +162,6 @@ Suggestion method:
 -C. check the word search column 3, 5, 6, and 7.
 
 -D. assign a correct div to column 4 for the virus
-
-**Directly perfrom step 3.4 will take very long time due to lot of virus have not been classified after step 3.3. It is better to perform step 3.5 to update two manually correct files after step 3.4. About 8,000 unclassified virus need to be analyzed in step 3.4, and it will save lot of time.**
 
 
 #####3.5 update the manually correct file to classification
