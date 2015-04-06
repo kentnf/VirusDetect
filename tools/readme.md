@@ -77,7 +77,7 @@ Example
 	grape cultivar Benifuji 
 
 
-######3.2.2 the abnormal host name should be \'Vitis vinifera\' or \'wine grape\' by searching GenBank taxonomy database.
+######3.2.2 the abnormal host name should be 'Vitis vinifera' or 'wine grape' by searching GenBank taxonomy database.
 
 ![img04](http://kentnf.github.io/tools/img/vcp_p4.png)
 
@@ -110,7 +110,7 @@ the genus & classification information from GenBank.
 
 #####3.4 manually classification using virus description
 
-**Run the classification again, notice add -c parameter to prepare file for next step.**
+**Run the classification again, notice to add -c parameter.**
 	
 	$ perl viral_DB_prepare.pl -t category -c 1 gbvrl*.gz 1>report.txt 2>&1
 
@@ -118,11 +118,11 @@ Afer manually correct in step 3.1 to 3.3. Some viral sequences still can not be 
 missing host feature and have a unrecognized genus name. But they have almost same description 
 with other classified virus. These virus could be classified by comparing their descriptions with 
 classified virus. The below command will do it automatically. The command will compare the 
-description of unclassified virus with classified virus, then brorrow the info
+description of unclassified virus with classified virus, then borrow the info
 of classification to the unclassified.
 
 For example, the sequence GI:331725 does not have host feature, and the genus name is 
-\“Small linear single stranded RNA satellites\”. It described as \“Cucumber mosaic virus satellite RNA\”. 
+“Small linear single stranded RNA satellites”. It described as “Cucumber mosaic virus satellite RNA”. 
 And another sequence GI:1103556 with same description was classified into plant virus. 
 It should be plant virus according to the description.
 
@@ -152,10 +152,14 @@ Beside correction with word search method, we also blast the unclassified virus 
 (col 8-12). Most of word search result and blast search result are same, less the 100 of them are diff. So
 manually corret the different part will saving a lot of time
 
-> Steps
+Suggestion method:
+
 -A. sort to find different in word search and blast search (col 4 and 8).
+
 -B. check the blast match length, identify. Lower than 100 match base, 90% identity show low blast clue for classification
+
 -C. check the word search column 3, 5, 6, and 7.
+
 -D. assign a correct div to column 4 for the virus
 
 >**step 3, and 4 could be combined into one. Before generate and apply patched genes table,**
