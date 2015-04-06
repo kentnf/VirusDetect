@@ -33,7 +33,7 @@ these virus taxon id in the script viral_DB_prepare.pl, sorry for that I did not
 
 The warnings message means virus sequence, take KC244112 as a example, does not have correct taxon id.
 
-######3.1.2 search the ID in WARN in genbank to find correct taxon id
+######3.1.2 search the locus ID in genbank to find correct taxon id
 
 In GenBank website, the KC244112 has correct taxon id 1600283.
 
@@ -51,22 +51,25 @@ Add the correct virus locus id and taxon id to subroutine correct_org_taxon_divi
        
 ![img03](http://kentnf.github.io/tools/img/vcp_p3.png)
  
-######3.1.4 re-run the viral_DB_prepare.pl until there is no WARN message
+######3.1.4 re-run the viral_DB_prepare.pl until there is no WARN message.
 
 	$ perl viral_DB_prepare.pl -t category gbvrl*.gz 1>report.txt 2>&1
 
 #####3.2 manually corret host name
 
-        1. manual_hname_table.txt
-           one abnormal name per line, please search the abnormal name using google, genbank taxon database, and iciba
-           to infer the correct name, this correct name must be include in genbank taxon database (in name.dmp.gz),
-           then append the correct name to the abnormal name in one line:
-           abnormal name [tab] correct name [return]
+The pipeline will classify some virus by its host name when it is not classified by means of genus. But the host name
+in GenBank may exist in abnormal that could not accepted by taxonomy database. The step 2 will generate a file **manual_hname_table.txt** which records abnormal host name.
 
-        >> Steps
-        A. open file manual_hname_table.txt
-        B. search the abnormal name using google and genbank
-        C. add the correct to behind the abnormal name
+The file manual_hname_table.txt lists one abnormal name per line. Please search the abnormal name using google, 
+genbank taxon database, and iciba to infer the correct name, this correct name must be include in genbank taxon 
+database (in name.dmp.gz). Then add the correct name behind the abnormal name in below format: 
+>abnormal name [tab] correct name [return]
+
+>example
+>
+>A. open file manual_hname_table.txt
+>B. search the abnormal name using google and genbank
+>C. add the correct to behind the abnormal name
 
 #####3.3 manually check the virus genus and classification 
 
