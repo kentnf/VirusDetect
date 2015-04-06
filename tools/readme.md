@@ -156,11 +156,8 @@ manually corret the different part will saving a lot of time
 > **Suggestion method:**
 
 > - A. sort to find different in word search and blast search (col 4 and 8).
-
 > - B. check the blast match length, identify. Lower than 100 match base, 90% identity show low blast clue for classification
-
 > - C. check the word search column 3, 5, 6, and 7.
-
 > - D. assign a correct div to column 4 for the virus
 
 
