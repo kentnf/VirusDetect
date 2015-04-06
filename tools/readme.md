@@ -66,7 +66,7 @@ database (in name.dmp.gz). Then add the correct name behind the abnormal name in
 >abnormal name [tab] correct name [return]
 
 >example
->
+>![img03](http://kentnf.github.io/tools/img/vcp_p3.png)
 >A. open file manual_hname_table.txt
 >B. search the abnormal name using google and genbank
 >C. add the correct to behind the abnormal name
