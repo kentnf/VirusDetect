@@ -77,7 +77,7 @@ Example
 	grape cultivar Benifuji 
 
 
-######3.2.3 the abnormal host name should be \'Vitis vinifera\' or \'wine grape\' by searching GenBank taxonomy database.
+######3.2.2 the abnormal host name should be \'Vitis vinifera\' or \'wine grape\' by searching GenBank taxonomy database.
 
 ![img03](http://kentnf.github.io/tools/img/vcp_p4.png)
 
@@ -94,14 +94,23 @@ Example
 
 #####3.3 manually check the virus genus and classification 
 
-manual_genus_table.txt
+After the classification in step2, the pipeline will create some new genus classification information that not presented in web (www.mcb.uct.ac.za/tutorial/ICTV%20Species%20Lists%20by%20host.htm). For example, the becurtovirus GI:169303562 was found in GenBank nt database, and it was categorized into plant virus according to its host is Suger Beet. Then the pipeline will automatically create a rule that becurtovius should be categorized into plant virus (below).
 
+![img03](http://kentnf.github.io/tools/img/vcp_p5.png)
+
+
+The new genus classification information was stored in file **manual_genus_table.txt**. 
 The file format is one genus & classification per line. If the genus has one division, that is pretty good result. If genus
 has more than one division, make it to keep one or more according frequency of each division, or searching
 background of this genus to make correct decision.
 
 If you are not familiar with virus genus classification system, please skip this step. That means you trust
 the genus & classification information from GenBank.
+
+**Run the classification again, notice add -c parameter to prepare file for next step.**
+
+	$ perl viral_DB_prepare.pl -t category -c 1 gbvrl*.gz 1>report.txt 2>&1
+
 
 #####3.4 manually classification using virus description
 
