@@ -7,7 +7,7 @@ Virus Classification Pipeline (version 0.1)
 	$ perl viral_DB_prepare.pl -t download > download.sh  
 	$ bash ./download.sh
 
-\* the 1st command only generate download commands, and the 2nd command will execute the download
+The 1st command only generate download commands, and the 2nd command will execute the download
 commands to download all viral sequences and taxonomy database.
 
 ####2. run viral_DB_prepare.pl script to classify virus
@@ -73,19 +73,19 @@ the genus & classification information from GenBank.
 
 manual_desc_table.txt
 
->The format of manual_desc_table.txt:
->1 - ID: GFLRNA3
->2 - Desc: Grapevine fanleaf virus satellite RNA (RNA3), complete cds.
->3 - Same Desc: Grapevine fanleaf virus
->4 - Plants
->5 - No. of same: 1
->6 - Freq of same: 100.00
->7 - ID of same: GFLRNA1
->8 - Div name by blast
->9 - best hit of blast
->10- match length of blast
->11- percentage identity
->12- match score
+>The format of manual_desc_table.txt:  
+>1 - ID: GFLRNA3  
+>2 - Desc: Grapevine fanleaf virus satellite RNA (RNA3), complete cds.  
+>3 - Same Desc: Grapevine fanleaf virus  
+>4 - Plants  
+>5 - No. of same: 1  
+>6 - Freq of same: 100.00  
+>7 - ID of same: GFLRNA1  
+>8 - Div name by blast  
+>9 - best hit of blast  
+>10- match length of blast  
+>11- percentage identity  
+>12- match score  
 
 The script seach the same description of unclassified virus against classified virus, then brorrow the info
 of classification to the unclassified. Just check the 2nd, 3rd, and 4th column. If it does not make sense,
