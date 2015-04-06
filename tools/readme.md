@@ -18,7 +18,7 @@ commands to download all viral sequences and taxonomy database.
 
 ######3.1 manually correct the virus taxon id
 
-There will be several virus do not have taxon id in download files, but they may have correct taxon id on 
+There will be several virus do not have correct taxon id in download files, but they may have correct taxon id on 
 GenBank website. So I guess the website update more frequently than ftp. To generate accurate classification, we need manually update 
 these virus taxon id in the script viral_DB_prepare.pl, sorry for that I did not make it as a automatically process.
 
@@ -31,13 +31,23 @@ these virus taxon id in the script viral_DB_prepare.pl, sorry for that I did not
 	[WARN]organism is not virus: AF101979
 	... 
 
+The warnings message means virus sequence, take KC244112 as a example, does not have correct taxon id.
+
 ########3.1.2 search the ID in WARN in genbank to find correct taxon id
+
+In GenBank website, the KC244112 has correct taxon id 1600283.
 
 ![img01](http://kentnf.github.io/tools/img/vcp_p1.png)
 
+
+Obviously, the taxon id 1600283 belong to Influenza B virus
+
 ![img02](http://kentnf.github.io/tools/img/vcp_p2.png)
 
+
 ########3.1.3 open file viral_DB_prepare.pl, add the correct taxon id to subroutine correct_org_taxon_division
+
+Add the correct virus locus id and taxon id to subroutine correct_org_taxon_division as below:
        
 ![img03](http://kentnf.github.io/tools/img/vcp_p3.png)
  
