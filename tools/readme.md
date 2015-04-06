@@ -22,7 +22,7 @@ There will be several virus do not have correct taxon id in download files, but 
 GenBank website. So I guess the website update more frequently than ftp. To generate accurate classification, we need manually update 
 these virus taxon id in the script viral_DB_prepare.pl, sorry for that I did not make it as a automatically process.
 
-########3.1.1 the file "report.txt" records these virus without taxon id like this:
+#######3.1.1 the file "report.txt" records these virus without taxon id like this:
 
 	$ grep "WARN" report.txt
 	[WARN]organism is not virus: KC244112
