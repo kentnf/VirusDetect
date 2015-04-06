@@ -170,16 +170,16 @@ Then run below command:
 	$ perl viral_DB_prepare.pl -t patch
 
 Three new update files will be generated in current folder.
-We need to check the updated files: 
+We need to check these updated files: 
         
->1. update_genus_table_v205.txt
->                old :
->                        Alphapermutotetravirus  NA      NA
->                update: # patch v205
->                        Alphapermutotetravirus  G1      Invertebrates
->                Then remove the line on old file
->        2. update_hname_table_v205.txt
->                The manually changed name should be in the end of this file
+	update_genus_table_v205.txt
+	update_hname_table_v205.txt
+	update_desc_table_v205.txt
+
+It is better to check these update files again. The updated information is append behind the label line 
+
+	**# patch v205**
+	\*update information will be here
 
 After check, use the three updated files to replace files in **tools** folder of VirusDetect. 
 Last, check the  **default_verion** locate in **tools** folder, make sure it same as the update file.
