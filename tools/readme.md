@@ -153,15 +153,15 @@ Beside correction with word search method, we also blast the unclassified virus 
 (col 8-12). Most of word search result and blast search result are same, less the 100 of them are diff. So
 manually corret the different part will saving a lot of time
 
-Suggestion method:
+> **Suggestion method:**
 
--A. sort to find different in word search and blast search (col 4 and 8).
+> - A. sort to find different in word search and blast search (col 4 and 8).
 
--B. check the blast match length, identify. Lower than 100 match base, 90% identity show low blast clue for classification
+> - B. check the blast match length, identify. Lower than 100 match base, 90% identity show low blast clue for classification
 
--C. check the word search column 3, 5, 6, and 7.
+> - C. check the word search column 3, 5, 6, and 7.
 
--D. assign a correct div to column 4 for the virus
+> - D. assign a correct div to column 4 for the virus
 
 
 #####3.5 update the manually correct file to classification
