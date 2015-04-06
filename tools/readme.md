@@ -65,11 +65,32 @@ genbank taxon database, and iciba to infer the correct name, this correct name m
 database (in name.dmp.gz). Then add the correct name behind the abnormal name in below format: 
 >abnormal name [tab] correct name [return]
 
->example
->![img03](http://kentnf.github.io/tools/img/vcp_p3.png)
->A. open file manual_hname_table.txt
->B. search the abnormal name using google and genbank
->C. add the correct to behind the abnormal name
+Example 
+
+######3.2.1 open file manual_hname_table.txt, the hosts were named as below:
+
+	grape cultivar 6-23     
+	grape cultivar 8612     
+	grape cultivar 87-1     
+	grape cultivar Atebage  
+	grape cultivar Augusta  
+	grape cultivar Benifuji 
+
+
+######3.2.3 the abnormal host name should be \'Vitis vinifera\' or \'wine grape\' by searching GenBank taxonomy database.
+
+![img03](http://kentnf.github.io/tools/img/vcp_p4.png)
+
+
+######3.2.3 add the correct host name behind the abnormal name
+
+	grape cultivar 6-23	Vitis vinifera
+	grape cultivar 8612	Vitis vinifera
+	grape cultivar 87-1	Vitis vinifera
+	grape cultivar Atebage	Vitis vinifera
+	grape cultivar Augusta	Vitis vinifera
+	grape cultivar Benifuji	Vitis vinifera
+
 
 #####3.3 manually check the virus genus and classification 
 
