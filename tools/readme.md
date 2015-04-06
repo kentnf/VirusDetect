@@ -178,8 +178,8 @@ We need to check these updated files:
 
 It is better to check these update files again. The updated information is append behind the label line 
 
-	**# patch v205**
-	\*update information will be here
+	# patch v205**
+	*update information will be here
 
 After check, use the three updated files to replace files in **tools** folder of VirusDetect. 
 Last, check the  **default_verion** locate in **tools** folder, make sure it same as the update file.
