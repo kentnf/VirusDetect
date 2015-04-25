@@ -6,13 +6,21 @@ Virus Classification Pipeline (version 0.1)
 
 The 1st command only generate download commands, and the 2nd command will execute the download
 commands to download all viral sequences and taxonomy database.
+
 ```
 $ perl viral_DB_prepare.pl -t download > download.sh  
 $ bash ./download.sh
 ```
+
 ####2. run viral_DB_prepare.pl script to classify virus
-   
-	$ perl viral_DB_prepare.pl -t category -c 1 gbvrl*.gz 1>report.txt 2>&1
+
+>__Note__
+>please add -c 1 if the classification is from previous result, or please remove `-c 1` if a denovo
+classification will be performed 
+
+``` 
+$ perl viral_DB_prepare.pl -t category -c 1 gbvrl*.gz 1>report.txt 2>&1
+```
 
 ####3. manually correction
 
