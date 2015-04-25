@@ -10,6 +10,7 @@
 use strict;
 use warnings;
 use Bio::SeqIO;
+use Bio::DB::GenBank;
 use Net::FTP;
 use IO::File;
 use Getopt::Std;
@@ -124,10 +125,9 @@ USAGE: $0 -t extProt -i input_seq gbvrl1.seq.gz gbvrl2.seq.gz ... gbvrlN.seq.gz
                 {
                         my $sid = $inseq->id;
 			my $acc = $inseq->accession;
-			print "$sid\t$acc\n";
 
 			my $pid;
-			next unless defined $select_id{$sid};
+			next unless defined $select_id{$acc};
 
 			foreach my $feat_object ($inseq->get_SeqFeatures)
                         {
@@ -137,8 +137,8 @@ USAGE: $0 -t extProt -i input_seq gbvrl1.seq.gz gbvrl2.seq.gz ... gbvrlN.seq.gz
 					foreach my $value ($feat_object->get_tag_values($tag)) {
 						$pid = $value if ($tag eq 'protein_id');
 						if ($tag eq 'translation' && length($value) > 0) {
-							#print $out1 ">".$pid."\n".$value."\n";
-							#print $out2 "$sid\t$acc\t$pid\n";
+							print $out1 ">".$pid."\n".$value."\n";
+							print $out2 "$sid\t$acc\t$pid\n";
 						}
 					}
 				}
@@ -637,7 +637,8 @@ USAGE: $0 -t category [options] input_file1 ... input_fileN
 		while(my $inseq = $seqin->next_seq)
 		{
 			# print $inseq->id."\n".$inseq->seq_version."\n".$inseq->desc."\n";
-			my $sid = $inseq->id;
+			#my $sid = $inseq->id;
+			my $sid = $inseq->accession;
 			$vrl_seq_info{$sid}{'ver'} = $inseq->seq_version;
 			$vrl_seq_info{$sid}{'seq'} = $inseq->seq;
 			$vrl_seq_info{$sid}{'des'} = $inseq->desc;
@@ -687,11 +688,15 @@ USAGE: $0 -t category [options] input_file1 ... input_fileN
 				# find the organism that not linked to virus through the division number is not equal to 9
 				# if get warn on screen, check the corrected virus taxon id in genbank, then change it manally in sub correct_org_taxon_division
 				unless ( defined $$node_table{$org_taxon}{'division'} ) {
-					if ( $$node_table{$org_taxon}{'division'} ne '9' ) {
-						my $changed_org_taxon = correct_org_taxon_division($sid);
-						$org_taxon = $changed_org_taxon unless $changed_org_taxon eq 'NA';
-						warn "[WARN]organism is not virus: $sid\n" if $changed_org_taxon eq 'NA';
-					}
+					my $changed_org_taxon = correct_org_taxon_division($sid);
+					$org_taxon = $changed_org_taxon unless $changed_org_taxon eq 'NA';
+					warn "[WARN]organism is not virus(missing): $sid\n" if $changed_org_taxon eq 'NA';
+				}
+
+				unless ( $$node_table{$org_taxon}{'division'} eq '9' ) {
+					my $changed_org_taxon = correct_org_taxon_division($sid);
+					$org_taxon = $changed_org_taxon unless $changed_org_taxon eq 'NA';
+					warn "[WARN]organism is not virus(mistake): $sid\n" if $changed_org_taxon eq 'NA';
 				}
 
 				# try next feature of the organism is not virus
@@ -1129,30 +1134,58 @@ sub get_division
 sub correct_org_taxon_division
 {
 	my $seq_id = shift;
-	
-	my %sid_org_taxon = (
-		'KC244112' => 1600283,
-		'KF178708' => 750074,
-		'KF178710' => 750074,
-		'KF178712' => 750074,
-		'KC167159' => 1449545,
-		'KC167160' => 1449545,
-		'KC167161' => 1449545,
-		'FJ654336' => 569708,
-		'EU100683' => 461790,
-		'EU100684' => 461791,
-		'EU478797' => 1503438,
-		'GU052197' => 352522,
-		'GU052198' => 352522,
-		'GU052199' => 352522,
-		'GU052200' => 352522,
-		'GU052201' => 352522,
-		'GU052202' => 352522
-	);
 
+	my %sid_taxon;
+	open(FH, 'add_taxid.txt') || die $!;
+	while(<FH>) {
+		chomp;
+		next if $_ =~ m/^#/;
+		my @a = split(/\t/, $_);
+		$sid_taxon{$a[0]} = $a[1];
+	}
+	close(FH);
+
+	if (defined $sid_taxon{$seq_id}) {
+		return $sid_taxon{$seq_id};
+	}
+	
+	# if there is no record for temp file, will find the tax through GenBank
 	my $taxon = 'NA';
-	$taxon = $sid_org_taxon{$seq_id} if defined $sid_org_taxon{$seq_id};
+	my $gb = Bio::DB::GenBank->new();
+	my $seq = $gb->get_Seq_by_acc($seq_id); # Unique ID, *not always the LOCUS ID*
+	foreach my $feat_object ($seq->get_SeqFeatures)
+	{
+        	my $primary_tag = $feat_object->primary_tag;
+        	next unless $primary_tag eq "source";
+
+        	# get org taxon id
+        	foreach my $tag ($feat_object->get_all_tags) {
+                	foreach my $value ($feat_object->get_tag_values($tag)) {
+                        	if ($tag eq 'db_xref' && $value =~ m/taxon:(\d+)/) {
+      	                         	if ( $taxon eq 'NA' ) { 
+						$taxon = $1; 
+
+						# update seq_id and taxon id
+						$sid_taxon{$seq_id} = $taxon;
+
+						open(UP, ">add_taxid.txt") || die $!;
+						foreach my $sid (sort keys %sid_taxon) {
+							print UP $sid."\t".$sid_taxon{$sid}."\n";
+						}
+						close(UP);
+
+						return $taxon; 
+					} 
+					# else { die "[ERR]Repeat organism taxon id $seq_id\n"; }
+                        	}
+                	}
+        	}
+	}
 	return $taxon;
+
+	#my $seq = $gb->get_Seq_by_acc('J00522'); # Accession Number
+	#my $seq = $gb->get_Seq_by_version('J00522.1'); # Accession.version
+	#my $seq = $gb->get_Seq_by_gi('405830'); # GI Number
 }
 
 =head2

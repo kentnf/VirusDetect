@@ -4,17 +4,18 @@ Virus Classification Pipeline (version 0.1)
 
 ####1. download viral sequneces and taxnomy database from GenBank ftp (ftp://ftp.ncbi.nih.gov/genbank/)
 
-	$ perl viral_DB_prepare.pl -t download > download.sh  
-	$ bash ./download.sh
-
 The 1st command only generate download commands, and the 2nd command will execute the download
 commands to download all viral sequences and taxonomy database.
-
+```
+$ perl viral_DB_prepare.pl -t download > download.sh  
+$ bash ./download.sh
+```
 ####2. run viral_DB_prepare.pl script to classify virus
    
-	$ perl viral_DB_prepare.pl -t category gbvrl*.gz 1>report.txt 2>&1
+	$ perl viral_DB_prepare.pl -t category -c 1 gbvrl*.gz 1>report.txt 2>&1
 
 ####3. manually correction
+
 
 #####3.1 manually correct the virus taxon id
 
@@ -154,6 +155,13 @@ Beside correction with word search method, we also blast the unclassified virus 
 manually corret the different part will saving a lot of time
 
 > **Suggestion method:**
+
+- Add col A behind col 'match score', compare col 4 and 8 in col A using function 'exac', 
+then sort col A and mv rows with 'true' value to another table. We think the classification 
+result is correct if the word search method and blast method generate same result.
+- then sort col 'Div name by blast', remove col with value 'NA-BLAST'. sort the remaing table
+with col 'match length of blast' and 'percentage identity'. 
+
 
 > - A. sort to find different in word search and blast search (col 4 and 8).
 > - B. check the blast match length, identify. Lower than 100 match base, 90% identity show low blast clue for classification
