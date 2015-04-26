@@ -76,8 +76,8 @@ my $tf = $WORKING_DIR."/temp";				# temp folder
 
 my $DATABASE_DIR = ${FindBin::RealBin}."/../databases";	# database folder
 my $seq_info = $DATABASE_DIR."/vrl_genbank.info.gz";	# virus sequence info
-my $prot_tab = $DATABASE_DIR."/vrl_plant_prot_table";	# virus protein table
 my $reference = $DATABASE_DIR."/vrl_plant";       	# virus sequence
+my $prot_tab  = $reference."_prot_table";   		# virus protein table
 Util::process_cmd("$BIN_DIR/formatdb -i $reference -p F") unless (-e "$reference.nhr");
 
 # format of seq_info

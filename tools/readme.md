@@ -106,7 +106,7 @@ Example
 	grape cultivar Augusta	Vitis vinifera
 	grape cultivar Benifuji	Vitis vinifera
 
-#####3.2 manually check the virus genus and classification 
+#####3.3 manually check the virus genus and classification 
 
 After the classification in step2, the pipeline will create some new genus classification information that not presented in web (www.mcb.uct.ac.za/tutorial/ICTV%20Species%20Lists%20by%20host.htm). For example, the becurtovirus GI:169303562 was found in GenBank nt database, and it was categorized into plant virus according to its host is Suger Beet. Then the pipeline will automatically create a rule that becurtovius should be categorized into plant virus (below).
 
@@ -123,13 +123,18 @@ the genus & classification information from GenBank.
 
 **Directly perfrom step 3.4 will take very long time due to lot of virus have not been classified after step 3.3. It is better to perform step 3.5 to update two manually correct files after step 3.4. About 8,000 unclassified virus need to be analyzed in step 3.4, and it will save lot of time.**
 
-#####3.3 manually classification using virus description
+#####3.4 manually classification using virus description
 
-__World-Search__  
-Afer manually correct in step 3.1 and 3.2. Some viral sequences still can not be classified for 
+**Run the classification again, notice to add -c parameter.**
+	
+	$ perl viral_DB_prepare.pl -t category -c 1 gbvrl*.gz 1>report.txt 2>&1
+
+Afer manually correct in step 3.1 to 3.3. Some viral sequences still can not be classified for 
 missing host feature and have a unrecognized genus name. But they have almost same description 
 with other classified virus. These virus could be classified by comparing their descriptions with 
-classified virus. 
+classified virus. The below command will do it automatically. The command will compare the 
+description of unclassified virus with classified virus, then borrow the info
+of classification to the unclassified.
 
 For example, the sequence GI:331725 does not have host feature, and the genus name is 
 “Small linear single stranded RNA satellites”. It described as “Cucumber mosaic virus satellite RNA”. 
@@ -138,12 +143,7 @@ It should be plant virus according to the description.
 
 ![img06](http://kentnf.github.io/tools/img/vcp_p6.png)
 
-__Blast-Search__
-Besides, the un-classified virus will blast against the classified virus. If the blast result shows 
-that they share similar sequences, the un-classified could be classifed according to blast result.
-
->The word-search and blast-search will automatically execute when perform classification. The output
-file __manual_desc_table.txt__ will record the word-search and blast-search result.
+The classified result **manual_desc_table.txt** need to be checked manually in case making incorrect classification.
 
 >The format of manual_desc_table.txt:  
 >1 - ID: GFLRNA3  
@@ -159,14 +159,12 @@ file __manual_desc_table.txt__ will record the word-search and blast-search resu
 >11- percentage identity  
 >12- match score  
 
-But the file __manual_desc_table.txt__ need to be checked manually in case making incorrect classification.
-
-
 Just check the 2nd, 3rd, and 4th column. If it does not make sense,
 correct them manually. Please also concern the 5th and 6th column, the error usually happens to the record
 without 100% freq.
 
-Most of word search result and blast search result are same, less the 100 of them are diff. So
+Beside correction with word search method, we also blast the unclassified virus against the classified virus
+(col 8-12). Most of word search result and blast search result are same, less the 100 of them are diff. So
 manually corret the different part will saving a lot of time
 
 > **Suggestion method:**
