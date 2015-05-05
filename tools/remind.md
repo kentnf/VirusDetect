@@ -83,7 +83,7 @@ the genus & classification information from GenBank.
 
 #####3.3 manually classification using virus description
 
-__World-Search__  
+__Word-Search__  
 Afer manually correct in step 3.1 and 3.2. Some viral sequences still can not be classified for 
 missing host feature and have a unrecognized genus name. But they have almost same description 
 with other classified virus. These virus could be classified by comparing their descriptions with 
@@ -119,27 +119,16 @@ file __manual_desc_table.txt__ will record the word-search and blast-search resu
 
 But the file __manual_desc_table.txt__ need to be checked manually in case making incorrect classification.
 
-Just check the 2nd, 3rd, and 4th column. If it does not make sense,
-correct them manually. Please also concern the 5th and 6th column, the error usually happens to the record
-without 100% freq.
-
-Most of word search result and blast search result are same, less the 100 of them are diff. So
-manually corret the different part will saving a lot of time
-
-> **Suggestion method:**
-
-- Add col A behind col 'match score', compare col 4 and 8 in col A using function 'exac', 
-then sort col A and mv rows with 'true' value to another table. We think the classification 
-result is correct if the word search method and blast method generate same result.
-- then sort col 'Div name by blast', remove col with value 'NA-BLAST'. sort the remaing table
-with col 'match length of blast' and 'percentage identity'. 
-
-
-> - A. sort to find different in word search and blast search (col 4 and 8).
-> - B. check the blast match length, identify. Lower than 100 match base, 90% identity show low blast clue for classification
-> - C. check the word search column 3, 5, 6, and 7.
-> - D. assign a correct div to column 4 for the virus
-
+>__Suggestion manually check method__
+>If the Word-Search result, and Blast-Search result are same, it means the confidence of classifcation is high.
+So please check the 2nd, 3rd, and 4th column. If the 3rd col desc is too short, the classification may not correct.
+And check the blast match length (10th col), percentage (11th col) at the same time. Usually, match length < 100bp
+and percentage less than 90% may not correct. 
+>Please also notice the 5th and 6th column, the error usually happens in the record without 100% freq, or only has
+1 supported classification.
+>Next check the classification specific to Word-Search or Blast-Search. 
+>Then check the conflict classification in Word-Search and Blast-Search.
+>Finally check the unclassified record. Try to figure out the classification by search the description of record.
 
 #####3.4 update the manually correct file to classification
 
