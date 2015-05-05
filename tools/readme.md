@@ -2,6 +2,11 @@
 Virus Classification Pipeline (version 0.1)
 --------------------------------------------
 
+>__Note__ 
+This document just describes how __Virus Classification Pipline__ works.
+
+[TOC]
+
 ####1. download viral sequneces and taxnomy database from GenBank ftp (ftp://ftp.ncbi.nih.gov/genbank/)
 
 The 1st command only generate download commands, and the 2nd command will execute the download
