@@ -28,52 +28,10 @@ $ perl viral_DB_prepare.pl -t category -c 1 gbvrl*.gz 1>report.txt 2>&1
 >the correction of virus taxon id will be automatically execute. An new file `add_taxid.txt` will
 >record the incorrect taxon id and corresponding correct one. 
 
-
-
-#####3.1 manually correct the virus taxon id
-
-There will be several virus do not have correct taxon id in download files, but they may have correct taxon id on 
-GenBank website. So I guess the website update more frequently than ftp. To generate accurate classification, we need manually update 
-these virus taxon id in the script viral_DB_prepare.pl, sorry for that I did not make it as a automatically process.
-
-######3.1.1 the file "report.txt" records these virus without taxon id like this:
-
-	$ grep "WARN" report.txt
-	[WARN]organism is not virus: KC244112
-	[WARN]organism is not virus: KC244113
-	[WARN]organism is not virus: AF050065
-	[WARN]organism is not virus: AF101979
-	... 
-
-The warnings message means virus sequence, take KC244112 as a example, does not have correct taxon id.
-
-######3.1.2 search the locus ID in genbank to find correct taxon id
-
-In GenBank website, the KC244112 has correct taxon id 1600283.
-
-![img01](http://kentnf.github.io/tools/img/vcp_p1.png)
-
-
-Obviously, the taxon id 1600283 belong to Influenza B virus
-
-![img02](http://kentnf.github.io/tools/img/vcp_p2.png)
-
-
-######3.1.3 open file viral_DB_prepare.pl, add the correct taxon id to subroutine correct_org_taxon_division
-
-Add the correct virus locus id and taxon id to subroutine correct_org_taxon_division as below:
-       
-![img03](http://kentnf.github.io/tools/img/vcp_p3.png)
- 
-######3.1.4 re-run the viral_DB_prepare.pl until there is no WARN message.
-
-	$ perl viral_DB_prepare.pl -t category gbvrl*.gz 1>report.txt 2>&1
-
-
 #####3.1 manually corret host name
 
 The pipeline will classify some virus by its host name when it is not classified by means of genus. But the host name
-in GenBank may exist in abnormal that could not accepted by taxonomy database. So the file __manual_hname_table.txt_
+in GenBank may exist in abnormal that could not accepted by taxonomy database. So the file __manual_hname_table.txt__
 records abnormal host name. It lists one abnormal name per line. Please search the abnormal name using google, 
 genbank taxon database, and iciba to infer the correct name, this correct name must be included in genbank taxon 
 database (in name.dmp.gz). Then add the correct name behind the abnormal name in below format: 
@@ -121,7 +79,7 @@ background of this genus to make correct decision.
 If you are not familiar with virus genus classification system, please skip this step. That means you trust
 the genus & classification information from GenBank.
 
-**Directly perfrom step 3.4 will take very long time due to lot of virus have not been classified after step 3.3. It is better to perform step 3.5 to update two manually correct files after step 3.4. About 8,000 unclassified virus need to be analyzed in step 3.4, and it will save lot of time.**
+>__Note__  denovo classification for step 3.3 (with -c 1 parameter) will take very long time, due to lot of virus have not been classified after step 3.2. It is better to perform step 3.4 to update two manually correct files, and perform the classification using the updated files (without -c 1 parameter, then run step 3.4). After that, less unclassified virus need to be analysis in step 3.2, and lot time saved. In my first run of vrl_v205, About 8,000 unclassified virus need to be analyzed in step 3.3 after update files.
 
 #####3.3 manually classification using virus description
 
@@ -161,7 +119,6 @@ file __manual_desc_table.txt__ will record the word-search and blast-search resu
 
 But the file __manual_desc_table.txt__ need to be checked manually in case making incorrect classification.
 
-
 Just check the 2nd, 3rd, and 4th column. If it does not make sense,
 correct them manually. Please also concern the 5th and 6th column, the error usually happens to the record
 without 100% freq.
@@ -184,9 +141,9 @@ with col 'match length of blast' and 'percentage identity'.
 > - D. assign a correct div to column 4 for the virus
 
 
-#####3.5 update the manually correct file to classification
+#####3.4 update the manually correct file to classification
 
-After steps 3.1 to 3.4, we need to update the manually correct files. 
+After steps 3.1 to 3.3, we need to update the manually correct files. 
 First, backup all the txt files in **tools** folder of VirusDetect. 
 Then run below command:
  
@@ -218,7 +175,6 @@ After manually correct all errors in classication, please move three patch files
 
 	$ perl viral_DB_prepare.pl -t category -c 1 gbvr*.gz
 
-
 ####5. unique the classified virus
 
 	$ perl viral_DB_prepare.pl -t unique input_virus.fasta
@@ -226,7 +182,19 @@ After manually correct all errors in classication, please move three patch files
 This is the last step of classication of virus, the unique virus sequences could be used as reference
 of VirusDetect program after create index for bwa and blast
 
-####6. manually update the classification
+####6. extract protein sequences from unique virus
+
+	$ viral_DB_prepare.pl -t extProt -i input_seq gbvrl1.seq.gz gbvrl2.seq.gz ... gbvrlN.seq.gz
+
+Two file will be generate for protein extracting. One is protein sequences, another is id mapping file for nucleotide and protein. 
+One virus nucleotide sequence may contain several ORFs. The last step is move the protein sequence and id mapping file into database
+folder of virus-detect. Please follow the file name of reference database.
+
+>vrl_plant
+>vrl_plant_prot
+>vrl_plant_prot_table
+
+####7. manually update the classification (options)
 
 The classification result of this pipline may contain very limited errors. For any specific reason or specific project, user may need to correct or update the classication for only several virus. 
 First, just correct the classification information in vrl_genbank.txt. Then run this command:
