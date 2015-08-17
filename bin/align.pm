@@ -271,13 +271,17 @@ pileup_to_contig -- convert pileup file to contig sequences
 =cut
 sub pileup_to_contig
 {
-	my ($input_pileup, $output_seq, $len_cutoff, $depth_cutoff, $prefix) = @_;
+	my ($input_seq, $input_pileup, $output_seq, $len_cutoff, $depth_cutoff, $prefix) = @_;
 
 	#java -cp java -cp $BIN_DIR extractConsensus $sample 1 40 $i
 	my %contig;
 	my $contig_num = 0;
 	$prefix = 'PILEUP2SEQ' unless $prefix;
 
+	# save contig length to hash
+	my %seq_hash = Util::load_seq($input_seq);
+
+	# main
 	my $fh = IO::File->new($input_pileup) || die $!;
 	my $out = IO::File->new(">".$output_seq) || die $!;
 
@@ -295,12 +299,15 @@ sub pileup_to_contig
 		# ref pos base depth match Qual?
 		# AB000282 216 T 1 ^!, ~
 		my @a = split(/\t/, $_);
-		die "[EROR]Pileup File, Line $_\n" if scalar @a < 5;
+		die "[ERR]Pileup File, Line $_\n" if scalar @a < 5;
 		($id, $pos, $base, $depth, $align, $qual) = ($a[0], $a[1], $a[2], $a[3], $a[4], $a[5]);
+		die "[ERR]undef seq len $id\n" unless defined $seq_hash{$id}{'length'};
+		my $seq_len = $seq_hash{$id}{'length'};
+		next if $pos > $seq_len;
 
 		# get best base by depth and quality
 		$base = get_best_base($base, $depth, $align, $_);
-
+	
 		#gene the contig sequence
 		if ( $id eq $pre_id ) # same reference
 		{
@@ -731,11 +738,25 @@ sub remove_redundancy
 	}
 	
 	# if the new contig number != old contig number, continue remove redundancy
+	my $rmDup_cycle_num = 0;
 	while( $after_contig_num != $before_contig_num )
 	{ 
 		remove_redundancy_main($contig_file, $parameters, $max_end_clip, $min_overlap, $min_identity, $bin_dir);
+		$after_contig_num  = count_seq($contig_file);   # get seq number of new contig
+		$rmDup_cycle_num++;
+		# end of 1 cycle remove redundancy:
+		if ($debug) {
+			print "[DEBUG]In cycle $rmDup_cycle_num remove redundancy: BeforeContig: $before_contig_num; AfterContig: $after_contig_num\n";
+		}
+		
+		# exit remove redundancy until they are same
+		last if $after_contig_num == $before_contig_num;
+		# force exit remove redundancy if perform 5 cycles analysis
+		last if $rmDup_cycle_num == 5;
+
+		# renew before and after contig number for next cycle 
 		$before_contig_num = $after_contig_num; 	# renew contig_num1
-		$after_contig_num  = count_seq($contig_file); 	# get seq number of new contig
+		$after_contig_num  = $before_contig_num - 1;	# setting this for start of next cycle
 	}
 
 	if ($after_contig_num > 1) {
@@ -744,10 +765,6 @@ sub remove_redundancy
 		Util::print_user_submessage("$after_contig_num of uniq contig was generated");
 	} else {
 		Util::print_user_submessage("None of uniq contig was generated");
-	}
-
-	if ($debug) {
-		print "[DEBUG]remove redundancy: BeforeContig: $before_contig_num; AfterContig: $after_contig_num\n";
 	}
 
 	# finish remove redundancy, next for base correction
@@ -804,10 +821,12 @@ sub base_correction
         }
 
 	# rewrite contig file using pileup to contigs
-	pileup_to_contig("$read_file.pileup", $contig_file, 40, 1, $perfix);
+	pileup_to_contig($contig_file, "$read_file.pileup", $contig_file, 40, 1, $perfix);
 
 	# remove temp files
         # system("rm $read_file.sam");
+
+	# below code for debug
         system("rm $read_file.bam");
         system("rm $read_file.sorted.bam");
         system("rm $read_file.pileup"); 	# must delete this file for next cycle remove redundancy
@@ -1076,7 +1095,7 @@ sub findRedundancy
 					# the query is included in subject
 					if ($query_start -1 <= $max_end_clip  && $query_to_end <= $max_end_clip)  
 					{
-						#my $hit_seq = $inset->{$hit_name}; 
+						my $hit_seq = $inset->{$hit_name}; 
 					    	#print "type1\t".$hit_name."\t".$query_name."\t".$hit_seq."\n";#输出合并信息供人工校对，调试用
 						return $hit_name."\tr";
 					}
@@ -1095,7 +1114,7 @@ sub findRedundancy
 							{ 
 						      		my $query_string = substr($query_seq, 0, $query_start); 							   
 								my $hit_string = substr($hit_seq, $hit_start, $hit_to_start);
-								#print "type2\t".$hit_name."\t".$query_name."\t".$query_string."\t".$hit_string."\n";#输出合并信息供人工校对，调试用
+								#print "type2\t".$hit_name."\t".$query_name."\t".$query_string."\t".$hit_string."\n";# for debug
 								$combined_seq = $hit_name.":".$query_name."\t".$query_string.$hit_string;
 								return $combined_seq;
 							} 
@@ -1104,7 +1123,7 @@ sub findRedundancy
 							{ 
 								my $hit_string = substr($hit_seq, 0, $hit_end); 
 								my $query_string = substr($query_seq, $query_end, $query_to_end); 
-								#print "type3\t".$hit_name."\t".$query_name."\t".$hit_string."\t".$query_string."\n";#输出合并信息供人工校对，调试用
+								#print "type3\t".$hit_name."\t".$query_name."\t".$hit_string."\t".$query_string."\n";# for debug
 								$combined_seq = $hit_name.":".$query_name."\t".$hit_string.$query_string;
 								return $combined_seq;
 							}
@@ -1117,7 +1136,7 @@ sub findRedundancy
 								my $query_string = substr($query_seq, 0, $query_start); 							   
 								my $hit_string = substr($hit_seq, 0, $hit_end-1);
 								rcSeq(\$hit_string, 'rc'); 
-								#print "type4\t".$hit_name."\t".$query_name."\t".$query_string."\t".$hit_string."\n";#输出合并信息供人工校对，调试用
+								#print "type4\t".$hit_name."\t".$query_name."\t".$query_string."\t".$hit_string."\n";# for debug
 								$combined_seq = $hit_name.":".$query_name."\t".$query_string.$hit_string;
 								return $combined_seq;
 							} 
@@ -1127,7 +1146,7 @@ sub findRedundancy
 								my $hit_string = substr($hit_seq, $hit_start, $hit_to_start); 
 								rcSeq(\$hit_string, 'rc');
 								my $query_string = substr($query_seq, $query_end, $query_to_end); 
-								#print "type5\t".$hit_name."\t".$query_name."\t".$hit_string."\t".$query_string."\n";#输出合并信息供人工校对，调试用
+								#print "type5\t".$hit_name."\t".$query_name."\t".$hit_string."\t".$query_string."\n";# for debug
 								$combined_seq = $hit_name.":".$query_name."\t".$hit_string.$query_string;
 								return $combined_seq;
 							} 

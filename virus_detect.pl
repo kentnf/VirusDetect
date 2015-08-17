@@ -213,9 +213,10 @@ foreach my $sample (@ARGV)
 		Util::process_cmd("$BIN_DIR/samtools mpileup -f $reference $sample.sorted.bam > $sample.pre.pileup 2> $TEMP_DIR/samtools.log", $debug) unless (-s "$sample.pre.pileup");
 		align::pileup_filter("$sample.pre.pileup", "$seq_info", "$coverage", "$sample.pileup", $debug) unless (-s "$sample.pileup");	# filter pileup file 
 
-		# parameter fo pileup_to_contig: input, output, min_len, min_depth, prefix
-		align::pileup_to_contig("$sample.pileup", "$sample.aligned", 40, 0, 'ALIGNED') if -s "$sample.pileup";
+		# parameter fo pileup_to_contig: input_contig input pileup, output, min_len, min_depth, prefix
+		align::pileup_to_contig($reference, "$sample.pileup", "$sample.aligned", 40, 0, 'ALIGNED') if -s "$sample.pileup";
 
+		# system("cp $sample.aligned $sample.aligned.raw.ctg");	# for debug
 		if (-s "$sample.aligned") {
 			align::remove_redundancy("$sample.aligned", $sample, $rr_blast_parameters, $max_end_clip, $min_overlap, $min_identity, 'ALIGNED', $BIN_DIR, $TEMP_DIR, $debug);
 			my $align_num = align::count_seq("$sample.aligned");
