@@ -29,6 +29,7 @@ elsif	($options{'t'} eq 'patch')	{ vrl_patch(\%options, \@ARGV); }	# combine the
 elsif	($options{'t'} eq 'unique')	{ vrl_unique(\%options, \@ARGV); }	# unique the classified virus
 elsif	($options{'t'} eq 'refine')	{ vrl_refine(); }			# revine manually changed classification
 elsif	($options{'t'} eq 'extProt')	{ vrl_extract_protein(\%options, \@ARGV); }	# extract protein sequence
+elsif	($options{'t'} eq 'rmDup')	{ vrl_rmDup(\%options, \@ARGV);	}	# remove duplication
 else	{ usage($version); }
 
 sub usage
@@ -73,7 +74,7 @@ PIPELINE (version $version):
    and blast search method (about half day) 
 
 5. move the patched file into bin folder, then run classification again
-   \$ $0 -t category -c 1 gbvr*.gz
+   \$ $0 -t category -c 1 gbvr*.g
 
 6. unique the classified virus
    \$ $0 -t unique input_virus.fasta
@@ -82,11 +83,96 @@ PIPELINE (version $version):
    \$ $0 -t refine [no parameters] 
    * output is like vrl_Bacteria_all.fasta.new
 
+
 ';
 	print $usage;
 	exit;
 }
 
+=head2
+ vrl_rmDup: remove duplication
+=cut
+sub vrl_rmDup
+{
+        my ($options, $files) = @_;
+
+        my $usage = qq'
+USAGE $0 input_seq
+        
+        -p      percentage identify (default:97)
+        -m      max length (default:40000)
+        -n      min length (default:100)
+
+';
+
+        print $usage and exit unless defined $$files[0];
+        my $input_file = $$files[0];
+        die "[ERR]file not exist $input_file\n" unless -s $$files[0];
+        my $prefix = $input_file; $prefix =~ s/\.fasta$//; $prefix =~ s/\.fa$//;
+
+        my $identity = 99;
+        $identity = $$options{'p'} if (defined $$options{'p'} && $$options{'p'} > 90);
+
+        my $max_len = 40000;
+        my $min_len = 100;
+        $max_len = $$options{'m'} if (defined $$options{'m'} && $$options{'m'} >= 1000);
+        $min_len = $$options{'n'} if (defined $$options{'n'} && $$options{'n'} >= 30 && $$options{'n'} < $max_len);
+
+        # filter reads by length, put sequence to hash
+        my %seq_hash;
+        my $filter_file = $prefix."_filter.fasta";
+        my $out1 = IO::File->new(">".$filter_file) || die $!;
+        my $in = Bio::SeqIO->new(-format=>'fasta', -file=>$input_file);
+        while(my $inseq = $in->next_seq)
+        {
+                my $id  = $inseq->id;
+                my $seq = $inseq->seq;
+                my $len = $inseq->length;
+                if ($len >= $min_len && $len <= $max_len) {
+                        print $out1 ">$id\n$seq\n";
+                        $seq_hash{$id} = $seq;
+                }
+        }
+        $out1->close;
+
+        # sort and cluster      
+        my $sort_file    = $prefix."_sort.fasta";
+        my $cluster_file = $prefix.".uc";
+        my $uclust_bin = $FindBin::RealBin."/../bin/uclust";
+
+        my $cmd1 = "$uclust_bin --mergesort $filter_file --output $sort_file";
+        unless (-s $sort_file) {
+                system($cmd1) && die "[ERR]CMD $cmd1\n";
+        }
+
+        $identity = $identity/100;
+
+        my $cmd2 = "$uclust_bin --input $sort_file --maxlen $max_len --minlen $min_len --uc $cluster_file --id $identity";
+        unless (-s $cluster_file) {
+                system($cmd2) && die "[ERR]CMD $cmd2\n";
+        }
+
+        # remove dup according to cluster info 
+        my $uniq_file = $prefix."_uniq.$identity.fasta";
+        my $out2 = IO::File->new(">".$uniq_file) || die $!;
+        my $fh1 = IO::File->new($cluster_file) || die $!;
+        while(<$fh1>)
+        {
+                chomp;
+                next if $_ =~ m/^#/;
+                next unless $_ =~ m/^C\t/;
+                my @a = split(/\t/, $_);
+                my $id = $a[8];
+                die "[ERR]undef seq $id\n" unless defined $seq_hash{$id};
+                print $out2 ">$id\n$seq_hash{$id}\n";
+        }
+        $fh1->close;
+        $out2->close;
+}
+
+=head
+ extract_protein: extract protein sequence 
+=cut
 sub vrl_extract_protein
 {
 	my ($options, $files) = @_;
