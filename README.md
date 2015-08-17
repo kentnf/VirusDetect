@@ -6,7 +6,7 @@ virus-detect program
 
 Install database
 	
-./Install.sh
+./Install.pl
 
 Test 
 
