@@ -1212,7 +1212,8 @@ sub draw_img
 			-glyph => 'generic',
 			-bgcolor => 'blue',
 			-label => 1,
-			-link => "http://www.ncbi.nlm.nih.gov/nuccore/$$hit_id"
+			-link => "http://www.ncbi.nlm.nih.gov/nuccore/$$hit_id",
+			-target => '_blank'
 		);
 
 	my $track = $panel->add_track(

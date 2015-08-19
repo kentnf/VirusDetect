@@ -47,7 +47,7 @@ while(my $inseq = $in1->next_seq) {
 
 my %prot; # save plant protein seq to hash
 my $in2;
-if ($in2 =~ m/\.gz$/) {
+if ($db_prot_s =~ m/\.gz$/) {
 	$in2 = Bio::SeqIO->new(-format=>'fasta', -file=>"gzip -cd $db_prot_s |");
 } else {
 	$in2 = Bio::SeqIO->new(-format=>'fasta', -file=>"$db_prot_s");

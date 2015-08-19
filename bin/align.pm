@@ -240,7 +240,7 @@ sub pileup_filter
 		{
 
 			# parse previous ref pileup info
-			die "[ERROR]undef ref id $id for lengh\n" unless defined $seq_len{$id};
+			die "[ERROR]undef ref id $id for length\n" unless defined $seq_len{$id};
 			my $len_cutoff = $seq_len{$pre_id} * $coverage;
 			my $len = scalar(@pileup_info);
 			if ($len > $len_cutoff) {

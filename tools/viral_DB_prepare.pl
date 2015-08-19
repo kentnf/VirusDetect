@@ -110,7 +110,7 @@ USAGE $0 input_seq
         die "[ERR]file not exist $input_file\n" unless -s $$files[0];
         my $prefix = $input_file; $prefix =~ s/\.fasta$//; $prefix =~ s/\.fa$//;
 
-        my $identity = 99;
+        my $identity = 97;
         $identity = $$options{'p'} if (defined $$options{'p'} && $$options{'p'} > 90);
 
         my $max_len = 40000;
