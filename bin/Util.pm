@@ -154,7 +154,12 @@ sub load_virus_info
 	# load protein tab info to hash
 	my %vid_pid; # key: virus ID, value: pid1 # pid2 # ... # pidN
 	if (defined $prot_tab && -s $prot_tab) {
-		my $fh1 = IO::File->new($prot_tab) || die $!;
+		my $fh1;
+		if ($prot_tab =~ m/\.gz$/) {
+			open($fh1, "-|", "gzip -cd $prot_tab") || die $!
+		} else {
+			open($fh1, $prot_tab) || die $!;
+		}
 		while(<$fh1>) {
 			chomp;
 			next if $_ =~ m/^#/;
@@ -172,7 +177,7 @@ sub load_virus_info
 	my %virus_info;
 	my $fh;	
 	if  ($file =~ m/\.gz$/) {
-		open($fh, "gunzip -c $file |") || die $!;
+		open($fh, "-|", "gzip -cd $file") || die $!;
 	} else {
 		open($fh, $file) || die $!;
 	}

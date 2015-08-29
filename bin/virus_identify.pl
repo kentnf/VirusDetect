@@ -75,9 +75,9 @@ my $result_dir = $WORKING_DIR."/result";		# result folder
 my $tf = $WORKING_DIR."/temp";				# temp folder
 
 my $DATABASE_DIR = ${FindBin::RealBin}."/../databases";	# database folder
-my $seq_info = $DATABASE_DIR."/vrl_genbank.info.gz";	# virus sequence info
-my $reference = $DATABASE_DIR."/vrl_plant";       	# virus sequence
-my $prot_tab  = $reference."_prot_table";   		# virus protein table
+my $seq_info  = $DATABASE_DIR."/vrl_genbank.info.gz";	# virus sequence info
+my $reference; # = $DATABASE_DIR."/vrl_plant";       	# virus sequence
+my $prot_tab  = $DATABASE_DIR."/vrl_idmapping.gz";	# virus protein table
 Util::process_cmd("$BIN_DIR/formatdb -i $reference -p F") unless (-e "$reference.nhr");
 
 # format of seq_info
@@ -114,7 +114,7 @@ my ($debug, $debug_force, $novel_check);
 # get input parameters #
 ########################
 GetOptions( 
-	#'reference=s' 		=> \$reference,
+	'reference=s' 		=> \$reference,
 	'diff_ratio=f' 		=> \$diff_ratio,
 	'hsp_cover=f'		=> \$hsp_cover,
 	'diff_contig_cover=f'	=> \$diff_contig_cover,

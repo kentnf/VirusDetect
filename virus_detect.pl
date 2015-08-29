@@ -272,7 +272,7 @@ foreach my $sample (@ARGV)
 
 	# identify the virus
 	Util::print_user_message("Virus identification");
-	my $cmd_identify = "$BIN_DIR/virus_identify.pl ";
+	my $cmd_identify = "$BIN_DIR/virus_identify.pl --reference $reference ";
 	$cmd_identify .= "--word_size $word_size --exp_value $exp_value --identity_percen $percent_identity ";
 	$cmd_identify .= "--cpu_num $thread_num --mis_penalty $mis_penalty_b --gap_cost $gap_cost_b --gap_extension $gap_extension_b ";
 	$cmd_identify .= "--hsp_cover $hsp_cover --diff_ratio $diff_ratio --diff_contig_cover $diff_contig_cover --diff_contig_length $diff_contig_length ";
