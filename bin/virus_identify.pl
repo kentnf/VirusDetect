@@ -78,7 +78,6 @@ my $DATABASE_DIR = ${FindBin::RealBin}."/../databases";	# database folder
 my $seq_info  = $DATABASE_DIR."/vrl_genbank.info.gz";	# virus sequence info
 my $reference; # = $DATABASE_DIR."/vrl_plant";       	# virus sequence
 my $prot_tab  = $DATABASE_DIR."/vrl_idmapping.gz";	# virus protein table
-Util::process_cmd("$BIN_DIR/formatdb -i $reference -p F") unless (-e "$reference.nhr");
 
 # format of seq_info
 # AB000048 \t 2007 \t Parvovirus \t Feline panleukopenia virus gene for nonstructural protein 1, complete cds, isolate: 483. \t 1 \t Vertebrata \n
@@ -146,6 +145,7 @@ main: {
 	die "[ERROR]undef input reads: $sample\n$usage" unless -s $sample;
 	die "[ERROR]undef input contig: $contig\n$usage" unless -s $contig;
 
+	Util::process_cmd("$BIN_DIR/formatdb -i $reference -p F") unless (-e "$reference.nhr");
 	# create result folder according to sample name, copy contig to result folder
 	my $sample_base = basename($sample);
 	my $sample_dir = $result_dir."_".$sample_base;
