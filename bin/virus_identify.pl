@@ -197,99 +197,108 @@ main: {
 	my ($known_contig, $known_blast_table) = Util::find_known_contig($blast_table, 60, 50);
 
 	unlink($blast_output) unless $debug;
-	if (scalar(keys(%$known_contig)) == 0) { system("touch $sample_dir/no_virus_detected"); exit; } 
 
-	# report information for error checking:
-	if ($debug) {
-		print "=== For all contigs ===\nBlast Table: $nn1\nFiltered Blast Table: ".Util::line_num($blast_table);
-		print "Contig Num:".scalar(keys(%contig_info))."\nKnown Contigs:".scalar(keys(%$known_contig))."\n";
-		print "Blast Table for known contig: ".Util::line_num($known_blast_table)."\n";
-	}
-
-	# 4. get hit coverage information, then remove redundancy hit
-	#    this function looks redundance, it has save filter compared to step 3, but the filtered
-	#    result only works on known coverage and block computation
-	my ($known_coverage, $known_block) = Util::get_hit_coverage($known_blast_table, 60, 0.5, 1);
-
-	Util::save_file($known_coverage, "$sample.known.cov");  # checking files
-
-	# 5. remove redundancy hit.
-	#    after remove redundancy, the similar viral seq will be removed
-	#    Diff_ratio : 
-	#    Diff_contig_cover : 
-	#    Diff_contig_length : 
-	#    the output file is known identified
-	my $known_identified = Util::remove_redundancy_hit($known_coverage, $known_blast_table, $diff_ratio, $diff_contig_cover, $diff_contig_length);
-
-	Util::save_file($known_identified, "$sample.known.identified");
-
-	# 6. align read to contigs get depth, then compute reference depth using contig depth
-	# %contig_depth -> key: contig ID, depth, cover; value: depth, coverage
-	# %known_depth  -> key1: ref_ID; 
-	# 		   key2; depth, norm
-	# 		   value: raw depth, normalized depth
-	# filter the depth and coverage by depth cutoff and coverage cutoff, save the file
-	my %contig_depth = get_contig_mapped_depth($contig, $sample, $cpu_num, $file_type);
-	my %known_depth  = correct_depth($known_identified, \%contig_depth, \%contig_info, $sample, $depth_norm); # input sample will provide lib_size for depth normalization
-
-	# 7 the known identified table was filter again using depth and coverage
-	#   define coverage: query contig cov / total viral seq, 
-	#   define depth:
-	#   if the coverage meet cutoff, and raw & normalized depth meet the cutoff, identified virus will reported (final table)
-	my ($final_known_ctgs, $removed_ctgs);
-	($known_identified, $final_known_ctgs, $removed_ctgs) = filter_by_coverage_depth($known_identified, \%known_depth, $coverage_cutoff, $depth_cutoff);
-	Util::save_file($known_identified, "$sample.known.identified_with_depth");
-
-	my ($known_contig_table, $known_contig_blast_table, $known_reference) =  combine_table1($known_identified, $known_blast_table, \%contig_info, \%virus_info, \%reference_info);
-	my $known_contig_blast_sam = Util::blast_table_to_sam($known_contig_blast_table);
-	Util::save_file($known_contig_table, "$sample_dir/$sample_base.known.xls");
-	Util::save_file($known_reference, "$sample_dir/known.reference.fa");
-	Util::save_file($known_contig_blast_sam, "$sample_dir/$sample_base.known.sam");
-	
-	my $known_num = 0; ($known_num, $known_identified) = arrange_col2($known_identified, \%virus_info);
-
-	if ( length($known_identified) > 1 ) { 
-		Util::plot_result($known_identified, $known_contig_blast_table, $sample_dir, 'known'); 
-	} else {
-		unlink "$sample_dir/$sample_base.known.xls" if -e "$sample_dir/$sample_base.known.xls";
-	}
-	
-	Util::print_user_submessage("$known_num of known virus has been identified");
-
-	# output final-known/half-knwon/novel contigs;
-	#    final-known contigs: contigs in final result known.xls
-	#    half-known contigs : contigs not in final result, but meet the cutoff of 60% identity to virus, and 50% coverage of itself
-	#			  --- it include contig also pass remove redundancy, but failed on coverage and depth filter
-	#    novel contigs : need re-define 
-	my $known_contig_f = "$sample.known.contigs";
 	my $novel_contig = "$sample.novel.contigs";
-	my $half_known_contig_f = "$sample.unconsidered.contigs";
-	my $fh1 = IO::File->new(">".$known_contig_f) || die $!;
-	my $fh2 = IO::File->new(">".$novel_contig) || die $!;
-	my $fh3 = IO::File->new(">".$half_known_contig_f) || die $!;
-                
-	foreach my $cid (sort keys %contig_info) {
-		if (defined $$final_known_ctgs{$cid}) {
-			print $fh1 ">$cid\n$contig_info{$cid}{'seq'}\n";
-		} elsif (defined $$known_contig{$cid} ) {
-			if (defined $$removed_ctgs{$cid}) {
-				print $fh2 ">$cid\n$contig_info{$cid}{'seq'}\n";
-			} elsif ($contig_info{$cid}{'length'} >= $novel_len_cutoff) { 
-				print $fh2 ">$cid\n$contig_info{$cid}{'seq'}\n";
-			} else {
-				print $fh3 ">$cid\n$contig_info{$cid}{'seq'}\n";
-			}
-		} else {
-			print $fh2 ">$cid\n$contig_info{$cid}{'seq'}\n";
-		}
-	}
-	$fh1->close;
-	$fh2->close;
-	$fh3->close;
+	my %contig_depth = get_contig_mapped_depth($contig, $sample, $cpu_num, $file_type);
+	my ($final_known_ctgs, $removed_ctgs);
 
-	Util::process_cmd("cp $known_contig_f $sample_dir/contig_sequences.known.fa");
-	Util::process_cmd("cp $novel_contig   $sample_dir/contig_sequences.novel.fa");
-	Util::process_cmd("cp $half_known_contig_f $sample_dir/contig_sequences.unconsidered.fa");
+	if (scalar(keys(%$known_contig)) == 0) { 
+		system("touch $sample_dir/no_virus_detected");
+		system("cp $contig $novel_contig");
+		
+	} else { 
+		# report information for error checking:
+		if ($debug) {
+			print "=== For all contigs ===\nBlast Table: $nn1\nFiltered Blast Table: ".Util::line_num($blast_table);
+			print "Contig Num:".scalar(keys(%contig_info))."\nKnown Contigs:".scalar(keys(%$known_contig))."\n";
+			print "Blast Table for known contig: ".Util::line_num($known_blast_table)."\n";
+		}
+
+		# 4. get hit coverage information, then remove redundancy hit
+		#    this function looks redundance, it has save filter compared to step 3, but the filtered
+		#    result only works on known coverage and block computation
+		my ($known_coverage, $known_block) = Util::get_hit_coverage($known_blast_table, 60, 0.5, 1);
+
+		Util::save_file($known_coverage, "$sample.known.cov");  # checking files
+
+		# 5. remove redundancy hit.
+		#    after remove redundancy, the similar viral seq will be removed
+		#    Diff_ratio : 
+		#    Diff_contig_cover : 
+		#    Diff_contig_length : 
+		#    the output file is known identified
+		my $known_identified = Util::remove_redundancy_hit($known_coverage, $known_blast_table, $diff_ratio, $diff_contig_cover, $diff_contig_length);
+
+		Util::save_file($known_identified, "$sample.known.identified");
+
+		# 6. align read to contigs get depth, then compute reference depth using contig depth
+		# %contig_depth -> key: contig ID, depth, cover; value: depth, coverage
+		# %known_depth  -> key1: ref_ID; 
+		# 		   key2; depth, norm
+		# 		   value: raw depth, normalized depth
+		# filter the depth and coverage by depth cutoff and coverage cutoff, save the file
+		# my %contig_depth = get_contig_mapped_depth($contig, $sample, $cpu_num, $file_type);
+		my %known_depth  = correct_depth($known_identified, \%contig_depth, \%contig_info, $sample, $depth_norm); # input sample will provide lib_size for depth normalization
+
+		# 7 the known identified table was filter again using depth and coverage
+		#   define coverage: query contig cov / total viral seq, 
+		#   define depth:
+		#   if the coverage meet cutoff, and raw & normalized depth meet the cutoff, identified virus will reported (final table)
+		# my ($final_known_ctgs, $removed_ctgs);
+		($known_identified, $final_known_ctgs, $removed_ctgs) = filter_by_coverage_depth($known_identified, \%known_depth, $coverage_cutoff, $depth_cutoff);
+		Util::save_file($known_identified, "$sample.known.identified_with_depth");
+
+		my ($known_contig_table, $known_contig_blast_table, $known_reference) =  combine_table1($known_identified, $known_blast_table, \%contig_info, \%virus_info, \%reference_info);
+		my $known_contig_blast_sam = Util::blast_table_to_sam($known_contig_blast_table);
+		Util::save_file($known_contig_table, "$sample_dir/$sample_base.known.xls");
+		Util::save_file($known_reference, "$sample_dir/known.reference.fa");
+		Util::save_file($known_contig_blast_sam, "$sample_dir/$sample_base.known.sam");
+	
+		my $known_num = 0; ($known_num, $known_identified) = arrange_col2($known_identified, \%virus_info);
+
+		if ( length($known_identified) > 1 ) { 
+			Util::plot_result($known_identified, $known_contig_blast_table, $sample_dir, 'known'); 
+		} else {
+			unlink "$sample_dir/$sample_base.known.xls" if -e "$sample_dir/$sample_base.known.xls";
+		}
+	
+		Util::print_user_submessage("$known_num of known virus has been identified");
+
+		# output final-known/half-knwon/novel contigs;
+		#    final-known contigs: contigs in final result known.xls
+		#    half-known contigs : contigs not in final result, but meet the cutoff of 60% identity to virus, and 50% coverage of itself
+		#			  --- it include contig also pass remove redundancy, but failed on coverage and depth filter
+		#    novel contigs : need re-define 
+		my $known_contig_f = "$sample.known.contigs";
+		#my $novel_contig = "$sample.novel.contigs";
+		my $half_known_contig_f = "$sample.unconsidered.contigs";
+		my $fh1 = IO::File->new(">".$known_contig_f) || die $!;
+		my $fh2 = IO::File->new(">".$novel_contig) || die $!;
+		my $fh3 = IO::File->new(">".$half_known_contig_f) || die $!;
+                
+		foreach my $cid (sort keys %contig_info) {
+			if (defined $$final_known_ctgs{$cid}) {
+				print $fh1 ">$cid\n$contig_info{$cid}{'seq'}\n";
+			} elsif (defined $$known_contig{$cid} ) {
+				if (defined $$removed_ctgs{$cid}) {
+					print $fh2 ">$cid\n$contig_info{$cid}{'seq'}\n";
+				} elsif ($contig_info{$cid}{'length'} >= $novel_len_cutoff) { 
+					print $fh2 ">$cid\n$contig_info{$cid}{'seq'}\n";
+				} else {
+					print $fh3 ">$cid\n$contig_info{$cid}{'seq'}\n";
+				}
+			} else {
+				print $fh2 ">$cid\n$contig_info{$cid}{'seq'}\n";
+			}
+		}
+		$fh1->close;
+		$fh2->close;
+		$fh3->close;
+
+		Util::process_cmd("cp $known_contig_f $sample_dir/contig_sequences.known.fa");
+		Util::process_cmd("cp $novel_contig   $sample_dir/contig_sequences.novel.fa");
+		Util::process_cmd("cp $half_known_contig_f $sample_dir/contig_sequences.unconsidered.fa");
+	}
 
 	if ( $novel_check && -s $novel_contig )
 	{
