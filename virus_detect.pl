@@ -104,7 +104,6 @@ my $hits_return = 500;				# megablast number of hit returns
 my $hsp_cover = 0.75;
 my $coverage_cutoff = 0.1;			# coverage cutoff for final result
 my $depth_cutoff = 5;				# depth cutoff for final result
-my $depth_norm = 0;				# depth normalized by library size
 my $novel_len_cutoff = 100;
 
 # disabled parameters or used as fixed value
@@ -118,9 +117,9 @@ my $debug;
 # get input paras #
 GetOptions(
 	'r|reference=s'		=> \$reference,
-	'h|host_reference=s'	=> \$host_reference,
+	'h|host_reference=s'=> \$host_reference,
 	't|thread_num=i'	=> \$thread_num,
-	'd|debug'		=> \$debug,
+	'd|debug'			=> \$debug,
 
 	'max_dist=i' 		=> \$max_dist,
 	'max_open=i' 		=> \$max_open,
@@ -140,20 +139,19 @@ GetOptions(
 	
 	'word_size=i' 		=> \$word_size,
 	'exp_value-s' 		=> \$exp_value,
-	'percent_identity=s' 	=> \$percent_identity,
+	'percent_identity=s'=> \$percent_identity,
 	'mis_penalty_b=i' 	=> \$mis_penalty_b,
 	'gap_cost_b=i' 		=> \$gap_cost_b,
-	'gap_extension_b=i' 	=> \$gap_extension_b,
+	'gap_extension_b=i' => \$gap_extension_b,
 
 	'hsp_cover=s' 		=> \$hsp_cover,
 	'diff_ratio=s' 		=> \$diff_ratio,
 	'diff_contig_cover=s' 	=> \$diff_contig_cover,
 	'diff_contig_length=s'	=> \$diff_contig_length,
 
-	'coverage_cutoff=f' 	=> \$coverage_cutoff,
+	'coverage_cutoff=f' => \$coverage_cutoff,
 	'depth_cutoff=f' 	=> \$depth_cutoff,
-	'depth_norm'	 	=> \$depth_norm,
-	'novel_len_cutoff=i' 	=> \$novel_len_cutoff
+	'novel_len_cutoff=i'=> \$novel_len_cutoff
 );
 
 # check host 
@@ -276,7 +274,7 @@ foreach my $sample (@ARGV)
 	$cmd_identify .= "--word_size $word_size --exp_value $exp_value --identity_percen $percent_identity ";
 	$cmd_identify .= "--cpu_num $thread_num --mis_penalty $mis_penalty_b --gap_cost $gap_cost_b --gap_extension $gap_extension_b ";
 	$cmd_identify .= "--hsp_cover $hsp_cover --diff_ratio $diff_ratio --diff_contig_cover $diff_contig_cover --diff_contig_length $diff_contig_length ";
-	$cmd_identify .= "--coverage_cutoff $coverage_cutoff --depth_cutoff $depth_cutoff --depth_norm --novel-check ";
+	$cmd_identify .= "--coverage_cutoff $coverage_cutoff --depth_cutoff $depth_cutoff ";
 	$cmd_identify .= "--novel_len_cutoff $novel_len_cutoff ";
 	$cmd_identify .= "-d " if $debug;
 	$cmd_identify .= "$sample $sample.combined ";

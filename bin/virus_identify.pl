@@ -57,8 +57,10 @@ my $usage = <<_EOUSAGE_;
 #
 #  --coverage_cutoff	The coverage cutoff for final ouput [0.1] 
 #  --depth_cutoff	The depth cutoff for final ouput    [5]
-#  --depth_norm		Normalized depth by library size [off]
-#  --novel_len_cutoff	Force unconsidered contig longer than this cutoff as novel contigs [1000]
+#  --novel_len_cutoff   Length cutoff of a contig categorized as novel
+#            when it is not reported as known, but it may 
+#            shows similarity with the reference virus 
+#            sequences. The default is 100bp [100]
 ###########################################################################################
 
 _EOUSAGE_
@@ -82,56 +84,55 @@ my $prot_tab  = $DATABASE_DIR."/vrl_idmapping.gz";	# virus protein table
 # format of seq_info
 # AB000048 \t 2007 \t Parvovirus \t Feline panleukopenia virus gene for nonstructural protein 1, complete cds, isolate: 483. \t 1 \t Vertebrata \n
 
-###############################
-##  global vars		     ##
-###############################
-my $hsp_cover = 0.75;		# for blast filter
-my $drop_off = 5;		# for blast filter
-my $diff_ratio= 0.25;		# ratio for number of diff contig
+############################
+## ====  global vars ==== ##
+############################
+my $hsp_cover = 0.75;			# for blast filter
+my $drop_off = 5;				# for blast filter
+my $diff_ratio= 0.25;			# ratio for number of diff contig
 my $diff_contig_cover = 0.5;	# for hit filter
 my $diff_contig_length = 100;	# for hit filter
-my $coverage_cutoff = 0.1;	# coverage cutoff for final result
-my $depth_cutoff = 5;		# depth cutoff for final result
-my $depth_norm = 0;		# normalization depth by library size
-my $novel_len_cutoff = 1000;	# 
+my $coverage_cutoff = 0.1;		# coverage cutoff for final result
+my $depth_cutoff = 5;			# depth cutoff for final result
+my $novel_len_cutoff = 100;		# the unused known contigs were used for novel contig identification (this parameter is fixed)
+my $depth_norm = 1;				# normalization depth by library size (this parameter is fixed)
+my $novel_check = 1;			# enable novel check (this parameter is fixed)
 
 my $word_size = 11;
-my $cpu_num = 8;		# megablast: thread number
-my $mis_penalty = -1;		# megablast: penalty for mismatch
-my $gap_cost = 2;		# megablast: penalty for gap open
-my $gap_extension = 1;		# megablast: penalty for gap extension
-my $exp_value = 1e-5;		#
-my $identity_percen = 25;	# tblastx: hsp_identity cutoff for protein blast
+my $cpu_num = 8;				# megablast: thread number
+my $mis_penalty = -1;			# megablast: penalty for mismatch
+my $gap_cost = 2;				# megablast: penalty for gap open
+my $gap_extension = 1;			# megablast: penalty for gap extension
+my $exp_value = 1e-5;			#
+my $identity_percen = 25;		# tblastx: hsp_identity cutoff for protein blast
 
-my $filter_query = "F";		# megablast: F - disable remove simple sequence
-my $hits_return = 500;		# megablast: hit number
-my $input_suffix='';
+my $filter_query = "F";			# megablast: F - disable remove simple sequence
+my $hits_return = 500;			# megablast: hit number
+my $input_suffix = '';
 
-my ($debug, $debug_force, $novel_check);
+my ($debug, $debug_force);
 
 ########################
 # get input parameters #
 ########################
 GetOptions( 
-	'reference=s' 		=> \$reference,
-	'diff_ratio=f' 		=> \$diff_ratio,
-	'hsp_cover=f'		=> \$hsp_cover,
+	'reference=s' 			=> \$reference,
+	'diff_ratio=f' 			=> \$diff_ratio,
+	'hsp_cover=f'			=> \$hsp_cover,
 	'diff_contig_cover=f'	=> \$diff_contig_cover,
 	'diff_contig_length=i'	=> \$diff_contig_length,
-	'word_size=i' 		=> \$word_size,
-	'exp_value=f' 		=> \$exp_value,
+	'word_size=i' 			=> \$word_size,
+	'exp_value=f' 			=> \$exp_value,
 	'identity_percen=f' 	=> \$identity_percen,
-	'cpu_num=i' 		=> \$cpu_num,
-	'mis_penalty=i' 	=> \$mis_penalty,
-	'gap_cost=i' 		=> \$gap_cost,
-	'gap_extension=i' 	=> \$gap_extension,
-	'coverage_cutoff=f'	=> \$coverage_cutoff,
-	'depth_cutoff=f'	=> \$depth_cutoff,
-	'depth_norm'		=> \$depth_norm,
-	'novel_len_cutoff=i'    => \$novel_len_cutoff,
-	'd|debug'		=> \$debug,
-	'f|force'		=> \$debug_force,
-	'n|novel-check'		=> \$novel_check,
+	'cpu_num=i' 			=> \$cpu_num,
+	'mis_penalty=i' 		=> \$mis_penalty,
+	'gap_cost=i' 			=> \$gap_cost,
+	'gap_extension=i' 		=> \$gap_extension,
+	'coverage_cutoff=f'		=> \$coverage_cutoff,
+	'depth_cutoff=f'		=> \$depth_cutoff,
+	'd|debug'				=> \$debug,
+	'novel_len_cutoff=i'	=> \$novel_len_cutoff,
+	'f|force'				=> \$debug_force,
 );
 
 if (scalar(@ARGV) != 2) {
@@ -152,8 +153,12 @@ main: {
 	Util::process_cmd("mkdir $sample_dir", $debug) unless -e $sample_dir;
 	Util::process_cmd("cp $contig $sample_dir/contig_sequences.fa", $debug);
 
-	# load contig info to hash; key: seqID, seq, length; value: seq, length
+	# load contig info to hash; 
+	# key1: seqID, 
+	# key2:  seq, length, type; 
+	# value: seq, length, (known, unused, novel, undetermined)
 	my %contig_info = Util::load_seq($contig);
+	foreach my $cid (sort keys %contig_info) { $contig_info{$cid}{'type'} = 'undetermined'; }
 	my %reference_info = Util::load_seq($reference);
 	my %reference_prot_info = Util::load_seq($reference."_prot");
 
@@ -198,15 +203,12 @@ main: {
 
 	unlink($blast_output) unless $debug;
 
-	my $novel_contig = "$sample.novel.contigs";
 	my %contig_depth = get_contig_mapped_depth($contig, $sample, $cpu_num, $file_type);
-	my ($final_known_ctgs, $removed_ctgs);
+	my ($final_known_ctgs, $removed_ctgs, $final_novel_ctgs, $removed_novel_ctgs);
 
-	if (scalar(keys(%$known_contig)) == 0) { 
-		system("touch $sample_dir/no_virus_detected");
-		system("cp $contig $novel_contig");
-		
-	} else { 
+	# if there is known contig 
+	if (scalar(keys(%$known_contig)) > 0) 
+	{ 
 		# report information for error checking:
 		if ($debug) {
 			print "=== For all contigs ===\nBlast Table: $nn1\nFiltered Blast Table: ".Util::line_num($blast_table);
@@ -264,43 +266,62 @@ main: {
 	
 		Util::print_user_submessage("$known_num of known virus has been identified");
 
-		# output final-known/half-knwon/novel contigs;
-		#    final-known contigs: contigs in final result known.xls
-		#    half-known contigs : contigs not in final result, but meet the cutoff of 60% identity to virus, and 50% coverage of itself
-		#			  --- it include contig also pass remove redundancy, but failed on coverage and depth filter
-		#    novel contigs : need re-define 
-		my $known_contig_f = "$sample.known.contigs";
-		#my $novel_contig = "$sample.novel.contigs";
-		my $half_known_contig_f = "$sample.unconsidered.contigs";
-		my $fh1 = IO::File->new(">".$known_contig_f) || die $!;
-		my $fh2 = IO::File->new(">".$novel_contig) || die $!;
-		my $fh3 = IO::File->new(">".$half_known_contig_f) || die $!;
-                
-		foreach my $cid (sort keys %contig_info) {
-			if (defined $$final_known_ctgs{$cid}) {
-				print $fh1 ">$cid\n$contig_info{$cid}{'seq'}\n";
-			} elsif (defined $$known_contig{$cid} ) {
-				if (defined $$removed_ctgs{$cid}) {
-					print $fh2 ">$cid\n$contig_info{$cid}{'seq'}\n";
-				} elsif ($contig_info{$cid}{'length'} >= $novel_len_cutoff) { 
-					print $fh2 ">$cid\n$contig_info{$cid}{'seq'}\n";
-				} else {
-					print $fh3 ">$cid\n$contig_info{$cid}{'seq'}\n";
-				}
-			} else {
-				print $fh2 ">$cid\n$contig_info{$cid}{'seq'}\n";
+		# assign known type to contigs 
+		#    known: contigs in final result known.xls
+		#    unused: contigs that met cutoff of known contigs, but not presented in final result
+		foreach my $cid (sort keys %contig_info) 
+		{
+			# assign known type to final known contigs
+			if (defined $$final_known_ctgs{$cid})  {
+				$contig_info{$cid}{'type'} = 'known';
+				next;
+			}
+
+			# in the knonw contig, which include not only final known contigs, 
+			# but also some contig meet the cutoff (60% identity, 50% coverage) 
+			# 
+			# options:
+			# 1. set these known as unused (except final known)
+			# 2. set these known as undetermined for novel identification
+			# 3. (current used) --
+			#    3.1 set these known as unused (except final known)
+			#    3.2 set these known as undetermined for novel identification if longer than novel len cutoff
+			if ( defined $$known_contig{$cid} ) {
+				$contig_info{$cid}{'type'} = 'unused' if $contig_info{$cid}{'length'} < $novel_len_cutoff;
+				next;
 			}
 		}
-		$fh1->close;
-		$fh2->close;
-		$fh3->close;
-
-		Util::process_cmd("cp $known_contig_f $sample_dir/contig_sequences.known.fa");
-		Util::process_cmd("cp $novel_contig   $sample_dir/contig_sequences.novel.fa");
-		Util::process_cmd("cp $half_known_contig_f $sample_dir/contig_sequences.unconsidered.fa");
 	}
+	else
+	{ 
+		# create file 'no_known_virus_detected' if there is no contig meet cutoff of known virus
+		system("touch $sample_dir/no_known_virus_detected");
+	}
+	############################################
+	# ===== end of known virus detection ===== #
+	############################################
 
-	if ( $novel_check && -s $novel_contig )
+	############################################
+	# ===== begin of novel virus detection === #
+	############################################	
+	
+	# 1. 
+	# check the number of undetermined contigs
+	# and save the undetermined to novel
+	my $novel_contig = "$sample.novel.contigs";
+	my $fhn = IO::File->new(">".$novel_contig) || die $!;
+	my $num_undetermined = 0;
+	foreach my $cid (sort keys %contig_info) { 
+		if ($contig_info{$cid}{'type'} eq 'undetermined') {
+			$num_undetermined++;
+			print $fhn ">$cid\n$contig_info{$cid}{'seq'}\n"; 
+		}
+	}
+	$fhn->close;
+	
+	# 2. 
+	# blast 
+	if ( $novel_check && $num_undetermined > 0 )
 	{
 		# compare noval contigs against virus database using tblastx
 		$blast_output = "$sample.novel.paired";
@@ -310,7 +331,7 @@ main: {
 		Util::process_cmd("$blast_program -i $novel_contig -d $reference_prot -o $blast_output $blast_param", $debug) unless -s $blast_output;
 		my $blast_novel_table = Util::parse_blast_to_table($blast_output, $blast_program);
 		my $mm1 = Util::line_num($blast_novel_table);
-		   $blast_novel_table = Util::filter_blast_table($blast_novel_table, 0, $drop_off, $blast_program);
+		$blast_novel_table = Util::filter_blast_table($blast_novel_table, 0, $drop_off, $blast_program);
 		unlink($blast_output) unless $debug;
 
 		# report information
@@ -320,7 +341,7 @@ main: {
 		unless (length $blast_novel_table > 1 )
 		{
 			Util::process_cmd("touch $sample_dir/no_novel_virus_detected", $debug);
-			Util::process_cmd("cp $novel_contig $sample_dir/unknown.contigs.fa", $debug);
+			Util::process_cmd("cp $novel_contig $sample_dir/undetermined.contigs.fa", $debug);
 			exit;
 		}
 	
@@ -328,33 +349,73 @@ main: {
 		my ($novel_coverage, $novel_block) = Util::get_hit_coverage($blast_novel_table, $identity_percen, 0, 1);
 		my $novel_identified = Util::remove_redundancy_hit($novel_coverage, $blast_novel_table, $diff_ratio, $diff_contig_cover, $diff_contig_length);		
 
-		# 5. get depth 
+		# 5. get depth
 		my %novel_depth  = correct_depth($novel_identified, \%contig_depth, \%contig_info, $sample, $depth_norm);
-		($novel_identified, $final_known_ctgs, $removed_ctgs) = filter_by_coverage_depth($novel_identified, \%novel_depth, $coverage_cutoff, $depth_cutoff);	
+		($novel_identified, $final_novel_ctgs, $removed_novel_ctgs) = filter_by_coverage_depth($novel_identified, \%novel_depth, $coverage_cutoff, $depth_cutoff);
 		
 		# combine
 		my ($novel_contig_table, $novel_contig_blast_table, $novel_reference) =  combine_table1($novel_identified, $blast_novel_table, \%contig_info, \%virus_info, \%reference_prot_info);
 		my $novel_contig_blast_sam = Util::blast_table_to_sam($novel_contig_blast_table);
 		Util::save_file($novel_contig_table, "$sample_dir/$sample_base.novel.xls");
 		Util::save_file($novel_reference, "$sample_dir/novel.reference.fa");
-        	Util::save_file($novel_contig_blast_sam, "$sample_dir/$sample_base.novel.sam");
+       	Util::save_file($novel_contig_blast_sam, "$sample_dir/$sample_base.novel.sam");
 
 		my $novel_num = 0; ($novel_num, $novel_identified) = arrange_col2($novel_identified, \%virus_info);
 
 		if ( length($novel_identified) > 1 ) { 
 			Util::plot_result($novel_identified, $novel_contig_blast_table, $sample_dir, 'novel'); 
 		} else {
-                	unlink "$sample_dir/$sample_base.novel.xls" if -e "$sample_dir/$sample_base.novel.xls";
-                }
+			unlink "$sample_dir/$sample_base.novel.xls" if -e "$sample_dir/$sample_base.novel.xls";
+		}
+		Util::print_user_submessage("$novel_num of novel virus has been identified");
 
-                Util::print_user_submessage("$novel_num of novel virus has been identified");
+        # assign novel type to contigs 
+        #    novel: contigs in final result known.xls
+        #    unused: contigs that met cutoff of known contigs, but not presented in final result
+        foreach my $cid (sort keys %contig_info)
+        {
+            # assign known type to final known contigs
+            if (defined $$final_novel_ctgs{$cid})  {
+                $contig_info{$cid}{'type'} = 'novel';
+                next;
+            }
+        }
 	}
+
+	# output known, novel, and undetermined seq
+	#    known contigs: contigs in final result known.xls
+	#    novel contigs: contigs in final result novel.xls
+	#    undetermined_contigs: contigs that not belong to known contigs:
+	my ($known_contig_content, $novel_contig_content, $undet_contig_content) = ('', '', '');
+	foreach my $cid (sort keys %contig_info) {
+		if (defined $contig_info{$cid}{'type'})	
+		{
+			if ($contig_info{$cid}{'type'} eq 'known') {
+				$known_contig_content.=">$cid\n$contig_info{$cid}{'seq'}\n";
+			} 
+			elsif ($contig_info{$cid}{'type'} eq 'novel') {
+				$novel_contig_content.=">$cid\n$contig_info{$cid}{'seq'}\n";
+			} 
+			elsif ($contig_info{$cid}{'type'} eq 'undetermined' || $contig_info{$cid}{'type'} eq 'unused') {
+				$undet_contig_content.=">$cid\n$contig_info{$cid}{'seq'}\n";
+			}
+			else {
+				die "[ERR]contig type: $cid-> $contig_info{$cid}{'type'}\n";
+			}
+		}
+		else {
+			$undet_contig_content.=">$cid\n$contig_info{$cid}{'seq'}\n";
+		}
+	}
+	Util::save_file($known_contig_content, "$sample_dir/contig_sequences.known.fa") if length($known_contig_content) > 1;
+	Util::save_file($novel_contig_content, "$sample_dir/contig_sequences.novel.fa") if length($novel_contig_content) > 1;
+	Util::save_file($undet_contig_content, "$sample_dir/contig_sequences.undetermined.fa") if length($undet_contig_content) > 1;
 }
 
 # put folder new folder
 
 #################################################################
-# kentnf: subroutine						#
+# kentnf: subroutine											#
 #################################################################
 
 =head2
@@ -515,7 +576,7 @@ sub correct_depth
 		if ($id =~ m/^>/) { <$fh>; }
 		if ($id =~ m/^@/) { <$fh>; <$fh>; <$fh>; }
 		$lib_size++;
-        }
+	}
 	$fh->close;
 
 	# convert contig depth to reference depth
@@ -571,25 +632,28 @@ sub filter_by_coverage_depth
 	my %removed_contigs;		# removed contigs for novel
 
 	chomp($known_identified);
-        my @a = split(/\n/, $known_identified);
-        foreach my $line (@a)
-        {
-                my @ta = split(/\t/, $line);
+	my @a = split(/\n/, $known_identified);
+	foreach my $line (@a) {
+		my @ta = split(/\t/, $line);
 		my @tb = split(/,/, $ta[4]);
 		die "[ERR]no support contig: $line\n" if scalar @tb < 1;
 	
-                if ($ta[3] > $coverage_cutoff) {
+		if ($ta[3] > $coverage_cutoff) {
+			#debug
 			die "[ERR]Undef depth for $ta[0]\n" unless defined $$known_depth{$ta[0]}{'norm'};
-                        if ( $$known_depth{$ta[0]}{'norm'} > $depth_cutoff || $$known_depth{$ta[0]}{'depth'} > $depth_cutoff ) {
-                               $output_identified.=$line."\t".$$known_depth{$ta[0]}{'depth'}."\t".$$known_depth{$ta[0]}{'norm'}."\n";
+			if ( $$known_depth{$ta[0]}{'norm'} > $depth_cutoff || $$known_depth{$ta[0]}{'depth'} > $depth_cutoff ) 
+			{
+				$output_identified.=$line."\t".$$known_depth{$ta[0]}{'depth'}."\t".$$known_depth{$ta[0]}{'norm'}."\n";
 				foreach my $ctg (@tb) { $known_contigs{$ctg} = 1; }
-                        } else {
+			} 
+			else 
+			{
 				foreach my $ctg (@tb) { $removed_contigs{$ctg} = 1; }
 			}
-                } else {
+		} else {
 			foreach my $ctg (@tb) { $removed_contigs{$ctg} = 1; }
 		}
-        }
+	}
 
 	my $org_removed_num = scalar(keys(%removed_contigs));
 	my $org_known_num   = scalar(keys(%known_contigs));
@@ -597,11 +661,12 @@ sub filter_by_coverage_depth
 	# check if removed contigs has knwon one, then delete it from removed
 	foreach my $ctg (sort keys %removed_contigs) {
 		delete $removed_contigs{$ctg} and $ccn++ if defined $known_contigs{$ctg};
-			
 	}
+
 	#print "removed:$org_removed_num\tknown:$org_known_num\tcorrect:$ccn\n";
 	return ($output_identified, \%known_contigs, \%removed_contigs);
 }
+
 =head2 
 
  combine_table1 -- combine the result to generate final table
@@ -625,8 +690,8 @@ sub filter_by_coverage_depth
 
 my ($known_contig_table, $knwon_contig_blast_table, $known_reference) =  combine_table1($known_identified, $known_blast_table, \%contig_info, \%virus_info, \%reference_info);
 
-
 =cut 
+
 sub combine_table1
 {
 	my ($known_identified, $known_blast_table, $contig_info, $virus_info, $reference_info) = @_;
@@ -639,15 +704,14 @@ sub combine_table1
 	chomp($known_identified);
 	my @a = split(/\n/, $known_identified);
 
-	foreach my $line (@a)
-        {
+	foreach my $line (@a) {
 		next if $line =~ m/^#/;
-                # HQ593108        7458    96      0.0113971574148565      CONTIG282       1
-                my @ta = split(/\t/, $line);
+		# HQ593108        7458    96      0.0113971574148565      CONTIG282       1
+		my @ta = split(/\t/, $line);
 		die "[ERR]Undef Ref Seq: $ta[0]\n" unless defined $$reference_info{$ta[0]}{'seq'};
 		$reference_seq.= ">$ta[0]\n$$reference_info{$ta[0]}{'seq'}\n";
-                $hit_index{$ta[0]} = 1;
-        }
+		$hit_index{$ta[0]} = 1;
+	}
 
         # main
         my $output_table = "#Contig_ID\tContig_Seq\tContig_Len\tHit_ID\tHit_Len\tGenus\tDescription\tContig_start\tContig_end\tHit_start\tHit_end\tHsp_identity\tE_value\tHsp_strand\n";

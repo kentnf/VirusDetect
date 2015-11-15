@@ -1063,15 +1063,34 @@ sub aln2cm
 }
 
 =head2
-
  plot_result -- plot the result
-
 =cut
 sub plot_result
 {
 	my ($known_identified, $known_contig_blast_table, $output, $type) = @_;
 
-	my $OUTPUT_DIR  =  "$output/$type"."_references";
+	# parse blast result to get contig_length and match length
+	# push contig and match info to hash
+	# key 1: contig
+	# 	key 2: length
+	# 		   match
+	# 		   iden
+	my %contig_match;
+	chomp($known_contig_blast_table);
+	my @bs = split(/\n/, $known_contig_blast_table);
+	foreach my $bs (@bs) {
+		my @line = split(/\t/, $bs);
+		if ($line[13] =~ m/(\d+)\/(\d+)\(\d+%\)/) {
+			$contig_match{$line[0]}{'match'}  = $1;
+			$contig_match{$line[0]}{'length'} = $2;
+			$contig_match{$line[0]}{'iden'}   = $1/$2;
+		}
+		else {
+			die "[ERR]CONTIG $bs\n";
+		}
+	}
+
+	my $OUTPUT_DIR  = "$output/$type"."_references";
 	mkdir $OUTPUT_DIR unless -e $OUTPUT_DIR;
 	my $output_file = "$output/$type.html"; 	
 
@@ -1082,6 +1101,10 @@ sub plot_result
 	my $out_table = '';
 	my $line_number=0;
 
+	# save contig and virus to hash
+	# key: contig ID
+	# value: virus accession ID
+	my %contig_virus;
 	chomp($known_identified);
 	my @a = split(/\n/, $known_identified);
 	foreach my $line (@a)
@@ -1091,18 +1114,34 @@ sub plot_result
 
 		my @ta = split(/\t/, $line);
 		# 0 [col1] - virus seq ID
-                # 1 [col2] - virus seq length
-                # 2 [col3] - virus seq cover length
-                # 3 [col4] - coverage (cover_length/seq_length: col3/col2)
-                # 4 [col5] - contigs
-                # 5 [col6] - contig number
-                # 6 [col7] - raw depth (read depth, from pileup file)
-                # 7 [col8] - normalized depth
+		# 1 [col2] - virus seq length
+		# 2 [col3] - virus seq cover length
+		# 3 [col4] - coverage (cover_length/seq_length: col3/col2)
+		# 4 [col5] - contigs
+		# 5 [col6] - contig number
+		# 6 [col7] - raw depth (read depth, from pileup file)
+		# 7 [col8] - normalized depth
 		# 8 [col9] - genus
 		# 9 [col10]- desc
 
 		die "[ERR]Num of cols: $line\n" unless scalar @ta == 10;
 		my ($ref, $len, $cov_base, $coverage, $contig, $contig_num, $raw_depth, $norm_depth, $genus, $desc) = @ta;
+
+		my ($match, $len_c, $max_iden, $min_iden) = (0, 0, 0, 100);
+		my @c = split(/,/, $ta[4]);
+		foreach my $cid (@c) {
+			$match += $contig_match{$cid}{'match'};
+			$len_c += $contig_match{$cid}{'length'};
+			my $iden_c = $contig_match{$cid}{'iden'};
+			$max_iden = $iden_c if $iden_c > $max_iden;
+			$min_iden = $iden_c if $iden_c < $min_iden;
+		}
+		my $iden = sprintf("%.2f", $match/$len_c*100);
+		$max_iden = sprintf("%.2f", $max_iden*100);
+		$min_iden = sprintf("%.2f", $min_iden*100);
+		$iden = 100 if $iden == 100;
+		$max_iden = 100 if $max_iden == 100;
+		$min_iden = 100 if $min_iden == 100;
 
 		$all_hits{$ref} = 1; 
 		$index{$ref} = $line_number;
@@ -1113,44 +1152,56 @@ sub plot_result
 		$norm_depth = sprintf("%.1f", $norm_depth);
 
 		$out_table .= qq' 
-   <tr>
-        <td><a href="$link">$ref</a></td>
-        <td>$len</td>
-        <td>$cov_base ($coverage)</td>
-        <td>$contig_num</td>	
-        <td>$raw_depth</td>
+  <tr>
+	<td><a href="$link">$ref</a></td>
+	<td>$len</td>
+	<td>$cov_base ($coverage)</td>
+	<td>$contig_num</td>	
+	<td>$raw_depth</td>
 	<td>$norm_depth</td>
-        <td>$genus</td>	
+	<td>$iden</td>
+	<td>$max_iden</td>
+	<td>$min_iden</td>
+	<td>$genus</td>	
 	<td width="50%">$desc</td>	
-   </tr>';	
+  </tr>';	
 	}
 
 	$out_table = qq'
-<style type="text/css">
-td,th
-{
-  font-family : Arial, Sans-Serif, Helv, Helvetica, Verdana;
-  font-size: 12px;
-}
-</style>
-<table border=1 cellpadding=3 style=border-collapse:collapse bordercolor=#gray width=780 align=center>
+<!-- Top 6 lines shoud be removed when load html into virome database -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+<script> \$(function() { \$(\'a\').tooltip(); }) </script>
+<br><br><br><br><br>
+
+<table class="table table-bordered table-condensed" style="font-size:12px; width: 780px;" align=center>
   <tr bgcolor=#e2e8ec>
-    <th>Reference</th>
-    <th>Length</th>
-    <th>Coverage(%)</th>
-    <th>#contig</th>
-    <th>Depth</th>
-    <th>Depth(Norm)</th>
-    <th>Genus</th>
-    <th width="50%">Description</th>
+	<th><a title="" data-placement="top" data-toggle="tooltip" data-original-title="GenBank accession number of reference sequence to which 
+significant similarity was found with contigs assembled from the sample">Reference</a></th>
+	<th><a title="" data-placement="top" data-toggle="tooltip" data-original-title="Length of the reference sequence identified">Length</a></th>
+	<th><a title="" data-placement="top" data-toggle="tooltip" data-original-title="percentage of the GenBank reference sequence that is
+covered by alignment of contigs assembled from the sample">Coverage (%)</a></th>
+	<th><a title="" data-placement="top" data-toggle="tooltip" data-original-title="Number of contigs, assembled from the sample, that can be
+aligned to the reference sequence">#contig</a></th>
+	<th><a title="" data-placement="top" data-toggle="tooltip" data-original-title="The average total number of times each nucleotide of the
+reference sequence is covered by sequences identified in the sample">Depth</a></th>
+	<th><a title="" data-placement="top" data-toggle="tooltip" data-original-title="The average number of times each nucleotide of the GenBank
+reference sequence is covered by aligned sequences identified in the sample per million of total sequenced reads (small RNAs)">Depth (Norm)</a></th>
+	<th><a title="" data-placement="top" data-toggle="tooltip" data-original-title="The average percentage of nucleotide identity to the GenBank
+reference sequence of all contigs aligned to that sequence">%Identity</a></th>
+	<th><a title="" data-placement="top" data-toggle="tooltip" data-original-title="Maximum percentage of sequence identity of the
+contigs with significant similarity to the GenBank reference sequence">%Iden Max</a></th>
+	<th><a title="" data-placement="top" data-toggle="tooltip" data-original-title="Minimum percentage of sequence identity of the
+contigs with significant similarity to the GenBank reference sequence">%Iden Min</a></th>
+	<th>Genus</th>
+	<th>Description</th>
   </tr>
 $out_table
 </table>';
 
 	# output table to file
-	open(OUT, ">$output_file" ) || die $!;
-	print OUT "<br>$out_table<br>";
-	close(OUT);
+	save_file($out_table, $output_file);
 
 	# put blast information to hash
 	# key: hit ID
@@ -1171,12 +1222,19 @@ $out_table
 		my $out_hit = $OUTPUT_DIR."/$hit.html";
 
 		open(OUT1, ">$out_hit") or print "you forgot to make $OUTPUT_DIR";
-		print OUT1 qq'<div align=center>';
+		print OUT1 qq'<!-- Top 5 lines shoud be removed when load html into virome database -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+<br><br><br>
+		
+<div align=center>
+';
 		draw_img(\$hit, \@lines, \*OUT1, $OUTPUT_DIR);
-		print OUT1 qq'</div>';
+		print OUT1 qq'</div><br>';
 	
 		my $table_info = output_aligments(\@lines);
-		print OUT1 "<br>$table_info<br>";
+		print OUT1 $table_info;
 		close(OUT1);
 
 		# code for checking
@@ -1192,72 +1250,68 @@ sub draw_img
 	my $full_length = $cols[3];
 
 	my $panel = Bio::Graphics::Panel->new(
-                                      -length => $full_length,
-                                      -width  => 610,
-                                      -pad_left => 25,
-                                      -pad_right => 25,
-                                     );
+		-length => $full_length,
+		-width  => 610,
+		-pad_left => 25,
+		-pad_right => 25,
+	);
        
 	my $full_length_seq = Bio::Graphics::Feature->new(
-                                                -start => 1,
-                                                -end => $full_length,
-						-display_name => "$$hit_id",
-                                                );
+		-start => 1,
+		-end => $full_length,
+		-display_name => "$$hit_id",
+	);
        
 	$panel->add_track( 
-                        $full_length_seq,
-                        -glyph => 'arrow',
-                        -tick => 2,
-                        -fgcolor => 'black',
-                        -double => 1,
-                 );
+		$full_length_seq,
+		-glyph => 'arrow',
+		-tick => 2,
+		-fgcolor => 'black',
+		-double => 1,
+	);
 
 	$panel->add_track(
-			$full_length_seq,
-			-glyph => 'generic',
-			-bgcolor => 'blue',
-			-label => 1,
-			-link => "http://www.ncbi.nlm.nih.gov/nuccore/$$hit_id",
-			-target => '_blank'
-		);
+		$full_length_seq,
+		-glyph => 'generic',
+		-bgcolor => 'blue',
+		-label => 1,
+		-link => "http://www.ncbi.nlm.nih.gov/nuccore/$$hit_id",
+		-target => '_blank'
+	);
 
 	my $track = $panel->add_track(
-                              -glyph => 'graded_segments',
-                              -label => 1,
-			      -bgcolor => 'red',
-			      -sort_order  => 'high_score',
-			      -min_score   => 80,
-                              -max_score   => 100, # identity for score
-			      -key         => 'domains',
-			      -link        => '#$id',
-			      -description => sub {
-                                my $feature = shift;
-                                return unless $feature->has_tag('description');
-                                my ($description) = $feature->each_tag_value('description');
-                                "$description";
-                               },
+		-glyph => 'graded_segments',
+		-label => 1,
+		-bgcolor => 'red',
+		-sort_order  => 'high_score',
+		-min_score   => 80,
+		-max_score   => 100, # identity for score
+		-key         => 'domains',
+		-link        => '#$id',
+		-description => sub {
+			my $feature = shift;
+			return unless $feature->has_tag('description');
+			my ($description) = $feature->each_tag_value('description');
+			"$description";
+		},
+	);
 
-                             );
-
-	foreach my $each_contig (@$align_info)
-	{
+	foreach my $each_contig (@$align_info) {
 		my @mm = split(/\t/, $each_contig);
 		my $feature = Bio::Graphics::Feature->new(
-							-name	      => $mm[0],
-							-score        => $mm[5], # identify for score
-							-start        => $mm[11],
-							-end          => $mm[12],
-							-primary_id   => $mm[0],
-							);
-
+			-name	      => $mm[0],
+			-score        => $mm[5], # identify for score
+			-start        => $mm[11],
+			-end          => $mm[12],
+			-primary_id   => $mm[0],
+		);
 		$track->add_feature($feature);
-		
 	}
 	
 	my ($url,$map,$mapname) = $panel->image_and_map(
-						-root => $OUTPUT_DIR,
-						-url=> "$$hit_id",
-						);
+		-root => $OUTPUT_DIR,
+		-url=> "$$hit_id",
+	);
 						
 	print $out qq(<img src="$url" border=0 usemap="#$mapname">),"\n";
 	print $out $map;
@@ -1271,14 +1325,7 @@ sub output_aligments
 	
 	# table title
 	my $out_table = qq'
-<style type="text/css">
-td,th
-{
-  font-family : Arial, Sans-Serif, Helv, Helvetica, Verdana;
-  font-size: 12px;
-}
-</style>
-<table border=1 cellpadding=3 style=border-collapse:collapse bordercolor=#gray width=680 align=center>
+<table class="table table-bordered table-condensed" style="font-size:12px; width: 700px;" align=center>
   <tr bgcolor=#e2e8ec>
     <th>Order</th>
     <th>Query ID</th>
