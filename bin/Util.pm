@@ -1071,7 +1071,7 @@ sub plot_result
 
 	# parse blast result to get contig_length and match length
 	# push contig and match info to hash
-	# key 1: contig
+	# key 1: contig # reference virus ID
 	# 	key 2: length
 	# 		   match
 	# 		   iden
@@ -1081,9 +1081,9 @@ sub plot_result
 	foreach my $bs (@bs) {
 		my @line = split(/\t/, $bs);
 		if ($line[13] =~ m/(\d+)\/(\d+)\(\d+%\)/) {
-			$contig_match{$line[0]}{'match'}  = $1;
-			$contig_match{$line[0]}{'length'} = $2;
-			$contig_match{$line[0]}{'iden'}   = $1/$2;
+			$contig_match{$line[0]."#".$line[2]}{'match'}  = $1;
+			$contig_match{$line[0]."#".$line[2]}{'length'} = $2;
+			$contig_match{$line[0]."#".$line[2]}{'iden'}   = $1/$2;
 		}
 		else {
 			die "[ERR]CONTIG $bs\n";
@@ -1130,9 +1130,10 @@ sub plot_result
 		my ($match, $len_c, $max_iden, $min_iden) = (0, 0, 0, 100);
 		my @c = split(/,/, $ta[4]);
 		foreach my $cid (@c) {
-			$match += $contig_match{$cid}{'match'};
-			$len_c += $contig_match{$cid}{'length'};
-			my $iden_c = $contig_match{$cid}{'iden'};
+			my $key = $cid."#".$ref;
+			$match += $contig_match{$key}{'match'};
+			$len_c += $contig_match{$key}{'length'};
+			my $iden_c = $contig_match{$key}{'iden'};
 			$max_iden = $iden_c if $iden_c > $max_iden;
 			$min_iden = $iden_c if $iden_c < $min_iden;
 		}
@@ -1167,8 +1168,7 @@ sub plot_result
   </tr>';	
 	}
 
-	$out_table = qq'
-<!-- Top 6 lines shoud be removed when load html into virome database -->
+	$out_table = qq'<!-- Top 6 lines shoud be removed when load html into virome database -->
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>

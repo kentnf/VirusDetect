@@ -92,7 +92,7 @@ my $cpu_num = 8;
 # paras for blast && identification 
 my $word_size = 11;
 my $exp_value = 1e-5;				#
-my $percent_identity = 25;			# tblastx “‘µ∞∞◊÷ –Ú¡–¿¥±»∂‘ ±hspµƒ◊Ó–°Õ¨“ª–‘
+my $percent_identity = 25;			# percent identity for tblastx
 my $mis_penalty_b = -1;				# megablast mismatch penlty, minus integer
 my $gap_cost_b = 2;				# megablast gap open cost, plus integer
 my $gap_extension_b = 1;			# megablast gap extension cost, plus integer
@@ -107,8 +107,8 @@ my $depth_cutoff = 5;				# depth cutoff for final result
 my $novel_len_cutoff = 100;
 
 # disabled parameters or used as fixed value
-my $coverage = 0.3;  				# √øÃı≤Œøº–Ú¡–»Áπ˚±ªreads∏≤∏«µƒ≤ø∑÷’º»´≥§±»¿˝µƒ„–÷µ
-my $objective_type='maxLen';			# objective type for Velvet assembler: n50°¢maxLen, avgLen
+my $coverage = 0.3;  				# 
+my $objective_type='maxLen';			# objective type for Velvet assembler:
 my $diff_ratio= 0.25;
 my $diff_contig_cover = 0.5;
 my $diff_contig_length= 100; 

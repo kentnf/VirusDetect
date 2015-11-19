@@ -733,7 +733,7 @@ sub remove_redundancy
 	$after_contig_num  = $before_contig_num - 1;	# this is seq number after remove redundancy	
 
 	if ($before_contig_num == 0) {
-		Util::print_user_submessage("None of uniq contig was generated");
+		Util::print_user_submessage("None of unique contig is generated");
 		return 1;
 	}
 	
@@ -760,11 +760,11 @@ sub remove_redundancy
 	}
 
 	if ($after_contig_num > 1) {
-		Util::print_user_submessage("$after_contig_num of uniq contigs were generated");
+		Util::print_user_submessage("$after_contig_num unique contigs are generated");
 	} elsif ($after_contig_num == 1) {
-		Util::print_user_submessage("$after_contig_num of uniq contig was generated");
+		Util::print_user_submessage("$after_contig_num unique contig is generated");
 	} else {
-		Util::print_user_submessage("None of uniq contig was generated");
+		Util::print_user_submessage("None of unique contig is generated");
 	}
 
 	# finish remove redundancy, next for base correction

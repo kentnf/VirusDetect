@@ -263,8 +263,14 @@ main: {
 		} else {
 			unlink "$sample_dir/$sample_base.known.xls" if -e "$sample_dir/$sample_base.known.xls";
 		}
-	
-		Util::print_user_submessage("$known_num of known virus has been identified");
+
+		if ($known_num > 1) {
+			Util::print_user_submessage("$known_num known viruses have been identified");
+		} elsif ($known_num == 1) {
+			Util::print_user_submessage("$known_num known virus has been identified");
+		} else {
+			Util::print_user_submessage("None of known virus has been identified");
+		}
 
 		# assign known type to contigs 
 		#    known: contigs in final result known.xls
@@ -367,7 +373,14 @@ main: {
 		} else {
 			unlink "$sample_dir/$sample_base.novel.xls" if -e "$sample_dir/$sample_base.novel.xls";
 		}
-		Util::print_user_submessage("$novel_num of novel virus has been identified");
+
+		if ($novel_num > 1) {
+			Util::print_user_submessage("$novel_num novel viruses have been identified");
+		} elsif ($novel_num == 1) {
+			Util::print_user_submessage("$novel_num novel virus has been identified");
+		} else {
+			Util::print_user_submessage("None of novel virus has been identified");
+		}
 
         # assign novel type to contigs 
         #    novel: contigs in final result known.xls
