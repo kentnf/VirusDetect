@@ -252,24 +252,24 @@ main: {
 
 		my ($known_contig_table, $known_contig_blast_table, $known_reference) =  combine_table1($known_identified, $known_blast_table, \%contig_info, \%virus_info, \%reference_info);
 		my $known_contig_blast_sam = Util::blast_table_to_sam($known_contig_blast_table);
-		Util::save_file($known_contig_table, "$sample_dir/$sample_base.known.xls");
-		Util::save_file($known_reference, "$sample_dir/known.reference.fa");
-		Util::save_file($known_contig_blast_sam, "$sample_dir/$sample_base.known.sam");
+		Util::save_file($known_contig_table, "$sample_dir/$sample_base.blastn.xls");
+		Util::save_file($known_reference, "$sample_dir/blastn.reference.fa");
+		Util::save_file($known_contig_blast_sam, "$sample_dir/$sample_base.blastn.sam");
 	
 		my $known_num = 0; ($known_num, $known_identified) = arrange_col2($known_identified, \%virus_info);
 
 		if ( length($known_identified) > 1 ) { 
-			Util::plot_result($known_identified, $known_contig_blast_table, $sample_dir, 'known'); 
+			Util::plot_result($known_identified, $known_contig_blast_table, $sample_dir, 'blastn'); 
 		} else {
-			unlink "$sample_dir/$sample_base.known.xls" if -e "$sample_dir/$sample_base.known.xls";
+			unlink "$sample_dir/$sample_base.blastn.xls" if -e "$sample_dir/$sample_base.blastn.xls";
 		}
 
 		if ($known_num > 1) {
-			Util::print_user_submessage("$known_num known viruses have been identified");
+			Util::print_user_submessage("$known_num viruses have been identified by nucleotide similarity (BlastN)");
 		} elsif ($known_num == 1) {
-			Util::print_user_submessage("$known_num known virus has been identified");
+			Util::print_user_submessage("$known_num virus has been identified by nucleotide similarity (BlastN) ");
 		} else {
-			Util::print_user_submessage("None of known virus has been identified");
+			Util::print_user_submessage("None of known virus has been identified by nucleotide similarity (BlastN)");
 		}
 
 		# assign known type to contigs 
@@ -346,7 +346,7 @@ main: {
 		# exit if no blast table was generated
 		unless (length $blast_novel_table > 1 )
 		{
-			Util::process_cmd("touch $sample_dir/no_novel_virus_detected", $debug);
+			Util::process_cmd("touch $sample_dir/no_virus_detected_by_blastx", $debug);
 			Util::process_cmd("cp $novel_contig $sample_dir/undetermined.contigs.fa", $debug);
 			exit;
 		}
@@ -362,24 +362,24 @@ main: {
 		# combine
 		my ($novel_contig_table, $novel_contig_blast_table, $novel_reference) =  combine_table1($novel_identified, $blast_novel_table, \%contig_info, \%virus_info, \%reference_prot_info);
 		my $novel_contig_blast_sam = Util::blast_table_to_sam($novel_contig_blast_table);
-		Util::save_file($novel_contig_table, "$sample_dir/$sample_base.novel.xls");
-		Util::save_file($novel_reference, "$sample_dir/novel.reference.fa");
-       	Util::save_file($novel_contig_blast_sam, "$sample_dir/$sample_base.novel.sam");
+		Util::save_file($novel_contig_table, "$sample_dir/$sample_base.blastx.xls");
+		Util::save_file($novel_reference, "$sample_dir/blastx.reference.fa");
+       	Util::save_file($novel_contig_blast_sam, "$sample_dir/$sample_base.blastx.sam");
 
 		my $novel_num = 0; ($novel_num, $novel_identified) = arrange_col2($novel_identified, \%virus_info);
 
 		if ( length($novel_identified) > 1 ) { 
-			Util::plot_result($novel_identified, $novel_contig_blast_table, $sample_dir, 'novel'); 
+			Util::plot_result($novel_identified, $novel_contig_blast_table, $sample_dir, 'blastx'); 
 		} else {
-			unlink "$sample_dir/$sample_base.novel.xls" if -e "$sample_dir/$sample_base.novel.xls";
+			unlink "$sample_dir/$sample_base.blastx.xls" if -e "$sample_dir/$sample_base.blastx.xls";
 		}
 
 		if ($novel_num > 1) {
-			Util::print_user_submessage("$novel_num novel viruses have been identified");
+			Util::print_user_submessage("$novel_num viruses have been identified by translated protein similarity (BlastX)");
 		} elsif ($novel_num == 1) {
-			Util::print_user_submessage("$novel_num novel virus has been identified");
+			Util::print_user_submessage("$novel_num virus has been identified by translated protein similarity (BlastX)");
 		} else {
-			Util::print_user_submessage("None of novel virus has been identified");
+			Util::print_user_submessage("None of virus has been identified by translated protein similarity (BlastX)");
 		}
 
         # assign novel type to contigs 
@@ -420,8 +420,8 @@ main: {
 			$undet_contig_content.=">$cid\n$contig_info{$cid}{'seq'}\n";
 		}
 	}
-	Util::save_file($known_contig_content, "$sample_dir/contig_sequences.known.fa") if length($known_contig_content) > 1;
-	Util::save_file($novel_contig_content, "$sample_dir/contig_sequences.novel.fa") if length($novel_contig_content) > 1;
+	Util::save_file($known_contig_content, "$sample_dir/contig_sequences.blastn.fa") if length($known_contig_content) > 1;
+	Util::save_file($novel_contig_content, "$sample_dir/contig_sequences.blastx.fa") if length($novel_contig_content) > 1;
 	Util::save_file($undet_contig_content, "$sample_dir/contig_sequences.undetermined.fa") if length($undet_contig_content) > 1;
 }
 
