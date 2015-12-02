@@ -249,11 +249,11 @@ main: {
 		}
 
 		if ($known_num > 1) {
-			Util::print_user_submessage("$known_num viruses have been identified by nucleotide similarity (BlastN)");
+			Util::print_user_submessage("$known_num viruses have been identified by nucleotide similarity (BLASTN)");
 		} elsif ($known_num == 1) {
-			Util::print_user_submessage("$known_num virus has been identified by nucleotide similarity (BlastN) ");
+			Util::print_user_submessage("$known_num virus has been identified by nucleotide similarity (BLASTN) ");
 		} else {
-			Util::print_user_submessage("None of known virus has been identified by nucleotide similarity (BlastN)");
+			Util::print_user_submessage("None of known virus has been identified by nucleotide similarity (BLASTN)");
 		}
 
 		# assign known type to contigs 
@@ -359,11 +359,11 @@ main: {
 		}
 
 		if ($novel_num > 1) {
-			Util::print_user_submessage("$novel_num viruses have been identified by translated protein similarity (BlastX)");
+			Util::print_user_submessage("$novel_num viruses have been identified by translated protein similarity (BLASTX)");
 		} elsif ($novel_num == 1) {
-			Util::print_user_submessage("$novel_num virus has been identified by translated protein similarity (BlastX)");
+			Util::print_user_submessage("$novel_num virus has been identified by translated protein similarity (BLASTX)");
 		} else {
-			Util::print_user_submessage("None of virus has been identified by translated protein similarity (BlastX)");
+			Util::print_user_submessage("None of virus has been identified by translated protein similarity (BLASTX)");
 		}
 
         # assign novel type to contigs 
