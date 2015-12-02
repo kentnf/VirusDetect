@@ -1,21 +1,5 @@
 #!/usr/bin/env perl
 
-=head
-
- update information
- 
- 1. input fasta/fastq file, do not need file-type, contig-type, file-list parameters. 
-    add parameters for identify novel virus?
-   
- 2. delete the reference parameters, because it should have sequence information, do not need changed 
-    but user can input their own reference information ? 
-    or generated reference form the sequence ?
-
- 3. add debug and force [debug] parameters, 
-    force, it will using knwon contig to perform novel identification 
-
-=cut
-
 use strict;
 use warnings;
 use Getopt::Long;
