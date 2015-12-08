@@ -114,11 +114,15 @@ my $diff_contig_cover = 0.5;
 my $diff_contig_length= 100; 
 my $debug;
 
+# add another parameters for seq_type, it could be automatically get by scan input reads
+my $seq_type = 'sRNA';	# default is sRNA, another choice is mRNA
+
 # get input paras #
 GetOptions(
 	'r|reference=s'		=> \$reference,
 	'h|host_reference=s'=> \$host_reference,
 	't|thread_num=i'	=> \$thread_num,
+	's|seq_type=s'		=> \$seq_type, 
 	'd|debug'			=> \$debug,
 
 	'max_dist=i' 		=> \$max_dist,
@@ -237,12 +241,24 @@ foreach my $sample (@ARGV)
 		align::align_to_reference($align_program, $sample, $host_reference, "$sample.sam", $align_parameters, 1, $TEMP_DIR, $debug);
 		align::generate_unmapped_reads("$sample.sam", "$sample.unmapped");
 		Util::print_user_message("De novo assembly");
-		align::velvet_optimiser_combine("$sample.unmapped", "$sample.assembled", 9, 19, 5, 25, $objective_type, $BIN_DIR, $TEMP_DIR, $debug) if -s "$sample.unmapped";
+
+		if ($seq_type eq 'mRNA') {
+			align::velvet_optimiser_combine("$sample.unmapped", "$sample.assembled", 31, 31, 25, 25, $objective_type, $BIN_DIR, $TEMP_DIR, $debug) if -s "$sample.unmapped";
+		}
+		else {
+			align::velvet_optimiser_combine("$sample.unmapped", "$sample.assembled", 9, 19, 5, 25, $objective_type, $BIN_DIR, $TEMP_DIR, $debug) if -s "$sample.unmapped";
+		}
 	}	
 	else
 	{
 		Util::print_user_message("De novo assembly");
-		align::velvet_optimiser_combine($sample, "$sample.assembled", 9, 19, 5, 25, $objective_type, $BIN_DIR, $TEMP_DIR, $debug);
+
+		if ($seq_type eq 'mRNA') {
+			align::velvet_optimiser_combine("$sample.unmapped", "$sample.assembled", 31, 31, 25, 25, $objective_type, $BIN_DIR, $TEMP_DIR, $debug) if -s "$sample.unmapped";
+		} 
+		else {
+			align::velvet_optimiser_combine($sample, "$sample.assembled", 9, 19, 5, 25, $objective_type, $BIN_DIR, $TEMP_DIR, $debug);
+		}
 	}
 
 	# part B3 remove redundancy contigs after denovo assembly
