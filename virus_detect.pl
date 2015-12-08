@@ -264,7 +264,7 @@ foreach my $sample (@ARGV)
 	# part B3 remove redundancy contigs after denovo assembly
 	if (-s "$sample.assembled") {
 		# subtraction host-derived contigs 	
-		if ($host_reference) {
+		if ($host_reference && $seq_type eq 'mRNA') {
 		    my $blast_program = $BIN_DIR."/megablast";
  			my $blast_output  = "$sample.assembled.blast";
 			my $blast_param   = "-p 90 -F $filter_query -a $cpu_num -W $word_size -q $mis_penalty -G $gap_cost -E $gap_extension -b $hits_return -e $exp_value";
