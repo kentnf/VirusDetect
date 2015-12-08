@@ -264,13 +264,21 @@ foreach my $sample (@ARGV)
 	# part B3 remove redundancy contigs after denovo assembly
 	if (-s "$sample.assembled") {
 		# subtraction host-derived contigs 	
-		if ($host_reference && $seq_type eq 'mRNA') {
+		if ($host_reference) {
 		    my $blast_program = $BIN_DIR."/megablast";
  			my $blast_output  = "$sample.assembled.blast";
 			my $blast_param   = "-p 90 -F $filter_query -a $cpu_num -W $word_size -q $mis_penalty -G $gap_cost -E $gap_extension -b $hits_return -e $exp_value";
     		Util::process_cmd("$blast_program -i $sample.assembled -d $host_reference -o $blast_output $blast_param", $debug) unless -s $blast_output;
 			my $blast_table  = Util::parse_blast_to_table($blast_output, $blast_program);
-			Util::host_subtraction("$sample.assembled", $blast_table, 90, 70);
+			my %subtract = Util::host_subtraction("$sample.assembled", $blast_table, 90, 70);
+			my $sub_num = scalar(keys(%subtract));
+			if ($sub_num > 1) {
+				Util::print_user_submessage("$sub_num host-derived contigs were removed");
+			} elsif ($sub_num == 1) {
+				Util::print_user_submessage("$sub_num host-derived contig was removed");
+			} else {
+				Util::print_user_submessage("None host-derived contig was removed");
+			}
 		}
 		align::remove_redundancy("$sample.assembled", $sample, $rr_blast_parameters, $max_end_clip, $min_overlap, $min_identity, 'ASSEMBLED',$BIN_DIR, $TEMP_DIR, $debug) if -s "$sample.assembled";
 	} else {

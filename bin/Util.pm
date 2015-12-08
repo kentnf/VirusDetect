@@ -178,6 +178,8 @@ sub host_subtraction
 	my $fh = IO::File->new(">".$contigs) || die $!;
 	print $fh $host_rm_seq;
 	$fh->close;
+
+	return %host;
 }
 
 =head2
