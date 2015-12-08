@@ -174,12 +174,12 @@ foreach my $sample (@ARGV)
 	my $sample_base = basename($sample);
 
 	# set path and folder folder
-	my $WORKING_DIR   = cwd();					# set current folder as working folder
+	my $WORKING_DIR   = cwd();									# set current folder as working folder
 	my $DATABASE_DIR  = ${FindBin::RealBin}."/databases";		# set database folder
-	my $BIN_DIR       = ${FindBin::RealBin}."/bin";			# set script folder 
+	my $BIN_DIR       = ${FindBin::RealBin}."/bin";				# set script folder 
 	my $TEMP_DIR      = $WORKING_DIR."/".$sample_base."_temp";	# set temp folder
-	$reference	  = $DATABASE_DIR."/".$reference;		# set reference
-	my $seq_info	  = $DATABASE_DIR."/vrl_genbank.info.gz";		# set vrl info
+	$reference	  	  = $DATABASE_DIR."/".$reference;			# set reference
+	my $seq_info	  = $DATABASE_DIR."/vrl_genbank.info.gz";	# set vrl info
 	print "Working: $WORKING_DIR\nDatabase: $DATABASE_DIR\nBin: $BIN_DIR\nTemp: $TEMP_DIR\n" if $debug;
 
 	# create temp folder and create link for sample
@@ -245,7 +245,17 @@ foreach my $sample (@ARGV)
 		align::velvet_optimiser_combine($sample, "$sample.assembled", 9, 19, 5, 25, $objective_type, $BIN_DIR, $TEMP_DIR, $debug);
 	}
 
+	# part B3 remove redundancy contigs after denovo assembly
 	if (-s "$sample.assembled") {
+		# subtraction host-derived contigs 	
+		if ($host_reference) {
+		    my $blast_program = $BIN_DIR."/megablast";
+ 			my $blast_output  = "$sample.assembled.blast";
+			my $blast_param   = "-p 90 -F $filter_query -a $cpu_num -W $word_size -q $mis_penalty -G $gap_cost -E $gap_extension -b $hits_return -e $exp_value";
+    		Util::process_cmd("$blast_program -i $sample.assembled -d $host_reference -o $blast_output $blast_param", $debug) unless -s $blast_output;
+			my $blast_table  = Util::parse_blast_to_table($blast_output, $blast_program);
+			Util::host_subtraction("$sample.assembled", $blast_table, 90, 70);
+		}
 		align::remove_redundancy("$sample.assembled", $sample, $rr_blast_parameters, $max_end_clip, $min_overlap, $min_identity, 'ASSEMBLED',$BIN_DIR, $TEMP_DIR, $debug) if -s "$sample.assembled";
 	} else {
 		Util::print_user_submessage("None of uniq contig was generated");

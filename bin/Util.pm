@@ -100,6 +100,87 @@ sub save_file {
 }
 
 =head2
+ host_subtraction -- subtract host derived contigs
+=cut
+sub host_subtraction
+{
+	my ($contigs, $input_blast_table, $identity, $min_cov) = @_;
+      
+    # put blast info to hash
+    # %blk ->
+    # key: query ID
+    # value: [Query start, Query End], [Query start, Query End] ....
+    # %query_length -> keu: query ID, value: query length
+    # %host -> key: contig ID, value: 1
+    my %blk;
+    my %query_len;
+    my %host;
+    
+	chomp($input_blast_table);
+	my @a = split(/\n/, $input_blast_table);
+	foreach my $line (@a)
+	{
+		# $query_name, $query_length, $hit_name, $hit_length, $hsp_length, $identity, $evalue, $score, $strand, $query_start, $query_end, $hit_start, $hit_end, $query_to_end, $hit_to_end, $identity2, $aligned_query, $aligned_hit, $aligned_string#
+		chomp($line); 
+		next if $line =~ m/^#/;
+		my @ta = split(/\t/, $line);
+
+		if ($ta[5]>=$identity) {   
+			push(@{$blk{$ta[0]}}, [@ta[9,10]]); # create blk hash for query ID and [query_start,query_end], query is contig
+			defined $query_len{$ta[0]} or $query_len{$ta[0]} = $ta[1];
+		}
+	}
+
+	foreach my $tk (sort keys %blk)
+	{   
+		my @o; # put non-overlap blocks to array @o for one query
+		for my $ar (sort { $a->[0]<=>$b->[0] || $a->[1]<=>$b->[1];} @{$blk{$tk}})
+		{   
+			if (scalar(@o) == 0)
+			{   
+				push(@o, [@$ar]);
+			} 
+			elsif ($o[-1][1] >= $ar->[0]-1) # combine overlapped block
+			{   
+				$o[-1][1] < $ar->[1] and $o[-1][1] = $ar->[1];
+			}
+			else
+			{   
+				push(@o, [@$ar]);
+			}
+		}
+
+		my $total_cov = 0; # compute total coverage according to non-overlap blocks for one query 
+		for my $ar ( @o )
+		{     
+			# print information for error checking
+			# #query_name query_len block_start block_end block_length
+			# print join("\t", $tk, $query_len{$tk}, $ar->[0], $ar->[1], $ar->[1]-$ar->[0]+1)."\n"; 
+			$total_cov += ($ar->[1]-$ar->[0]+1);
+		}
+        
+		my $ratio=int($total_cov/$query_len{$tk}*10000+0.5)/100;
+        if($ratio >= $min_cov) {   
+			defined $host{$tk} or $host{$tk} = 1;
+		}
+    }
+
+    # filter assembled contigs to subtract host 
+	my $host_rm_seq = '';
+	my $in = Bio::SeqIO->new(-format=>'fasta', -file=>$contigs);
+	while(my $inseq = $in->next_seq) {
+		my $id = $inseq->id;
+		next if defined $host{$id};
+		my $sq = $inseq->seq;
+		$host_rm_seq .= ">$id\n$sq\n";
+	}
+
+	my $fh = IO::File->new(">".$contigs) || die $!;
+	print $fh $host_rm_seq;
+	$fh->close;
+}
+
+=head2
  xa2multi -- convert xa tag to multiply hit
 =cut
 sub xa2multi
@@ -219,7 +300,7 @@ sub load_virus_info
 
  modified by kentnf
  20140715: 1. combine blast_parse_table22.pl and blast_parse_table24.pl
-	   2. make it to subroutine parse_blast_to_table
+		   2. make it to subroutine parse_blast_to_table
 =cut
 
 sub parse_blast_to_table 
@@ -433,11 +514,11 @@ sub filter_blast_table
 	my $output_blast_table = '';
 	        
 	my $last_query="";
-        my $last_hit="";
-        my $current_query;
-        my $current_hit;
-        my $high_identity;
-        my $current_identity;
+	my $last_hit="";
+	my $current_query;
+	my $current_hit;
+	my $high_identity;
+	my $current_identity;
 
 	chomp($input_blast_table);
 	my @a = split("\n", $input_blast_table);
@@ -447,39 +528,40 @@ sub filter_blast_table
 		my @cols = split(/\t/, $line);
 		# $query_name, $query_length, $hit_name, $hit_length, $hsp_length, $identity, $evalue, $score, $strand, $query_start, $query_end, $hit_start, $hit_end, $query_to_end, $hit_to_end, $identity2, $aligned_query, $aligned_hit, $aligned_string#
 
-                # $cols[4] : hsp_length
-                # $cols[1] : query_length
-                # $cols[3] : hit_length
-                # $cols[0] : query_id
-                # $cols[2] : hit_id
-                # $cols[5] : identity
+		# $cols[4] : hsp_length
+		# $cols[1] : query_length
+		# $cols[3] : hit_length
+		# $cols[0] : query_id
+		# $cols[2] : hit_id
+		# $cols[5] : identity
 
-                # the query or hit must meet the coverage requirement
-                if( $param*$cols[4]/$cols[1] >= $coverage || $param*$cols[4]/$cols[3] >= $coverage)
-                {
+		# the query or hit must meet the coverage requirement
+		if( $param*$cols[4]/$cols[1] >= $coverage || $param*$cols[4]/$cols[3] >= $coverage)
+		{
+			$current_query=$cols[0];
+			$current_hit=$cols[2];
+			$current_identity=$cols[5];
 
-                        $current_query=$cols[0];
-                        $current_hit=$cols[2];
-                        $current_identity=$cols[5];
-
-                        if( $current_query ne $last_query )
-			{    					# new query
-                                $high_identity=$cols[5];        # get the highest identity
+			if( $current_query ne $last_query )
+			{
+				# new query
+				$high_identity=$cols[5];        # get the highest identity
 				$output_blast_table.=$line."\n";# output the 1st hit for each query, it should have the lowest evalue
-                        }
+			}
 			else
 			{
-                                # if the query and hit are same, only keep the line with lowerest evalue, 1st one
-                                if (($current_hit ne $last_hit) && ($current_identity >= $high_identity-$identity_dropoff))
-                                {
+				# if the query and hit are same, only keep the line with lowerest evalue, 1st one
+				if (($current_hit ne $last_hit) && ($current_identity >= $high_identity-$identity_dropoff))
+				{
 					$output_blast_table.=$line."\n";
-                                }
-                        }
-                        $last_query=$cols[0];
-                        $last_hit=$cols[2];
-                }
-        }
-
+				}
+                        
+			}
+                        
+			$last_query=$cols[0];
+			$last_hit=$cols[2];
+		}
+	}
 	return $output_blast_table;
 }
 
