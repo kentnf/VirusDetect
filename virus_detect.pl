@@ -243,7 +243,7 @@ foreach my $sample (@ARGV)
 		Util::print_user_message("De novo assembly");
 
 		if ($seq_type eq 'mRNA') {
-			align::velvet_optimiser_combine("$sample.unmapped", "$sample.assembled", 31, 31, 25, 25, $objective_type, $BIN_DIR, $TEMP_DIR, $debug) if -s "$sample.unmapped";
+			align::velvet_optimiser_combine("$sample.unmapped", "$sample.assembled", 31, 31, 10, 10, $objective_type, $BIN_DIR, $TEMP_DIR, $debug) if -s "$sample.unmapped";
 		}
 		else {
 			align::velvet_optimiser_combine("$sample.unmapped", "$sample.assembled", 9, 19, 5, 25, $objective_type, $BIN_DIR, $TEMP_DIR, $debug) if -s "$sample.unmapped";
@@ -254,7 +254,7 @@ foreach my $sample (@ARGV)
 		Util::print_user_message("De novo assembly");
 
 		if ($seq_type eq 'mRNA') {
-			align::velvet_optimiser_combine("$sample.unmapped", "$sample.assembled", 31, 31, 25, 25, $objective_type, $BIN_DIR, $TEMP_DIR, $debug) if -s "$sample.unmapped";
+			align::velvet_optimiser_combine("$sample.unmapped", "$sample.assembled", 31, 31, 10, 10, $objective_type, $BIN_DIR, $TEMP_DIR, $debug) if -s "$sample.unmapped";
 		} 
 		else {
 			align::velvet_optimiser_combine($sample, "$sample.assembled", 9, 19, 5, 25, $objective_type, $BIN_DIR, $TEMP_DIR, $debug);

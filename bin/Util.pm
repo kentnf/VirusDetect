@@ -4,6 +4,7 @@ use strict;
 use warnings;
 use Bio::SeqIO; 
 use Bio::Graphics;
+use Bio::SeqFeature::Generic;
 
 sub line_num {
 	my $input = shift;
@@ -513,58 +514,173 @@ sub filter_blast_table
 	elsif ($blast_program =~ m/tblastx/ || $blast_program =~ m/blastx/) { $param = 3; }
 	else  { die "[ERR]blast program: $blast_program\n"; }
 
-	my $output_blast_table = '';
-	        
-	my $last_query="";
-	my $last_hit="";
-	my $current_query;
-	my $current_hit;
-	my $high_identity;
-	my $current_identity;
-
 	chomp($input_blast_table);
 	my @a = split("\n", $input_blast_table);
+
+	# define var for last query hit
+	my $last_query = '';
+	my $last_hit = '';
+	my $last_query_len;
+	my $last_hit_len;
+	my $current_query;
+	my $current_hit;
+	#my $high_identity;
+	#my $current_identity;
+
+	# defined output 
+	my $output_blast_table = '';
+
+	# define array to store the multiple hsp for one pairs of query and hit
+	# [$query_start, $query_end, $hit_start, $hit_end, $identity, $line], 
+	# [$query_start, $query_end, $hit_start, $hit_end, $identity, $line],
+	#  ....
+	my @hsp_region = ();
+	
+	# defined hash to store highest_iden for each contigs;
+	# key: query ID
+	# value: identity;
+	my %high_iden;
+
 	foreach my $line ( @a )
 	{
 		if ($line =~ m/^#/) { $output_blast_table.=$line."\n"; next; }
 		my @cols = split(/\t/, $line);
 		# $query_name, $query_length, $hit_name, $hit_length, $hsp_length, $identity, $evalue, $score, $strand, $query_start, $query_end, $hit_start, $hit_end, $query_to_end, $hit_to_end, $identity2, $aligned_query, $aligned_hit, $aligned_string#
 
-		# $cols[4] : hsp_length
-		# $cols[1] : query_length
-		# $cols[3] : hit_length
-		# $cols[0] : query_id
-		# $cols[2] : hit_id
-		# $cols[5] : identity
+		my $query_id	= $cols[0];
+		my $query_len	= $cols[1];
+		my $hit_id		= $cols[2];
+		my $hit_len		= $cols[3];
+		my $hsp_len		= $cols[4] * $param;
+		my $identity	= $cols[5];
+		my $query_start = $cols[9];
+		my $query_end	= $cols[10];
+		my $hit_start	= $cols[11];
+		my $hit_end		= $cols[12];
 
-		# the query or hit must meet the coverage requirement
-		if( $param*$cols[4]/$cols[1] >= $coverage || $param*$cols[4]/$cols[3] >= $coverage)
+		$current_query = $query_id;
+		$current_hit = $hit_id;
+
+		if ($current_query eq $last_query) 
 		{
-			$current_query=$cols[0];
-			$current_hit=$cols[2];
-			$current_identity=$cols[5];
-
-			if( $current_query ne $last_query )
+			if ($current_hit eq $last_hit) {
+				# current and hit are same as previous, pub the his position to array
+				push(@hsp_region, [$query_start, $query_end, $hit_start, $hit_end, $identity, $line]);
+			} 
+			else 
 			{
-				# new query
-				$high_identity=$cols[5];        # get the highest identity
-				$output_blast_table.=$line."\n";# output the 1st hit for each query, it should have the lowest evalue
-			}
-			else
-			{
-				# if the query and hit are same, only keep the line with lowerest evalue, 1st one
-				if (($current_hit ne $last_hit) && ($current_identity >= $high_identity-$identity_dropoff))
-				{
-					$output_blast_table.=$line."\n";
+				# same contig hit to different vrl
+				my ($m_cov, $m_iden, $m_align) = get_iden_cov(\@hsp_region, $last_query_len, $last_hit_len);
+				if ($m_cov >= $coverage) {
+					$high_iden{$last_query} = $m_iden unless defined $high_iden{$last_query};
+					if ($m_iden >= $high_iden{$last_query} - $identity_dropoff) {
+						$output_blast_table.= $m_align;
+					}
 				}
-                        
+
+				# start new for next
+				@hsp_region = ();
+				push(@hsp_region, [$query_start, $query_end, $hit_start, $hit_end, $identity, $line]);
 			}
-                        
-			$last_query=$cols[0];
-			$last_hit=$cols[2];
+		} 
+		else 
+		{
+			# process previous query contigs
+			if (@hsp_region > 0) { # skip 1 line of blast
+				my ($m_cov, $m_iden, $m_align) = get_iden_cov(\@hsp_region, $last_query_len, $last_hit_len);
+				if ($m_cov >= $coverage) {
+					# define the highest identity if the coverage meet requirement
+					$high_iden{$last_query} = $m_iden unless defined $high_iden{$last_query};
+					if ($m_iden >= $high_iden{$last_query} - $identity_dropoff) {
+   		             	$output_blast_table.= $m_align;
+					}
+				}
+			}
+
+			# start new for next
+			@hsp_region = (); 
+			push(@hsp_region, [$query_start, $query_end, $hit_start, $hit_end, $identity, $line]);
+
+		}
+
+		$last_query = $query_id;
+		$last_hit = $hit_id;
+		$last_query_len = $query_len;
+		$last_hit_len = $hit_len;
+	}
+
+	# parse the last record
+	my ($m_cov, $m_iden, $m_align) = get_iden_cov(\@hsp_region, $last_query_len, $last_hit_len);
+	if ($m_cov >= $coverage) {
+		# define the highest identity if the coverage meet requirement
+		$high_iden{$last_query} = $m_iden unless defined $high_iden{$last_query};
+		if ($m_iden >= $high_iden{$last_query} - $identity_dropoff) {
+			$output_blast_table.= $m_align;
 		}
 	}
+
 	return $output_blast_table;
+}
+
+# sidekick of filter blast table
+sub get_iden_cov
+{
+	my ($hsp_region, $query_len, $hit_len) = @_;
+
+	my $identity = 0;
+	my $coverage = 0;
+	my $alignment = '';
+
+	# compute query coverage
+	# for store query overlap
+	my @qo;	
+	foreach my $hr (sort { $a->[0]<=>$b->[0] || $a->[1]<=>$b->[1];} @{$hsp_region}) {
+		# $hr (hsp region) is array of:
+		# [$query_start, $query_end, $hit_start, $hit_end, $identiy, $alignment]
+		if (scalar(@qo) == 0) {   
+			push(@qo, [$hr->[0], $hr->[1]]);
+		}
+		elsif ($qo[-1][1] >= $hr->[0]-1) {  # combine overlapped block  
+			$qo[-1][1] < $hr->[1] and $qo[-1][1] = $hr->[1];
+		}
+		else {   
+			push(@qo, [$hr->[0], $hr->[1]]);
+		}
+
+		$identity = $hr->[4] if $identity == 0; # use the best hit for identity;
+		$alignment .= $hr->[5]."\n";
+	}
+
+	my $query_cov_len = 0;
+	foreach my $qr (@qo) {
+		 $query_cov_len += abs($qr->[1] - $qr->[0] + 1);
+	}
+	$coverage = $query_cov_len/$query_len if $query_cov_len/$query_len > $coverage;
+
+	# compute hit coverage
+	# for store hit coverage
+	my @ho;
+	foreach my $hr (sort { $a->[2]<=>$b->[2] || $a->[3]<=>$b->[3];} @{$hsp_region}) {
+		# $hr (hsp region) is array of:
+		# [$query_start, $query_end, $hit_start, $hit_end, $identiy, $alignment]
+		if (scalar(@ho) == 0) {
+			push(@ho, [$hr->[2], $hr->[3]]);
+		}
+		elsif ($ho[-1][1] >= $hr->[2]-1) {  # combine overlapped block
+			$ho[-1][1] < $hr->[3] and $ho[-1][1] = $hr->[3];
+		}
+		else {
+			push(@ho, [$hr->[2], $hr->[3]]);
+		}
+	}
+
+	my $hit_cov_len = 0;
+	foreach my $hr (@ho) {
+		$hit_cov_len += abs($hr->[1] - $hr->[0] + 1);
+	}
+	$coverage = $hit_cov_len/$hit_len if $hit_cov_len/$hit_len > $coverage;
+
+	return ($coverage, $identity, $alignment);
 }
 
 =head2
@@ -660,17 +776,14 @@ sub find_known_contig
 }
 
 =head2
-
- filter_blast_table_by_hit
-
- hit_cov : 
+ get_hit_coverage: compute coverge of hit (vrl reference) according to blast table
  usage: hit_cov(input, output1, output2, identify, query_cov, ???param???);
  $sample.known.table", "$sample.known.cov", "$sample.known.block" 60, 0.5, 1
 
  # input is blast table informat : 
  # query_name \t query_length \t hit_name \t hit_length \t hsp_length \t identity \t evalue \t score \t 
  # strand \t query_start \t query_end \t hit_start \t hit_end ... \n
- # index 2¡¢3¡¢4¡¢5¡¢11¡¢12 are required
+ # index 2 3 4 5 11 12 are required
  
  # for each pair of [query, hit] should meet the requirement of identity and query_cov
  # ratio = all query coverage / hit_length
@@ -679,30 +792,29 @@ sub find_known_contig
 =cut
 sub get_hit_coverage
 {
-        my ($input_blast_table, $cutoff_identity, $query_cov, $param) = @_;
+	my ($input_blast_table, $cutoff_identity, $query_cov, $param) = @_;
 
-        # put hit info to hash hash
-        # hit is virus reference 
-        # query is assembled contigs
-        #
-        # %bkl
-        # key: hit_name, 
-        # value: arrays of block and query
-        #        for each element in array is another array include three element [hit_start, hit_end, hash_of_query]
-        # 
-        #       [hit_start, hit_end, hash_of_query], 
-        #       [hit_start, hit_end, hash_of_query], 
-        #       ....
-        #
-        #        % hash_of_query
-        #        key: queryID
-        #        value: 1
-        #
-        # %hit_len
-        # key: hit_name
-        # value: hit_length
-        my %blk;
-        my %hit_len;
+	# put hit info to hash hash
+	# hit is virus reference 
+	# query is assembled contigs
+	#
+	# %bkl
+	# key: hit_name, 
+	# value: arrays of block and query
+	#        for each element in array is another array include three element [hit_start, hit_end, hash_of_query]
+	#       [hit_start, hit_end, hash_of_query], 
+	#       [hit_start, hit_end, hash_of_query], 
+	#       ....
+	#
+	#        % hash_of_query
+	#        key: queryID
+	#        value: 1
+	#
+	# %hit_len
+	# key: hit_name
+	# value: hit_length
+	my %blk;
+	my %hit_len;
 	
 	chomp($input_blast_table);
 	my @a = split("\n", $input_blast_table);
@@ -715,17 +827,16 @@ sub get_hit_coverage
 		my ($query_name, $query_length, $hit_name, $hit_length, $hsp_length, $identity, $evalue,
 		$score, $strand, $query_start, $query_end, $hit_start, $hit_end) = (@ta[0..12]);
 
-		# query covered = param * hsp length / query length
-		# if ($hsp_length < 0 || $query_length < 0) { print $line."\n";  die; }
-
-		my $query_covered= $param * $hsp_length / $query_length;
-		if ( $identity >= $cutoff_identity && $query_covered >= $query_cov)
-		{
+		# remove the identity and query check, because the blast table has been filtered
+		#   using query identity, and (query | hit) coverage
+		#my $query_covered= $param * $hsp_length / $query_length;
+		#if ( $identity >= $cutoff_identity && $query_covered >= $query_cov)
+		#{
 			# put hit and (hit_start,hit_end) to hash
 			push(@{$blk{$hit_name}}, [$hit_start, $hit_end]);
 			$blk{$ta[2]}[-1][2]{$ta[0]}=1;
 			defined $hit_len{$hit_name} or $hit_len{$hit_name} = $hit_length;
-		}
+		#}
 	}
 
 	my %known_hit_cov;
@@ -733,59 +844,60 @@ sub get_hit_coverage
 	my $known_block	= "#hit_name\tblock_len\tblock_start\tblock_end\tcovered_len\tquery_names\n";
 
 	foreach my $tk (sort keys %blk) # sort by hit name 
-        {
-                # structure of array '@o' and $ar
-                # [array]               , [array]                 ... [array]
-                # [start, end, %contigs], [start, end, %contigs], ... [start, end, %contigs]
+	{
+		# structure of array '@o' and $ar
+		# [array]               , [array]                 ... [array]
+		# [start, end, %contigs], [start, end, %contigs], ... [start, end, %contigs]
 
-                my @o; # array for hit of non-overlap blocks
+		my @o; # array for hit of non-overlap blocks
 
-                # sort by hit start, hit end, and query name
-                foreach my $ar (sort {$a->[0]<=>$b->[0] || $a->[1]<=>$b->[1] || $a->[2] cmp $b->[2];} @{$blk{$tk}})
-                {
-                        #if ($tk eq 'D10663')
-                        #{
-                        #       print "$$ar[0]\t$$ar[1]\n";
-                        #       my %sss = %{$$ar[2]};
-                        #       foreach my $k (sort keys %sss) {
-                        #               print $k."\n";
-                        #       }
-                        #       die;
-                        #}
+		# sort by hit start, hit end, and query name
+		foreach my $ar (sort {$a->[0]<=>$b->[0] || $a->[1]<=>$b->[1] || $a->[2] cmp $b->[2];} @{$blk{$tk}})
+		{
+			# if ($tk eq 'D10663')
+			# {
+			#	print "$$ar[0]\t$$ar[1]\n";
+			#	my %sss = %{$$ar[2]};
+			#	foreach my $k (sort keys %sss) {
+			#		print $k."\n";
+			#	}
+			#	die;
+			# }
 
-                        if (scalar(@o) == 0) 
+			if (scalar(@o) == 0) 
 			{
-                                push(@o, [@$ar]);
-                        }
+				push(@o, [@$ar]);
+			}
 			elsif ($o[-1][1] >= $ar->[0]-1) 
 			{ # if the hit start < previous hit end, should combine two hits
-                                for my $qname (keys %{$ar->[2]}) 
+				for my $qname (keys %{$ar->[2]}) 
 				{
-                                        $o[-1][2]{$qname}=1;
-                                }
-                                $o[-1][1] < $ar->[1] and $o[-1][1] = $ar->[1];
-                        }
+					$o[-1][2]{$qname}=1;
+				}
+				$o[-1][1] < $ar->[1] and $o[-1][1] = $ar->[1];
+			}
 			else
 			{
-                                push(@o, [@$ar]);
-                        }
-                }
+				push(@o, [@$ar]);
+			}
+		}
 
-                my $total_cov = 0; # hit totoal coverage 
-                my %aa;
-                for my $ar (@o) {
-                        my @query_names = sort keys %{$ar->[2]};
-                        # output to file
-                        # hit_name \t hit_len \t hit_block_start \t hit_block_end \t hit_block_length \t query names
-                        $known_block.=join("\t", $tk, $hit_len{$tk}, $ar->[0], $ar->[1], $ar->[1]-$ar->[0]+1, join(",", @query_names))."\n";
+		my $total_cov = 0; # hit totoal coverage 
+		my %aa;
+		for my $ar (@o) 
+		{
+			my @query_names = sort keys %{$ar->[2]};
+	
+			# output to file
+			# hit_name \t hit_len \t hit_block_start \t hit_block_end \t hit_block_length \t query names
+			$known_block.=join("\t", $tk, $hit_len{$tk}, $ar->[0], $ar->[1], $ar->[1]-$ar->[0]+1, join(",", @query_names))."\n";
+			$total_cov += ($ar->[1]-$ar->[0]+1);            # get total length of all non-overlap block
+			@aa{@query_names} = (1) x scalar(@query_names); # put all the contigs into hash table
+		}
 
-                        $total_cov += ($ar->[1]-$ar->[0]+1);            # get total length of all non-overlap block
-                        @aa{@query_names} = (1) x scalar(@query_names); # put all the contigs into hash table
-                }
-
-                # output file: known.cov
-                # format:
-                # hit_id \t hit_length \t hit_converage_len \t hit_coverage_% \t contigs_name \t contigs_num
+		# output file: known.cov
+		# format:
+		# hit_id \t hit_length \t hit_converage_len \t hit_coverage_% \t contigs_name \t contigs_num
 
 		$known_hit_cov{$tk}{'length'} = $hit_len{$tk};
 		$known_hit_cov{$tk}{'cov'} = $total_cov;
@@ -794,7 +906,7 @@ sub get_hit_coverage
 
 		my $bbb =join("\t", $tk, $hit_len{$tk}, $total_cov, $total_cov/$hit_len{$tk}*1.0, join(",", sort keys %aa), scalar(keys %aa))."\n"; 
 		$known_hit_cov.=$bbb;
-        }
+	}
 
 	return ($known_hit_cov, $known_block);
 }
@@ -1380,15 +1492,78 @@ sub draw_img
 		},
 	);
 
-	foreach my $each_contig (@$align_info) {
-		my @mm = split(/\t/, $each_contig);
-		my $feature = Bio::Graphics::Feature->new(
-			-name	      => $mm[0],
-			-score        => $mm[5], # identify for score
-			-start        => $mm[11],
-			-end          => $mm[12],
-			-primary_id   => $mm[0],
+	# update for multiple HSP
+	# 1. add fist record to $last_query_id and hsp
+	my $first_hsp = shift @$align_info;
+	my @fmm = split(/\t/, $first_hsp);
+	my $last_query_id = $fmm[0];
+	my @hsp = ();
+	push(@hsp, [$fmm[11], $fmm[12], $fmm[5]]);
+
+	# 2. scan other hsp from 2nd
+	foreach my $each_hsp (@$align_info) 
+	{
+		my @mm = split(/\t/, $each_hsp);
+		my $query_id = $mm[0];
+		my $score = $mm[5];
+		my $start = $mm[11];
+		my $end   = $mm[12];
+
+		if ($query_id ne $last_query_id)
+		{
+			# add hit feature
+			my $feature = Bio::SeqFeature::Generic->new(
+				-seq_id => $last_query_id,
+				#-name	=> $last_query_id,
+				#-score	=> $mm[5], # identify for score
+				#-start	=> $mm[11],
+				#-end	=> $mm[12],
+				-primary_id	=> $last_query_id,
+			);
+
+			# add hsp
+			foreach my $sub (@hsp) {
+				my $subfeature = Bio::SeqFeature::Generic->new(
+					-start 	=> $sub->[0],
+					-end	=> $sub->[1], 
+					-score 	=> $sub->[2]
+				);
+				$feature->add_sub_SeqFeature($subfeature,'EXPAND');
+			}
+			$track->add_feature($feature);
+	
+			# clean and add hsp
+			@hsp = ();
+			push(@hsp, [$start, $end, $score]);
+			$last_query_id = $query_id;
+		} 
+		else 
+		{
+			push(@hsp, [$start, $end, $score]);
+		}
+	}
+
+	# 3. add last hsp
+	if (@hsp > 0 && $last_query_id) {
+		# add hit feature
+		my $feature = Bio::SeqFeature::Generic->new(
+			-seq_id => $last_query_id,
+			#-name   => $last_query_id,
+			#-score => $mm[5], # identify for score
+			#-start => $mm[11],
+			#-end   => $mm[12],
+			-primary_id => $last_query_id,
 		);
+            
+		# add hsp
+		foreach my $sub (@hsp) {
+			my $subfeature = Bio::SeqFeature::Generic->new(
+				-start  => $sub->[0], 
+				-end    => $sub->[1],
+				-score  => $sub->[2]
+			);
+			$feature->add_sub_SeqFeature($subfeature,'EXPAND');
+		}
 		$track->add_feature($feature);
 	}
 	
