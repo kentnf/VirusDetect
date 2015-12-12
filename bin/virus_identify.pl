@@ -580,8 +580,6 @@ sub correct_depth
 	my %known_depth;
 	my %known_depth_norm;
 
-	print $known_identified;
-
 	chomp($known_identified);
 	my @l = split(/\n/, $known_identified);
 	foreach my $l (@l)
