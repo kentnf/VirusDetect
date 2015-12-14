@@ -1523,14 +1523,15 @@ sub draw_img
 
 	# update for multiple HSP
 	# 1. add fist record to $last_query_id and hsp
-	my $first_hsp = shift @$align_info;
+	my @align_info = @$align_info;
+	my $first_hsp = shift @align_info;
 	my @fmm = split(/\t/, $first_hsp);
 	my $last_query_id = $fmm[0];
 	my @hsp = ();
 	push(@hsp, [$fmm[11], $fmm[12], $fmm[5]]);
 
 	# 2. scan other hsp from 2nd
-	foreach my $each_hsp (@$align_info) 
+	foreach my $each_hsp (@align_info) 
 	{
 		my @mm = split(/\t/, $each_hsp);
 		my $query_id = $mm[0];
