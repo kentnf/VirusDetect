@@ -29,7 +29,10 @@ my $usage = <<_EOUSAGE_;
 #  --max_extension	Maximum number of gap extensions [1]  
 #  --len_seed		Take the first INT subsequence as seed [15] 
 #  --dist_seed		Maximum edit distance in the seed [1]  
-# 
+#
+# HISAT-related options (align mRNA to host reference)
+#  --hisat_dist		Maximum edit distance for HISAT [2]
+#
 # Megablast-related options (remove redundancy within virus contigs):
 #  --strand_specific	Only for sequences assembled from strand-
 #                        specific RNA-seq [false]
@@ -68,47 +71,50 @@ _EOUSAGE_
 if (scalar(@ARGV) < 1 ) { print $usage; exit; }
 
 # basic options
-my $reference= "vrl_plant";			# virus sequence
-my $host_reference;       			# host reference
-my $thread_num = 8; 				# thread number
+my $reference= "vrl_plant";		# virus sequence
+my $host_reference;       		# host reference
+my $thread_num = 8; 			# thread number
 
 # paras for BWA
 my $max_dist = 1;  				# max edit distance
 my $max_open = 1;  				# max gap opening
-my $max_extension = 1; 				# max gap extension (gap length)
+my $max_extension = 1;			# max gap extension (gap length)
 my $len_seed = 15; 				# bwa seed length
 my $dist_seed = 1; 				# bwa seed max edit distance
 
+# paras for HISAT:
+my $hisat_ed = 2;				# max edit disantce
+
 # paras for megablast detection (remove redundancy )
-my $strand_specific;  				# switch for strand specific transcriptome data? 
-my $min_overlap = 30; 				# minimum overlap for hsp combine
-my $max_end_clip = 6; 				# max end clip for hsp combine
-my $min_identity = 97;				# mininum identity for remove redundancy contigs
-my $mis_penalty = -1;     			# megablast mismatch penlty, minus integer
-my $gap_cost = 2;         			# megablast gap open cost, plus integer
-my $gap_extension = 1;    			# megablast gap extension cost, plus integer
+my $strand_specific;  			# switch for strand specific transcriptome data? 
+my $min_overlap = 30; 			# minimum overlap for hsp combine
+my $max_end_clip = 6; 			# max end clip for hsp combine
+my $min_identity = 97;			# mininum identity for remove redundancy contigs
+my $mis_penalty = -1;     		# megablast mismatch penlty, minus integer
+my $gap_cost = 2;         		# megablast gap open cost, plus integer
+my $gap_extension = 1;    		# megablast gap extension cost, plus integer
 my $cpu_num = 8;
 
 # paras for blast && identification 
 my $word_size = 11;
-my $exp_value = 1e-5;				#
-my $percent_identity = 25;			# percent identity for tblastx
-my $mis_penalty_b = -1;				# megablast mismatch penlty, minus integer
+my $exp_value = 1e-5;			#
+my $percent_identity = 25;		# percent identity for tblastx
+my $mis_penalty_b = -1;			# megablast mismatch penlty, minus integer
 my $gap_cost_b = 2;				# megablast gap open cost, plus integer
-my $gap_extension_b = 1;			# megablast gap extension cost, plus integer
+my $gap_extension_b = 1;		# megablast gap extension cost, plus integer
 
-my $filter_query = "F";				# megablast switch for remove simple sequence
-my $hits_return = 500;				# megablast number of hit returns
+my $filter_query = "F";			# megablast switch for remove simple sequence
+my $hits_return = 500;			# megablast number of hit returns
 
 # paras for result filter
 my $hsp_cover = 0.75;
-my $coverage_cutoff = 0.1;			# coverage cutoff for final result
-my $depth_cutoff = 5;				# depth cutoff for final result
+my $coverage_cutoff = 0.1;		# coverage cutoff for final result
+my $depth_cutoff = 5;			# depth cutoff for final result
 my $novel_len_cutoff = 100;
 
 # disabled parameters or used as fixed value
-my $coverage = 0.3;  				# 
-my $objective_type='maxLen';			# objective type for Velvet assembler:
+my $coverage = 0.3;  			# 
+my $objective_type='maxLen';	# objective type for Velvet assembler:
 my $diff_ratio= 0.25;
 my $diff_contig_cover = 0.5;
 my $diff_contig_length= 100; 
@@ -130,7 +136,9 @@ GetOptions(
 	'max_extension=i' 	=> \$max_extension,
 	'len_seed=i' 		=> \$len_seed,
 	'dist_seed=i' 		=> \$dist_seed,			 
-		
+	
+	'hisat_dist=i'		=> \$hisat_ed,
+	
 	'strand_specific!' 	=> \$strand_specific,
 	'min_overlap=i' 	=> \$min_overlap,
 	'max_end_clip=i' 	=> \$max_end_clip,
@@ -174,6 +182,7 @@ foreach my $sample (@ARGV)
 {
 	die $usage unless -s $sample;
 	my $file_type = Util::detect_FileType($sample);
+	my $data_type = Util::detect_DataType($sample);
 	my $seq_num = Util::detect_seqNum($sample);
 	my $sample_base = basename($sample);
 
@@ -238,11 +247,20 @@ foreach my $sample (@ARGV)
 	if( $host_reference ){
 		my $host_reference_base = $host_reference; $host_reference_base =~ s/.*\///;
 		Util::print_user_message("Align reads to host ($host_reference_base) reference sequences");
-		align::align_to_reference($align_program, $sample, $host_reference, "$sample.sam", $align_parameters, 1, $TEMP_DIR, $debug);
-		align::generate_unmapped_reads("$sample.sam", "$sample.unmapped");
+
+		if ($data_type eq 'mRNA') {
+			my $hisat_file_type = ''; # fasta or fastq
+			$hisat_file_type = '-q' if $file_type eq 'fastq';
+			Util::process_cmd("hisat --time -p $thread_num --un $sample.unmapped --no-unal $hisat_file_type -k 1 --mp 1,1 --rdg 0,1 --rfg 0,1 --np 1 --score-min C,-$hisat_ed,0 --ignore-quals -x $host_reference -U $sample -S $sample.sam 1> $sample.hisat.report.txt 2>&1");
+		} else {
+			align::align_to_reference($align_program, $sample, $host_reference, "$sample.sam", $align_parameters, 1, $TEMP_DIR, $debug);
+			align::generate_unmapped_reads("$sample.sam", "$sample.unmapped");
+		}
+
 		Util::print_user_message("De novo assembly");
 
-		if ($seq_type eq 'mRNA') {
+
+		if ($data_type eq 'mRNA') {
 			align::velvet_optimiser_combine("$sample.unmapped", "$sample.assembled", 17, 31, 5, 25, $objective_type, $BIN_DIR, $TEMP_DIR, $debug) if -s "$sample.unmapped";
 		}
 		else {
@@ -253,7 +271,7 @@ foreach my $sample (@ARGV)
 	{
 		Util::print_user_message("De novo assembly");
 
-		if ($seq_type eq 'mRNA') {
+		if ($data_type eq 'mRNA') {
 			align::velvet_optimiser_combine("$sample.unmapped", "$sample.assembled", 17, 31, 5, 25, $objective_type, $BIN_DIR, $TEMP_DIR, $debug) if -s "$sample.unmapped";
 		} 
 		else {

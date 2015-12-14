@@ -47,6 +47,35 @@ sub detect_FileType {
 	return $file_type;
 }
 
+# determine the dataType (sRNA, mRNA) by sequence length
+sub detect_DataType {
+	my $file = shift;
+	die "[ERR]Undef $file\n" unless -s $file;
+	my $n = 0;
+	my $total = 0;
+	open(FH, $file) || die $!;
+	while(<FH>) {
+		my $file_type;
+		my $sid = $_;	chomp($sid); 
+		if  	($sid =~ m/^>/) { $file_type = 'fasta'; }
+		elsif   ($sid =~ m/^@/) { $file_type = 'fastq'; }
+		else    { die "[ERR], can not detect the file type for file: $file\n"; }
+		my $seq = <FH>;	chomp($seq);
+		$total += length($seq);
+		if ($file_type eq 'fastq') { <FH>; <FH>; }
+		$n++;
+		last if $n > 1000;
+	}
+
+	my $data_type = 'sRNA';
+	my $mean = $total / $n;
+	if ($mean >= 36) {
+		$data_type = 'mRNA';
+	}
+
+	return $data_type;
+}
+
 sub detect_seqNum {
 	my $file = shift;
 	die "[ERR]Undef $file\n" unless -s $file;
