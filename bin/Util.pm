@@ -575,7 +575,7 @@ sub filter_blast_table
 		if ($line =~ m/^#/) { $output_blast_table.=$line."\n"; next; }
 		my @cols = split(/\t/, $line);
 		# $query_name, $query_length, $hit_name, $hit_length, $hsp_length, $identity, $evalue, $score, $strand, $query_start, $query_end, $hit_start, $hit_end, $query_to_end, $hit_to_end, $identity2, $aligned_query, $aligned_hit, $aligned_string#
-
+		next if scalar @cols < 13;
 		my $query_id	= $cols[0];
 		my $query_len	= $cols[1];
 		my $hit_id		= $cols[2];
@@ -639,12 +639,14 @@ sub filter_blast_table
 	}
 
 	# parse the last record
-	my ($m_cov, $m_iden, $m_align) = get_iden_cov(\@hsp_region, $last_query_len, $last_hit_len);
-	if ($m_cov >= $coverage) {
-		# define the highest identity if the coverage meet requirement
-		$high_iden{$last_query} = $m_iden unless defined $high_iden{$last_query};
-		if ($m_iden >= $high_iden{$last_query} - $identity_dropoff) {
-			$output_blast_table.= $m_align;
+	if (scalar @hsp_region > 0) {
+		my ($m_cov, $m_iden, $m_align) = get_iden_cov(\@hsp_region, $last_query_len, $last_hit_len);
+		if ($m_cov >= $coverage) {
+			# define the highest identity if the coverage meet requirement
+			$high_iden{$last_query} = $m_iden unless defined $high_iden{$last_query};
+			if ($m_iden >= $high_iden{$last_query} - $identity_dropoff) {
+				$output_blast_table.= $m_align;
+			}
 		}
 	}
 
@@ -684,6 +686,18 @@ sub get_iden_cov
 	foreach my $qr (@qo) {
 		 $query_cov_len += abs($qr->[1] - $qr->[0] + 1);
 	}
+
+	unless (defined $query_len) {
+		print "DEBUG\n";
+		print $alignment."\n";
+		foreach my $hr (sort { $a->[0]<=>$b->[0] || $a->[1]<=>$b->[1];} @{$hsp_region}) {
+			print $hr->[5]."\n";
+		}
+		print $hit_len."\n";
+		print "DEBUG\n";
+		exit;
+	} 
+	
 	$coverage = $query_cov_len/$query_len if $query_cov_len/$query_len > $coverage;
 
 	# compute hit coverage
