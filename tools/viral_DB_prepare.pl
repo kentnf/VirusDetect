@@ -388,11 +388,18 @@ sub run_cmd
 sub vrl_patch
 {
 	# do not need any parameters, just path the result to update files
+	my ($options, $files) = @_;
+	my $usage = qq'
+USAGE: $0 -t path [options]
+	-v version( default +1 of current )
+	   if you input 211, the version should be updated to 211
+
+';
 
 	# load default version
-        my $version_file = $FindBin::RealBin."/default_version";
-        my $version = `head -n 1 $version_file`; chomp($version);
-        die "[ERR]version $version\n" if $version < 0;
+	my $version_file = $FindBin::RealBin."/default_version";
+	my $version = `head -n 1 $version_file`; chomp($version);
+	die "[ERR]version $version\n" if $version < 0;
 	my $ver_num = $version;
         $version = "v$version";		
 	die "[ERR]version mumber:$ver_num\n" if $ver_num < 0;	
@@ -418,6 +425,8 @@ sub vrl_patch
 
 	# set output file
 	$ver_num++;
+	$ver_num = $$options{'v'} if (defined $$options{'v'} && $$options{'v'} > $ver_num);
+
 	my $new_version = "v$ver_num";
 	my $patch_hname = "update_hname_table_$new_version.txt";
 	my $patch_genus = "update_genus_table_$new_version.txt";
@@ -486,8 +495,8 @@ sub vrl_patch
 		chomp;
 		next if $_ =~ m/^#/;
 		my @a = split(/\t/, $_);
-		next unless $a[2];
-		next if $a[2] eq 'NA-CAT';
+		next unless $a[3];
+		next if $a[3] eq 'NA-CAT';
 		$manual_cat.= $_."\n";	
 		$desc_patch_num++;
 	}
@@ -1221,6 +1230,10 @@ sub correct_org_taxon_division
 {
 	my $seq_id = shift;
 
+	# create blank add_taxid.txt file if there is no info
+	system("touch add_taxid.txt") unless -e 'add_taxid.txt';
+
+	# check the exist record for accession ID and taxon id, save to hash
 	my %sid_taxon;
 	open(FH, 'add_taxid.txt') || die $!;
 	while(<FH>) {
@@ -1231,24 +1244,25 @@ sub correct_org_taxon_division
 	}
 	close(FH);
 
+	# return the taxon id if the assession were searched previously
 	if (defined $sid_taxon{$seq_id}) {
 		return $sid_taxon{$seq_id};
 	}
 	
-	# if there is no record for temp file, will find the tax through GenBank
+	# if there is no record for accesion, find the taxon in GenBank automatically
 	my $taxon = 'NA';
 	my $gb = Bio::DB::GenBank->new();
 	my $seq = $gb->get_Seq_by_acc($seq_id); # Unique ID, *not always the LOCUS ID*
 	foreach my $feat_object ($seq->get_SeqFeatures)
 	{
-        	my $primary_tag = $feat_object->primary_tag;
-        	next unless $primary_tag eq "source";
+		my $primary_tag = $feat_object->primary_tag;
+		next unless $primary_tag eq "source";
 
-        	# get org taxon id
-        	foreach my $tag ($feat_object->get_all_tags) {
-                	foreach my $value ($feat_object->get_tag_values($tag)) {
-                        	if ($tag eq 'db_xref' && $value =~ m/taxon:(\d+)/) {
-      	                         	if ( $taxon eq 'NA' ) { 
+		# get org taxon id
+		foreach my $tag ($feat_object->get_all_tags) {
+			foreach my $value ($feat_object->get_tag_values($tag)) {
+				if ($tag eq 'db_xref' && $value =~ m/taxon:(\d+)/) {
+					if ( $taxon eq 'NA' ) { 
 						$taxon = $1; 
 
 						# update seq_id and taxon id
@@ -1263,15 +1277,13 @@ sub correct_org_taxon_division
 						return $taxon; 
 					} 
 					# else { die "[ERR]Repeat organism taxon id $seq_id\n"; }
-                        	}
-                	}
-        	}
+				}
+			}
+		}
 	}
-	return $taxon;
 
-	#my $seq = $gb->get_Seq_by_acc('J00522'); # Accession Number
-	#my $seq = $gb->get_Seq_by_version('J00522.1'); # Accession.version
-	#my $seq = $gb->get_Seq_by_gi('405830'); # GI Number
+	# return taxon with NA
+	return $taxon;
 }
 
 =head2

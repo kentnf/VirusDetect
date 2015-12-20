@@ -410,3 +410,30 @@ unidentified Polydesmidae	Polydesmidae
 unidentified Tabanidae	Tabanidae
 yellow-bibed lory (Lorius chlorocercus)	Lorius lory
 yellow-naped Amazon (Amazona auropalliata)	Amazona auropalliata
+# patch v211
+Bhendi	okra
+Bos_taurus	cow
+Botritys cinerea strain V448	Botrytis cinerea
+Botritys sp. strain V446	Botrytis cinerea
+Chilli	chili pepper
+Himalayan griffon vulture	birds
+Hy-line variety brown chicken	chicken
+Lingnania fujianensis	bamboo
+cockatoo	parrot
+fiddler Crab	Uca mjoebergi
+fiddler crab	Uca mjoebergi
+flowering cherry	sweet cherry
+grapevine; cultivar: Cannonao	Vitis vinifera
+groundnut	peanut
+hamster	Mongolian hamster
+hermit Crab	crustaceans
+hermit crab	crustaceans
+large pool of wild-caught Drosophila (mixed D. ananassae, D. melanogaster, D. malerkotliana, and Scaptodrosophila latifasciaeformis)	Drosophila
+marine snail	gastropods
+mixture of Drosophila melanogaster and D. simulans	Drosophila
+neotropical bat	bats
+raspberry plant	red raspberry
+sandfly	sandflies
+single unknown drosophilid	Drosophila
+single unknown fly	Drosophila
+unknown Araneae,Neoscona nautica	brown sailor spider

@@ -465,3 +465,11 @@ Brambyvirus	G4	Plants
 Dinovernavirus	G1	Invertebrates
 Tupavirus	G10	Vertebrates
 # patch v206
+# patch v211
+kunsagivirus	G10	Vertebrates
+mammarenavirus	G10,G1	Vertebrates,Invertebrates
+piscihepevirus	G10	Vertebrates
+reptarenavirus	G10	Vertebrates
+rosadnavirus	G4	Plants
+sakobuvirus	G10	Vertebrates
+sicinivirus	G10	Vertebrates

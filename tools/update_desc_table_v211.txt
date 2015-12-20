@@ -9242,3 +9242,934 @@ KF740664	Pithovirus sibericum isolate P1084-T, complete genome.	by blast weak ev
 KC585008	Niakha virus isolate DakArD 88909, complete genome.	by blast weak evidence	Invertebrates
 AY995177	Pilchard herpesvirus putative terminase gene, partial cds.	by name	Vertebrates
 L25869	Eimeria nieschulzi virus RNA-dependent RNA polymerase gene, partial cds.	Eimeria	Invertebrates,Plants
+# patch v211
+KJ420969	Arivirus 1 isolate A0197177/6176/2010 non-structural polyprotein and putative capsid genes, complete cds.	NA-CAT	Vertebrates				NA-BLAST					FALSE
+KJ420970	Arivirus 2 isolate A0197177/6176/2010 non-structural polyprotein gene, partial cds; and putative capsid gene, complete cds.	NA-CAT	Vertebrates				NA-BLAST					FALSE
+JN000306	Halastavi arva RNA virus, complete genome.	NA-CAT	Vertebrates				NA-BLAST					FALSE
+KJ614390	Faustovirus strain E12, complete genome.	NA-CAT	Invertebrates				Invertebrates	AP013055	29	100	58	FALSE
+KR921745	Mollivirus sibericum isolate P1084-T, complete genome.	NA-CAT	Invertebrates				Algae	AF204951	30	100	60	FALSE
+JQ898333	Nepavirus isolate NepaV, complete genome.	NA-CAT	Plants				NA-BLAST					FALSE
+KT429819	Torulaspora delbrueckii dsRNA Mbarr-1 killer virus strain EX1180 Kbarr-1 killer toxin gene, complete cds.	NA-CAT	Fungi				Algae	AB071039	28	100	56	FALSE
+AF492670	Amapari virus glycoprotein precursor, gene, partial cds.	NA-CAT	Vertebrates				NA-BLAST					FALSE
+AF512834	Amapari virus strain BeAn 70563 glycoprotein precursor and nucleocapsid protein genes, complete cds.	NA-CAT	Vertebrates				Vertebrates	EU260463	86	86.87	93.7	TRUE
+AY216517	Amapari virus strain BeAn 70563 segment L, complete sequence.	NA-CAT	Vertebrates				Vertebrates	AY510022	50	90.91	69.9	TRUE
+AF485256	Amapari virus strain BeAn 70563 segment S, complete sequence.	NA-CAT	Vertebrates				Invertebrates	KF923400	114	89.06	143	FALSE
+AY924389	Amapari virus strain BeAn 70563 Z protein and RNA-dependent RNA polymerase genes, complete cds.	NA-CAT	Vertebrates				Vertebrates	AY510022	50	90.91	69.9	TRUE
+AF512831	Flexal virus strain BeAn 293022 glycoprotein precursor and nucleocapsid protein genes, complete cds.	NA-CAT	Vertebrates				Vertebrates	AY012687	638	78	194	TRUE
+EU627611	Flexal virus strain BeAn 293022 segment L, complete sequence.	NA-CAT	Vertebrates				Vertebrates	AY494081	165	80.88	95.6	TRUE
+AF485257	Flexal virus strain Pinheiro segment S, complete sequence.	NA-CAT	Vertebrates				Vertebrates	AY012687	636	77.75	178	TRUE
+AF492674	Guanarito virus glycoprotein precursor, gene, partial cds.	Guanarito virus	Vertebrates	49	100	JF412365,JF412366,JF412369,JF412370,JF412371	NA-BLAST					FALSE
+AF512832	Cupixi virus strain BeAn 119303 glycoprotein precursor and nucleocapsid protein genes, complete cds.	NA-CAT	Vertebrates				Vertebrates	FJ032026	75	84.27	65.9	TRUE
+AY216519	Cupixi virus strain BeAn 119303 segment L, complete sequence.	NA-CAT	Vertebrates				Vertebrates	AY510021	40	90.91	56	TRUE
+AY363902	Ippy virus polymerase (L) gene, partial cds.	Ippy	Vertebrates	1	100	HE814063	NA-BLAST					FALSE
+DQ328877	Ippy virus strain Dak An B 188 d segment S, complete sequence.	Ippy	Vertebrates	1	100	HE814063	Vertebrates	KJ909794	73	92.41	113	TRUE
+AF264248	Junin virus strain PH7367 nucleocapsid protein (NP) gene, partial cds.	Junin virus strain	Vertebrates	36	100	DQ531486,DQ531487,DQ531488,DQ531489,DQ854730	Invertebrates	KF923400	169	84.5	151	FALSE
+AY216509	Latino virus polymerase gene, partial cds.	Latino virus	Vertebrates	27	100	KM233886,KM233887,KM233888,KM233889,KM233890	NA-BLAST					FALSE
+AF512830	Latino virus strain MARU 10924 glycoprotein precursor and nucleocapsid protein genes, complete cds.	Latino virus strain MARU 10924	Vertebrates	2	100	AY935533,AY960333	Plants	U66898	75	84.27	65.9	FALSE
+AF485259	Latino virus strain Maru 10924 segment S, complete sequence.	Latino virus strain	Vertebrates	7	100	KM233886,KM233887,KM233888,KM233889,KM233890	Plants	U66898	75	84.27	65.9	FALSE
+AB627954	Lymphocytic choriomeningitis virus genomic RNA, segment: L, complete sequence, strain: WE, sub strain: Nagasaki.	Lymphocytic choriomeningitis virus	Vertebrates	180	100	DQ118959,DQ182704,DQ182705,DQ182706,DQ182707	Invertebrates	JN415685	24	100	48.1	FALSE
+AY894816	Lymphocytic choriomeningitis virus segment L intergenic region.	Lymphocytic choriomeningitis virus segment	Vertebrates	1	100	DQ118959	Invertebrates	KJ586326	35	94.59	58	FALSE
+KP272043	Capira virus strain VP-366G L protein gene, complete cds.	NA-CAT	Invertebrates				Invertebrates	KF297906	82	90.11	109	TRUE
+AY216513	Mobala virus strain An 21366 polymerase gene, partial cds.	Mobala virus strain	Vertebrates	3	100	JQ956481,JQ956482,JQ956483	NA-BLAST					FALSE
+AF492672	Machupo virus glycoprotein precursor, gene, partial cds.	Machupo virus	Vertebrates	83	100	FJ696411,FJ696412,FJ696413,FJ696414,FJ696415	NA-BLAST					FALSE
+JN794585	Machupo virus strain Mallele isolate USAMRIID ID 780 segment L, complete sequence.	Machupo virus strain	Vertebrates	77	100	AY571905,AY571906,AY571907,AY571908,AY571909	Invertebrates	KF923401	431	79.37	188	FALSE
+AY216512	Mopeia virus strain Mozambique polymerase gene, partial cds.	Mopeia virus	Vertebrates	17	100	KF926391,KF926392,KF926393,KF926394,KF926395	NA-BLAST					FALSE
+K02735	P. arenavirus S RNA 3' end, coding for the N protein.	P.	Vertebrates	574519	85.26	CY150558,CY150559,CY150560,CY150561,CY150562	NA-BLAST					FALSE
+AF492671	Parana virus glycoprotein precursor, gene, partial cds.	Parana	Vertebrates	63	79.75	HM212633,JF327421,JF327422,JF795513,JF795525	NA-BLAST					FALSE
+J02277	Pichinde arenavirus (prototype) l RNA, 3' end.	NA-CAT	Vertebrates				NA-BLAST					FALSE
+J02279	Pichinde arenavirus (prototype) S RNA, 3' end.	NA-CAT	Vertebrates				NA-BLAST					FALSE
+AF427517	Pichinde arenavirus large RNA segment, complete sequence.	NA-CAT	Vertebrates				Vertebrates	AY510019	58	89.23	73.8	TRUE
+J02278	Pichinde munchique virulent derivative l RNA, 3' end.	NA-CAT	Vertebrates				NA-BLAST					FALSE
+J02280	Pichinde munchique virulent derivative S RNA, 3' end.	NA-CAT	Vertebrates				NA-BLAST					FALSE
+K02734	Pichinde virus GPC precursor protein and N protein genes, complete cds.	NA-CAT	Vertebrates				NA-BLAST					FALSE
+AY216518	Pichinde virus polymerase gene, partial cds.	NA-CAT	Vertebrates				Vertebrates	AY924390	90	84.91	83.8	TRUE
+AF081552	Pichinde virus S glycoprotein precursor (GPC) and nucleoprotein (NP) genes, complete cds.	NA-CAT	Vertebrates				Vertebrates	AY012686	416	79.24	176	TRUE
+AF081553	Pichinde virus S glycoprotein precursor (GPC) and nucleoprotein (NP) genes, complete cds.	NA-CAT	Vertebrates				Vertebrates	KJ668826	57	89.06	71.9	TRUE
+AF081554	Pichinde virus S glycoprotein precursor (GPC) and nucleoprotein (NP) genes, complete cds.	NA-CAT	Vertebrates				NA-BLAST					FALSE
+AF081555	Pichinde virus S glycoprotein precursor (GPC) and nucleoprotein (NP) genes, complete cds.	NA-CAT	Vertebrates				NA-BLAST					FALSE
+JN378748	Pichinde virus strain An4763 segment L, complete sequence.	NA-CAT	Vertebrates				Vertebrates	EU938670	74	90.24	99.6	TRUE
+JN378747	Pichinde virus strain An4763 segment S, complete sequence.	NA-CAT	Vertebrates				NA-BLAST					FALSE
+EF529747	Pichinde virus strain Munchique CoAn4763 isolate P18 segment L, complete sequence.	NA-CAT	Vertebrates				Vertebrates	EU938660	75	86.21	77.9	TRUE
+EF529746	Pichinde virus strain Munchique CoAn4763 isolate P18 segment S, complete sequence.	NA-CAT	Vertebrates				NA-BLAST					FALSE
+EF529745	Pichinde virus strain Munchique CoAn4763 isolate P2 segment L, complete sequence.	NA-CAT	Vertebrates				Vertebrates	EU938660	75	86.21	77.9	TRUE
+EF529744	Pichinde virus strain Munchique CoAn4763 isolate P2 segment S, complete sequence.	NA-CAT	Vertebrates				Vertebrates	KJ668826	57	89.06	71.9	TRUE
+AY216506	Sabia virus strain SPH114202 segment L, complete sequence.	NA-CAT	Vertebrates				Vertebrates	KR260729	224	84.21	194	TRUE
+AY358026	Sabia virus strain SPH114202 segment L, complete sequence.	NA-CAT	Vertebrates				Vertebrates	KR260729	224	84.21	194	TRUE
+JN801475	Sabia virus strain SPH114202 segment L, complete sequence.	NA-CAT	Vertebrates				Vertebrates	KR260729	224	84.21	194	TRUE
+JN801474	Sabia virus strain SPH114202 segment S, complete sequence.	NA-CAT	Vertebrates				Vertebrates	EU260463	1243	76.95	208	TRUE
+J02411	tacaribe virus s rna 3' terminus.	NA-CAT	Vertebrates				NA-BLAST					FALSE
+KM972723	Tataguine virus strain H9963 glycoprotein precursor, gene, complete cds.	NA-CAT	Vertebrates				Vertebrates	KF254791	39	92.86	60	TRUE
+KM972724	Tataguine virus strain H9963 nucleoprotein gene, complete cds.	NA-CAT	Vertebrates				Vertebrates	KJ867200	25	100	50.1	TRUE
+KM972722	Tataguine virus strain H9963 RNA-dependent RNA-polymerase gene, partial cds.	NA-CAT	Vertebrates				Vertebrates	JN572062	62	95.38	105	TRUE
+KM403386	Mexican papita viroid-chimera 1, complete sequence.	Mexican papita	Plants	13	100	FJ824844,GQ131573,HG739081,KF683198,L78454	Invertebrates	AB006737	28	100	56	FALSE
+KM405245	Cherax quadricarinatus reovirus isolate WH-2012 RNA-dependent RNA polymerase gene, partial cds.	Cherax quadricarinatus	Invertebrates	1	100	KP410261	NA-BLAST					FALSE
+KM405246	Eriocheir sinensis Cholera-like Virus isolate WH-2007 RNA-dependent RNA polymerase gene, partial cds.	Eriocheir sinensis	Invertebrates	15	100	EF508130,KP638402,KP638403,KP638404,KP638405	NA-BLAST					FALSE
+KM405247	Eriocheir sinensis Bunya-like virus isolate JS-2000 M protein gene, partial cds.	Eriocheir sinensis	Invertebrates	15	100	EF508130,KP638402,KP638403,KP638404,KP638405	NA-BLAST					FALSE
+HG975302	Aspergillus fumigatus tetramycovirus-1 RdRP gene for RNA dependent RNA polymerase.	Aspergillus fumigatus	Plants,Fungi	5	83.33	FN178512,FN178513,FN178514,FN178515,FN376847	Plants	KJ787686	36	94.74	60	FALSE
+HG975303	Aspergillus fumigatus tetramycovirus-1 Serine protease domain gene for Protease.	Aspergillus fumigatus	Plants,Fungi	5	83.33	FN178512,FN178513,FN178514,FN178515,FN376847	NA-BLAST					FALSE
+HG975304	Aspergillus fumigatus tetramycovirus-1 Methyl transferase domain, APC basic domain gene for Methyl transferase.	Aspergillus fumigatus	Plants,Fungi	5	83.33	FN178512,FN178513,FN178514,FN178515,FN376847	NA-BLAST					FALSE
+HG975305	Aspergillus fumigatus tetramycovirus-1 PAS-rp, hexosaminidase domain gene for PAS-rich protein.	Aspergillus fumigatus	Plants,Fungi	5	83.33	FN178512,FN178513,FN178514,FN178515,FN376847	Plants	KP245737	33	94.29	54	FALSE
+KP792676	Tataguine virus strain H9963 nucleocapsid protein gene, complete cds.	NA-CAT	Vertebrates				NA-BLAST					FALSE
+KP792677	Tataguine virus strain H9963 polyprotein gene, complete cds.	NA-CAT	Vertebrates				Vertebrates	KF254791	39	92.86	60	TRUE
+KP792678	Tataguine virus strain H9963 RNA-dependent RNA polymerase gene, complete cds.	NA-CAT	Vertebrates				Vertebrates	JN572062	62	95.38	105	TRUE
+KP970121	Raspberry leaf blotch virus isolate Pittenweem segment RNA6, complete sequence.	Raspberry leaf blotch virus isolate	Plants	2	100	KP709057,KP709058	Invertebrates	AB624321	31	93.94	50.1	FALSE
+LC015646	Yellowstone lake mimivirus DNA, complete genome, isolate: 1.	NA-CAT	Algae				Algae	KC662249	68	89.47	87.7	TRUE
+LC015647	Yellowstone lake phycodnavirus 1 DNA, complete genome, isolate: 1.	NA-CAT	Algae				Algae	EF101928	30	100	60	TRUE
+LC015648	Yellowstone lake phycodnavirus 2 DNA, complete genome, isolate: 2.	NA-CAT	Algae				Algae	HM004429	97	90.65	133	TRUE
+LC015649	Yellowstone lake phycodnavirus 3 DNA, complete genome, isolate: 3.	NA-CAT	Algae				Algae	EF101928	30	100	60	TRUE
+KT253577	Poaceae-associated gemycircularvirus 1 isolate PaGmV-1_TO_STO14-29204_2014, complete genome.	NA-CAT	Plants				Vertebrates	KF371639	61	91.04	85.7	FALSE
+KT253578	Poaceae-associated gemycircularvirus 1 isolate PaGmV-1_TO_STO15-29204_2014, complete genome.	NA-CAT	Plants				Vertebrates	KF371639	61	91.04	85.7	FALSE
+KT253579	Poaceae-associated gemycircularvirus 1 isolate PaGmV-1_TO_STO18-29204_2014, complete genome.	NA-CAT	Plants				Vertebrates	KF371639	61	91.04	85.7	FALSE
+KT598248	Soybean leaf-associated gemycircularvirus 1 strain SlaGemV1-1, complete genome.	Soybean	Plants	897	98.79	D00507,D00717,D88615,D88616,DQ145545	Vertebrates	KF371639	36	94.74	60	FALSE
+LK931484	HCBI9.212 virus complete sequence.	NA-CAT	Plants,Fungi				Plants	KJ938717	499	90.89	692	FALSE
+LN827951	Sclerotinia sclerotiorum dsRNA mycovirus-L RdRp gene for RNA dependent RNA polymerase, isolate HAZ2-2.	Sclerotinia sclerotiorum dsRNA mycovirus-L	Plants,Fungi	1	100	JQ513382	Fungi	GU108594	206	92.38	307	FALSE
+M16734	Pichinde arenavirus viral-complementary RNA encoding nucleoprotein NP, complete cds.	NA-CAT	Vertebrates				NA-BLAST					FALSE
+M16735	Pichinde arenavirus S species RNA encoding GPC glycoprotein precursor, complete cds.	NA-CAT	Vertebrates				NA-BLAST					FALSE
+M27693	Lymphocytic choriomeningitis virus zinc finger protein gene, complete cds, and L protein gene, 3' end.	Lymphocytic choriomeningitis virus	Vertebrates	180	100	DQ118959,DQ182704,DQ182705,DQ182706,DQ182707	Invertebrates	AB289986	34	94.44	56	FALSE
+U34248	Oliveros virus glycoprotein precursor and nucleocapsid protein genes, complete cds.	Oliveros virus	Vertebrates	3	100	KP027657,KP027668,KP027677	Plants	U66898	520	84.28	414	FALSE
+U41071	Sabia virus glycoprotein precursor and nucleocapsid protein genes, complete cds.	NA-CAT	Vertebrates				Vertebrates	EU260463	1242	76.88	200	TRUE
+U43685	Amapari virus nucleocapsid protein gene, partial cds.	NA-CAT	Vertebrates				NA-BLAST					FALSE
+U43687	Flexal virus nucleocapsid protein gene, partial cds.	NA-CAT	Vertebrates				NA-BLAST					FALSE
+U43689	Parana virus nucleocapsid protein gene, partial cds.	Parana	Vertebrates	63	79.75	HM212633,JF327421,JF327422,JF795513,JF795525	NA-BLAST					FALSE
+U77601	Pichinde virus isolate PV2P2 glycoprotein precursor, gene, complete cds.	NA-CAT	Vertebrates				Vertebrates	AY012686	369	79.87	178	TRUE
+U77602	Pichinde virus isolate temperature-sensitive mutant ts13 segment S, complete sequence.	NA-CAT	Vertebrates				Vertebrates	KJ668826	82	83.67	67.9	TRUE
+U77603	Pichinde virus glycoprotein precursor, mRNA, complete cds.	NA-CAT	Vertebrates				Vertebrates	AY012686	369	79.87	178	TRUE
+U80003	Ippy virus nucleocapsid protein gene, partial cds.	Ippy	Vertebrates	1	100	HE814063	Vertebrates	KJ909794	73	92.41	113	TRUE
+U80005	Mopeia virus nucleocapsid protein gene, partial cds.	Mopeia virus	Vertebrates	17	100	KF926391,KF926392,KF926393,KF926394,KF926395	NA-BLAST					FALSE
+U80006	Mobala virus nucleocapsid protein gene, partial cds.	Mobala virus	Vertebrates	3	100	JQ956481,JQ956482,JQ956483	NA-BLAST					FALSE
+U43686	Guanarito virus nucleocapsid protein gene, partial cds.	Guanarito virus nucleocapsid protein gene, partial	Vertebrates	2	100	U62563,U62564	NA-BLAST					FALSE
+AF204179	Guanarito virus strain VHF-2033 nucleocapsid protein mRNA, partial cds.	Guanarito virus strain	Vertebrates	47	100	JF412365,JF412366,JF412369,JF412370,JF412371	NA-BLAST					FALSE
+AF204181	Guanarito virus strain VHF-1608 clone A nucleocapsid protein mRNA, partial cds.	Guanarito virus strain VHF-1608	Vertebrates	2	100	AY510022,AY562388	NA-BLAST					FALSE
+AF204183	Guanarito virus strain VHF-1658 nucleocapsid protein mRNA, partial cds.	Guanarito virus strain	Vertebrates	47	100	JF412365,JF412366,JF412369,JF412370,JF412371	NA-BLAST					FALSE
+AF204192	Guanarito virus strain VHF-2023 nucleocapsid protein mRNA, partial cds.	Guanarito virus strain	Vertebrates	47	100	JF412365,JF412366,JF412369,JF412370,JF412371	NA-BLAST					FALSE
+AF204193	Guanarito virus strain VHF-1981 nucleocapsid protein mRNA, partial cds.	Guanarito virus strain	Vertebrates	47	100	JF412365,JF412366,JF412369,JF412370,JF412371	NA-BLAST					FALSE
+AF204197	Guanarito virus strain VHF-4696 nucleocapsid protein mRNA, partial cds.	Guanarito virus strain	Vertebrates	47	100	JF412365,JF412366,JF412369,JF412370,JF412371	NA-BLAST					FALSE
+AF371443	Pirital virus strain 1657 nucleoprotein (N) gene, partial cds.	Pirital virus strain	Vertebrates	25	100	JF412367,JF412368,JF412381,JF412382,JF412383	NA-BLAST					FALSE
+AF371446	Pirital virus strain 1895 nucleoprotein (N) gene, partial cds.	Pirital virus strain	Vertebrates	25	100	JF412367,JF412368,JF412381,JF412382,JF412383	NA-BLAST					FALSE
+AF371449	Pirital virus strain 2550 nucleoprotein (N) gene, partial cds.	Pirital virus strain	Vertebrates	25	100	JF412367,JF412368,JF412381,JF412382,JF412383	NA-BLAST					FALSE
+AF371450	Pirital virus strain 2600 nucleoprotein (N) gene, partial cds.	Pirital virus strain	Vertebrates	25	100	JF412367,JF412368,JF412381,JF412382,JF412383	NA-BLAST					FALSE
+AF371452	Pirital virus strain 3078 nucleoprotein (N) gene, partial cds.	Pirital virus strain	Vertebrates	25	100	JF412367,JF412368,JF412381,JF412382,JF412383	NA-BLAST					FALSE
+AF371453	Pirital virus strain 3081 nucleoprotein (N) gene, partial cds.	Pirital virus strain	Vertebrates	25	100	JF412367,JF412368,JF412381,JF412382,JF412383	NA-BLAST					FALSE
+AF371467	Pirital virus strain 2731 clone B nucleoprotein (N) gene, partial cds.	Pirital virus strain	Vertebrates	25	100	JF412367,JF412368,JF412381,JF412382,JF412383	NA-BLAST					FALSE
+KP970122	Raspberry leaf blotch virus isolate Pittenweem segment RNA7, complete sequence.	Raspberry leaf blotch virus isolate	Plants	2	100	KP709057,KP709058	NA-BLAST					FALSE
+KR021355	Lake Sinai virus 7 clone 2014MT ORF1 gene, partial cds.	Lake Sinai virus	Invertebrates	42	100	HQ871931,HQ888865,JQ480620,JX045859,JX878492	NA-BLAST					FALSE
+KR528554	Marine snail associated circular virus isolate I0084, complete genome.	Marine	Invertebrates	25	96.15	D61384,D61385,D61386,D61387,D61388	NA-BLAST					FALSE
+KR528555	Hermit crab associated circular virus isolate I0085A4, complete genome.	Hermit	Invertebrates	3	75	FR851297,FR851300,FR851301,HM055932	NA-BLAST					FALSE
+KR528556	Hermit crab associated circular virus isolate I0085A5, complete genome.	Hermit	Invertebrates	3	75	FR851297,FR851300,FR851301,HM055932	NA-BLAST					FALSE
+KR528557	Hermit crab associated circular genome isolate I0085b, complete genome.	Hermit	Invertebrates	3	75	FR851297,FR851300,FR851301,HM055932	NA-BLAST					FALSE
+KR528558	Fiddler Crab associated circular virus isolate I0086a, complete genome.	NA-CAT	Invertebrates				NA-BLAST					FALSE
+KR528559	Fiddler Crab associated circular virus isolate I0086b, complete genome.	NA-CAT	Invertebrates				NA-BLAST					FALSE
+KR902735	Xinzhou spider virus 2 strain XZZZ-7 polyprotein gene, complete cds.	Xinzhou spider virus	Invertebrates	1	100	KR902730	NA-BLAST					FALSE
+LN680851	Reovirus sp. rainbow trout/F445-2013/NOR partial segment 1 for sigma 3 protein.	Reovirus sp.	Vertebrates	138	100	DQ220017,DQ220018,DQ220019,DQ220020,GU994013	NA-BLAST					FALSE
+LN827956	Botrytis cinerea negative-stranded RNA virus 1 RdRp gene for RNA dependent RNA polymerase, isolate HAZ3-9.	Botrytis cinerea	Plants,Fungi	29	76.32	EF580100,EF583556,HG326502,HG326503,HG326504	NA-BLAST					FALSE
+KP714070	Newfield virus putative replicase gene, complete cds.	NA-CAT	Invertebrates				NA-BLAST					FALSE
+KP714071	Kilifi Virus putative polyprotein gene, complete cds.	Kilifi	Invertebrates	147	96.08	HM346938,HM346939,HM346940,KF587911,KF587912	Invertebrates	FJ790487	34	94.44	56	TRUE
+KP714075	Twyford virus orf1 gene, complete cds; and orf2 gene, partial cds.	NA-CAT	Invertebrates				Invertebrates	AF092924	33	94.29	54	TRUE
+KP714089	Charvil virus putative polymerase gene, partial cds.	NA-CAT	Invertebrates				NA-BLAST					FALSE
+KP714090	Bloomfield virus segment 1 putative polymerase gene, complete cds.	NA-CAT	Invertebrates				Invertebrates	KR003804	554	89.35	720	TRUE
+KP714091	Bloomfield virus segment 2 putative major core protein gene, complete cds.	NA-CAT	Invertebrates				NA-BLAST					FALSE
+KP714092	Bloomfield virus segment 4 ORF1 gene, complete cds.	NA-CAT	Invertebrates				NA-BLAST					FALSE
+KP714093	Bloomfield virus segment 5 ORF1 gene, complete cds.	NA-CAT	Invertebrates				NA-BLAST					FALSE
+KP714094	Bloomfield virus segment 6 ORF1 gene, complete cds.	NA-CAT	Invertebrates				NA-BLAST					FALSE
+KP714095	Bloomfield virus segment 7 ORF1 gene, complete cds.	NA-CAT	Invertebrates				NA-BLAST					FALSE
+KP714096	Bloomfield virus segment 8 ORF1 gene, complete cds.	NA-CAT	Invertebrates				NA-BLAST					FALSE
+KP714097	Bloomfield virus segment 9 ORF1 gene, complete cds.	NA-CAT	Invertebrates				NA-BLAST					FALSE
+KP714098	Bloomfield virus segment 10 ORF1 gene, complete cds.	NA-CAT	Invertebrates				NA-BLAST					FALSE
+KP714101	Kallithea virus note fragment 1 putative deoxynucleoside kinase protein, putative Ac92-like protein, putative gp06-like protein, ORF2, putative odv-e56, putative gp33-like protein, putative gp34-like protein, putative gp35-like protein, putative gp36-like protein, putative gp37-like protein, ORF1, putative dnalig, putative gp39-like protein, putative gp41-like protein, hypothetical protein, putative gp44-like protein, putative p74 protein, ORF3, ORF4, and putative gp48-like protein genes, complete cds.	Kallithea virus	Invertebrates	39	100	KP969687,KP969689,KP969690,KP969691,KP969692	Vertebrates	KJ642613	51	98.08	95.6	FALSE
+KP714103	Kallithea virus note fragment 3 putative gp93-like protein, putative gp94-like protein, putative gp95-like protein, putative lef-4, putative gp97-like protein, putative gp22-like protein, putative gp23-like protein, putative gp19-like protein, putative rr1, ORF9, putative gp84-like protein, putative gp83-like protein, putative patatin-like phospholipase-like protein, ORF8, and putative lef-3 genes, complete cds.	Kallithea virus	Invertebrates	39	100	KP969687,KP969689,KP969690,KP969691,KP969692	Vertebrates	X52060	50	96.15	87.7	FALSE
+KP714104	Kallithea virus note fragment 4 putative lef-8, putative pif-1, putative Ac68-like protein, hypothetical proteins, putative dnaint/rec, putative gp60-like protein, putative gp61-like protein, putative 38K protein, ORF10, putative gp28-like protein, and ORF11 genes, complete cds.	Kallithea virus	Invertebrates	39	100	KP969687,KP969689,KP969690,KP969691,KP969692	Algae	KC662249	31	100	61.9	FALSE
+KP714106	Kallithea virus note fragment 6 hypothetical protein, ORF12, putative gp62-like protein, putative gp43-like protein, ORF13, putative vp91, putative pif-3, and putative dnahel 2 genes, complete cds.	Kallithea virus	Invertebrates	39	100	KP969687,KP969689,KP969690,KP969691,KP969692	Vertebrates	AY009089	37	97.37	67.9	FALSE
+KP714107	Kallithea virus note fragment 7 putative 19kda protein, ORF14, putative dnahel, ORF16, ORF15, and putative 61k AcORF9 genes, complete cds.	Kallithea virus	Invertebrates	39	100	KP969687,KP969689,KP969690,KP969691,KP969692	Algae	JX997158	39	95.12	65.9	FALSE
+KP714108	Kallithea virus note fragment 8 putative lef-9, hypothetical protein, putative mitochondrial carrier protein-like protein, and ORF16 genes, complete cds.	Kallithea virus	Invertebrates	39	100	KP969687,KP969689,KP969690,KP969691,KP969692	NA-BLAST					FALSE
+DQ832671	Lassa virus isolate BA302 nucleoprotein (NP) gene, partial cds.	Lassa virus isolate	Vertebrates	111	100	FJ824031,JX845167,JX845169,JX845171,KF926390	NA-BLAST					FALSE
+DQ832672	Lassa virus isolate BA350 nucleoprotein (NP) gene, partial cds.	Lassa virus isolate	Vertebrates	111	100	FJ824031,JX845167,JX845169,JX845171,KF926390	NA-BLAST					FALSE
+DQ832673	Lassa virus isolate BA354 nucleoprotein (NP) gene, partial cds.	Lassa virus isolate	Vertebrates	111	100	FJ824031,JX845167,JX845169,JX845171,KF926390	NA-BLAST					FALSE
+DQ832674	Lassa virus isolate BA356 nucleoprotein (NP) gene, partial cds.	Lassa virus isolate	Vertebrates	111	100	FJ824031,JX845167,JX845169,JX845171,KF926390	NA-BLAST					FALSE
+DQ832676	Lassa virus isolate BA375 nucleoprotein (NP) gene, partial cds.	Lassa virus isolate	Vertebrates	111	100	FJ824031,JX845167,JX845169,JX845171,KF926390	NA-BLAST					FALSE
+DQ832677	Lassa virus isolate BA377 nucleoprotein (NP) gene, partial cds.	Lassa virus isolate	Vertebrates	111	100	FJ824031,JX845167,JX845169,JX845171,KF926390	NA-BLAST					FALSE
+DQ832678	Lassa virus isolate BA378 nucleoprotein (NP) gene, partial cds.	Lassa virus isolate	Vertebrates	111	100	FJ824031,JX845167,JX845169,JX845171,KF926390	NA-BLAST					FALSE
+DQ832679	Lassa virus isolate BA382 nucleoprotein (NP) gene, partial cds.	Lassa virus isolate	Vertebrates	111	100	FJ824031,JX845167,JX845169,JX845171,KF926390	NA-BLAST					FALSE
+DQ832680	Lassa virus isolate BA384 nucleoprotein (NP) gene, partial cds.	Lassa virus isolate	Vertebrates	111	100	FJ824031,JX845167,JX845169,JX845171,KF926390	NA-BLAST					FALSE
+DQ832681	Lassa virus isolate BA686 nucleoprotein (NP) gene, partial cds.	Lassa virus isolate	Vertebrates	111	100	FJ824031,JX845167,JX845169,JX845171,KF926390	NA-BLAST					FALSE
+DQ832667	Lassa virus isolate BG129 nucleoprotein (NP) gene, partial cds.	Lassa virus isolate	Vertebrates	111	100	FJ824031,JX845167,JX845169,JX845171,KF926390	NA-BLAST					FALSE
+DQ832698	Lassa virus isolate DGD104 nucleoprotein (NP) gene, partial cds.	Lassa virus isolate	Vertebrates	111	100	FJ824031,JX845167,JX845169,JX845171,KF926390	NA-BLAST					FALSE
+DQ832699	Lassa virus isolate DGD112 nucleoprotein (NP) gene, partial cds.	Lassa virus isolate	Vertebrates	111	100	FJ824031,JX845167,JX845169,JX845171,KF926390	NA-BLAST					FALSE
+DQ832693	Lassa virus isolate DGD13 nucleoprotein (NP) gene, partial cds.	Lassa virus isolate	Vertebrates	111	100	FJ824031,JX845167,JX845169,JX845171,KF926390	NA-BLAST					FALSE
+DQ832694	Lassa virus isolate DGD28 nucleoprotein (NP) gene, partial cds.	Lassa virus isolate	Vertebrates	111	100	FJ824031,JX845167,JX845169,JX845171,KF926390	NA-BLAST					FALSE
+DQ832695	Lassa virus isolate DGD35 nucleoprotein (NP) gene, partial cds.	Lassa virus isolate	Vertebrates	111	100	FJ824031,JX845167,JX845169,JX845171,KF926390	NA-BLAST					FALSE
+DQ832692	Lassa virus isolate DGD4 nucleoprotein (NP) gene, partial cds.	Lassa virus isolate	Vertebrates	111	100	FJ824031,JX845167,JX845169,JX845171,KF926390	NA-BLAST					FALSE
+DQ832696	Lassa virus isolate DGD43 nucleoprotein (NP) gene, partial cds.	Lassa virus isolate	Vertebrates	111	100	FJ824031,JX845167,JX845169,JX845171,KF926390	NA-BLAST					FALSE
+DQ832697	Lassa virus isolate DGD87 nucleoprotein (NP) gene, partial cds.	Lassa virus isolate	Vertebrates	111	100	FJ824031,JX845167,JX845169,JX845171,KF926390	NA-BLAST					FALSE
+DQ832668	Lassa virus isolate GB132 nucleoprotein (NP) gene, partial cds.	Lassa virus isolate	Vertebrates	111	100	FJ824031,JX845167,JX845169,JX845171,KF926390	NA-BLAST					FALSE
+DQ832683	Lassa virus isolate TA341 nucleoprotein (NP) gene, partial cds.	Lassa virus isolate	Vertebrates	111	100	FJ824031,JX845167,JX845169,JX845171,KF926390	NA-BLAST					FALSE
+DQ832682	Lassa virus isolate TA416 nucleoprotein (NP) gene, partial cds.	Lassa virus isolate	Vertebrates	111	100	FJ824031,JX845167,JX845169,JX845171,KF926390	NA-BLAST					FALSE
+DQ832684	Lassa virus isolate TA444 nucleoprotein (NP) gene, partial cds.	Lassa virus isolate	Vertebrates	111	100	FJ824031,JX845167,JX845169,JX845171,KF926390	NA-BLAST					FALSE
+DQ832685	Lassa virus isolate TA462 nucleoprotein (NP) gene, partial cds.	Lassa virus isolate	Vertebrates	111	100	FJ824031,JX845167,JX845169,JX845171,KF926390	NA-BLAST					FALSE
+DQ832686	Lassa virus isolate TA464 nucleoprotein (NP) gene, partial cds.	Lassa virus isolate	Vertebrates	111	100	FJ824031,JX845167,JX845169,JX845171,KF926390	NA-BLAST					FALSE
+DQ832687	Lassa virus isolate TA471 nucleoprotein (NP) gene, partial cds.	Lassa virus isolate	Vertebrates	111	100	FJ824031,JX845167,JX845169,JX845171,KF926390	NA-BLAST					FALSE
+DQ832688	Lassa virus isolate TA491 nucleoprotein (NP) gene, partial cds.	Lassa virus isolate	Vertebrates	111	100	FJ824031,JX845167,JX845169,JX845171,KF926390	NA-BLAST					FALSE
+DQ832689	Lassa virus isolate TA817 nucleoprotein (NP) gene, partial cds.	Lassa virus isolate	Vertebrates	111	100	FJ824031,JX845167,JX845169,JX845171,KF926390	NA-BLAST					FALSE
+DQ832690	Lassa virus isolate TA820 nucleoprotein (NP) gene, partial cds.	Lassa virus isolate	Vertebrates	111	100	FJ824031,JX845167,JX845169,JX845171,KF926390	NA-BLAST					FALSE
+DQ832691	Lassa virus isolate TA846 nucleoprotein (NP) gene, partial cds.	Lassa virus isolate	Vertebrates	111	100	FJ824031,JX845167,JX845169,JX845171,KF926390	NA-BLAST					FALSE
+U80004	Lassa virus nucleocapsid protein gene, partial cds.	Lassa virus	Vertebrates	679	100	FJ824031,GU481056,GU481057,GU481058,GU481059	NA-BLAST					FALSE
+AY216508	Lassa virus polymerase gene, partial cds.	Lassa virus	Vertebrates	679	100	FJ824031,GU481056,GU481057,GU481058,GU481059	NA-BLAST					FALSE
+AY179175	Lassa virus strain CSF RING finger protein (Z) gene, complete cds.	Lassa virus strain	Vertebrates	512	100	GU481056,GU481057,GU481058,GU481059,GU481060	NA-BLAST					FALSE
+AF182253	Lassa virus strain las801100 nucleoprotein gene, partial cds.	Lassa virus strain	Vertebrates	512	100	GU481056,GU481057,GU481058,GU481059,GU481060	NA-BLAST					FALSE
+AF182244	Lassa virus strain las801108 nucleoprotein gene, partial cds.	Lassa virus strain	Vertebrates	512	100	GU481056,GU481057,GU481058,GU481059,GU481060	NA-BLAST					FALSE
+AF182234	Lassa virus strain las801618 nucleoprotein gene, partial cds.	Lassa virus strain	Vertebrates	512	100	GU481056,GU481057,GU481058,GU481059,GU481060	NA-BLAST					FALSE
+AF182233	Lassa virus strain las802662 nucleoprotein gene, partial cds.	Lassa virus strain	Vertebrates	512	100	GU481056,GU481057,GU481058,GU481059,GU481060	NA-BLAST					FALSE
+AF182259	Lassa virus strain las803201 nucleoprotein gene, partial cds.	Lassa virus strain	Vertebrates	512	100	GU481056,GU481057,GU481058,GU481059,GU481060	NA-BLAST					FALSE
+AF182266	Lassa virus strain las803203 nucleoprotein gene, partial cds.	Lassa virus strain	Vertebrates	512	100	GU481056,GU481057,GU481058,GU481059,GU481060	NA-BLAST					FALSE
+AF182258	Lassa virus strain las803204 nucleoprotein gene, partial cds.	Lassa virus strain	Vertebrates	512	100	GU481056,GU481057,GU481058,GU481059,GU481060	NA-BLAST					FALSE
+AF182236	Lassa virus strain las803209 nucleoprotein gene, partial cds.	Lassa virus strain	Vertebrates	512	100	GU481056,GU481057,GU481058,GU481059,GU481060	NA-BLAST					FALSE
+AF182229	Lassa virus strain las803210 nucleoprotein gene, partial cds.	Lassa virus strain	Vertebrates	512	100	GU481056,GU481057,GU481058,GU481059,GU481060	NA-BLAST					FALSE
+AF182227	Lassa virus strain las803787 nucleoprotein gene, partial cds.	Lassa virus strain	Vertebrates	512	100	GU481056,GU481057,GU481058,GU481059,GU481060	NA-BLAST					FALSE
+AF182262	Lassa virus strain las803791 nucleoprotein gene, partial cds.	Lassa virus strain	Vertebrates	512	100	GU481056,GU481057,GU481058,GU481059,GU481060	NA-BLAST					FALSE
+AF182260	Lassa virus strain las803792 nucleoprotein gene, partial cds.	Lassa virus strain	Vertebrates	512	100	GU481056,GU481057,GU481058,GU481059,GU481060	NA-BLAST					FALSE
+AF182263	Lassa virus strain las803793 nucleoprotein gene, partial cds.	Lassa virus strain	Vertebrates	512	100	GU481056,GU481057,GU481058,GU481059,GU481060	NA-BLAST					FALSE
+AF182271	Lassa virus strain las803796 nucleoprotein gene, partial cds.	Lassa virus strain	Vertebrates	512	100	GU481056,GU481057,GU481058,GU481059,GU481060	NA-BLAST					FALSE
+AF182256	Lassa virus strain las803972 nucleoprotein gene, partial cds.	Lassa virus strain	Vertebrates	512	100	GU481056,GU481057,GU481058,GU481059,GU481060	NA-BLAST					FALSE
+AF182224	Lassa virus strain las806319 nucleoprotein gene, partial cds.	Lassa virus strain	Vertebrates	512	100	GU481056,GU481057,GU481058,GU481059,GU481060	NA-BLAST					FALSE
+AF182223	Lassa virus strain las806320 nucleoprotein gene, partial cds.	Lassa virus strain	Vertebrates	512	100	GU481056,GU481057,GU481058,GU481059,GU481060	NA-BLAST					FALSE
+AF182226	Lassa virus strain las806322 nucleoprotein gene, partial cds.	Lassa virus strain	Vertebrates	512	100	GU481056,GU481057,GU481058,GU481059,GU481060	NA-BLAST					FALSE
+AF182228	Lassa virus strain las806791 nucleoprotein gene, partial cds.	Lassa virus strain	Vertebrates	512	100	GU481056,GU481057,GU481058,GU481059,GU481060	NA-BLAST					FALSE
+AF182261	Lassa virus strain las806828 nucleoprotein gene, partial cds.	Lassa virus strain	Vertebrates	512	100	GU481056,GU481057,GU481058,GU481059,GU481060	NA-BLAST					FALSE
+AF182264	Lassa virus strain las806829 nucleoprotein gene, partial cds.	Lassa virus strain	Vertebrates	512	100	GU481056,GU481057,GU481058,GU481059,GU481060	NA-BLAST					FALSE
+AF182254	Lassa virus strain las806843 nucleoprotein gene, partial cds.	Lassa virus strain	Vertebrates	512	100	GU481056,GU481057,GU481058,GU481059,GU481060	NA-BLAST					FALSE
+AF182269	Lassa virus strain las807868 nucleoprotein gene, partial cds.	Lassa virus strain	Vertebrates	512	100	GU481056,GU481057,GU481058,GU481059,GU481060	NA-BLAST					FALSE
+AF182257	Lassa virus strain las807974 nucleoprotein gene, partial cds.	Lassa virus strain	Vertebrates	512	100	GU481056,GU481057,GU481058,GU481059,GU481060	NA-BLAST					FALSE
+AF182268	Lassa virus strain las807977 nucleoprotein gene, partial cds.	Lassa virus strain	Vertebrates	512	100	GU481056,GU481057,GU481058,GU481059,GU481060	NA-BLAST					FALSE
+AF182267	Lassa virus strain las807992 nucleoprotein gene, partial cds.	Lassa virus strain	Vertebrates	512	100	GU481056,GU481057,GU481058,GU481059,GU481060	NA-BLAST					FALSE
+AF182265	Lassa virus strain las807998 nucleoprotein gene, partial cds.	Lassa virus strain	Vertebrates	512	100	GU481056,GU481057,GU481058,GU481059,GU481060	NA-BLAST					FALSE
+AF182270	Lassa virus strain las808255 nucleoprotein gene, partial cds.	Lassa virus strain	Vertebrates	512	100	GU481056,GU481057,GU481058,GU481059,GU481060	NA-BLAST					FALSE
+AF182252	Lassa virus strain las9607300 nucleoprotein gene, partial cds.	Lassa virus strain	Vertebrates	512	100	GU481056,GU481057,GU481058,GU481059,GU481060	NA-BLAST					FALSE
+AF182272	Lassa virus strain las9608911 nucleoprotein gene, partial cds.	Lassa virus strain	Vertebrates	512	100	GU481056,GU481057,GU481058,GU481059,GU481060	NA-BLAST					FALSE
+AY363907	Lassa virus strain SL20 polymerase (L) gene, partial cds.	Lassa virus strain	Vertebrates	512	100	GU481056,GU481057,GU481058,GU481059,GU481060	NA-BLAST					FALSE
+U80009	Junin virus nucleocapsid protein gene, partial cds.	Junin virus	Vertebrates	62	100	DQ531486,DQ531487,DQ531488,DQ531489,DQ854730	NA-BLAST					FALSE
+AY819707	Junin virus strain Candid #1 segment L, complete sequence.	Junin virus strain	Vertebrates	36	100	DQ531486,DQ531487,DQ531488,DQ531489,DQ854730	NA-BLAST					FALSE
+AY746354	Junin virus strain Candid-1 segment L, complete sequence.	Junin virus strain	Vertebrates	36	100	DQ531486,DQ531487,DQ531488,DQ531489,DQ854730	NA-BLAST					FALSE
+DQ538136	Junin virus strain Cba IV4454 Z protein gene, complete cds.	Junin virus strain	Vertebrates	36	100	DQ531486,DQ531487,DQ531488,DQ531489,DQ854730	NA-BLAST					FALSE
+AF264197	Junin virus strain CbaAn9446 glycoprotein 1 (G1) gene, partial cds.	Junin virus strain	Vertebrates	36	100	DQ531486,DQ531487,DQ531488,DQ531489,DQ854730	NA-BLAST					FALSE
+AF264238	Junin virus strain CbaAn9446 nucleocapsid protein (NP) gene, partial cds.	Junin virus strain	Vertebrates	36	100	DQ531486,DQ531487,DQ531488,DQ531489,DQ854730	NA-BLAST					FALSE
+AF264200	Junin virus strain CbaFHA5069 glycoprotein 1 (G1) gene, partial cds.	Junin virus strain	Vertebrates	36	100	DQ531486,DQ531487,DQ531488,DQ531489,DQ854730	NA-BLAST					FALSE
+AF264239	Junin virus strain CbaFHA5069 nucleocapsid protein (NP) gene, partial cds.	Junin virus strain	Vertebrates	36	100	DQ531486,DQ531487,DQ531488,DQ531489,DQ854730	NA-BLAST					FALSE
+AF264199	Junin virus strain CbaIV4454 glycoprotein 1 (G1) gene, partial cds.	Junin virus strain	Vertebrates	36	100	DQ531486,DQ531487,DQ531488,DQ531489,DQ854730	NA-BLAST					FALSE
+AF264236	Junin virus strain CbaIV4454 nucleocapsid protein (NP) gene, partial cds.	Junin virus strain	Vertebrates	36	100	DQ531486,DQ531487,DQ531488,DQ531489,DQ854730	NA-BLAST					FALSE
+AF264198	Junin virus strain CbaLye63 glycoprotein 1 (G1) gene, partial cds.	Junin virus strain	Vertebrates	36	100	DQ531486,DQ531487,DQ531488,DQ531489,DQ854730	NA-BLAST					FALSE
+AF264237	Junin virus strain CbaLye63 nucleocapsid protein (NP) gene, partial cds.	Junin virus strain	Vertebrates	36	100	DQ531486,DQ531487,DQ531488,DQ531489,DQ854730	NA-BLAST					FALSE
+AF264212	Junin virus strain PAn10004 glycoprotein 1 (G1) gene, partial cds.	Junin virus strain	Vertebrates	36	100	DQ531486,DQ531487,DQ531488,DQ531489,DQ854730	NA-BLAST					FALSE
+AF264253	Junin virus strain PAn10004 nucleocapsid protein (NP) gene, partial cds.	Junin virus strain	Vertebrates	36	100	DQ531486,DQ531487,DQ531488,DQ531489,DQ854730	NA-BLAST					FALSE
+AF264205	Junin virus strain PAn14661 glycoprotein 1 (G1) gene, partial cds.	Junin virus strain	Vertebrates	36	100	DQ531486,DQ531487,DQ531488,DQ531489,DQ854730	NA-BLAST					FALSE
+AF264254	Junin virus strain PAn14661 nucleocapsid protein (NP) gene, partial cds.	Junin virus strain	Vertebrates	36	100	DQ531486,DQ531487,DQ531488,DQ531489,DQ854730	NA-BLAST					FALSE
+AF264233	Junin virus strain PAn14823 glycoprotein 1 (G1) gene, partial cds.	Junin virus strain	Vertebrates	36	100	DQ531486,DQ531487,DQ531488,DQ531489,DQ854730	NA-BLAST					FALSE
+AF264271	Junin virus strain PAn14823 nucleocapsid protein (NP) gene, partial cds.	Junin virus strain	Vertebrates	36	100	DQ531486,DQ531487,DQ531488,DQ531489,DQ854730	NA-BLAST					FALSE
+AF264225	Junin virus strain PAn16114 glycoprotein 1 (G1) gene, partial cds.	Junin virus strain	Vertebrates	36	100	DQ531486,DQ531487,DQ531488,DQ531489,DQ854730	NA-BLAST					FALSE
+AF264258	Junin virus strain PAn16114 nucleocapsid protein (NP) gene, partial cds.	Junin virus strain	Vertebrates	36	100	DQ531486,DQ531487,DQ531488,DQ531489,DQ854730	NA-BLAST					FALSE
+AF264203	Junin virus strain PAn16160 glycoprotein 1 (G1) gene, partial cds.	Junin virus strain	Vertebrates	36	100	DQ531486,DQ531487,DQ531488,DQ531489,DQ854730	NA-BLAST					FALSE
+AF264240	Junin virus strain PAn16160 nucleocapsid protein (NP) gene, partial cds.	Junin virus strain	Vertebrates	36	100	DQ531486,DQ531487,DQ531488,DQ531489,DQ854730	NA-BLAST					FALSE
+AF264214	Junin virus strain PAn16256 glycoprotein 1 (G1) gene, partial cds.	Junin virus strain	Vertebrates	36	100	DQ531486,DQ531487,DQ531488,DQ531489,DQ854730	NA-BLAST					FALSE
+AF264257	Junin virus strain PAn16256 nucleocapsid protein (NP) gene, partial cds.	Junin virus strain	Vertebrates	36	100	DQ531486,DQ531487,DQ531488,DQ531489,DQ854730	NA-BLAST					FALSE
+AF264213	Junin virus strain PAn16288 glycoprotein 1 (G1) gene, partial cds.	Junin virus strain	Vertebrates	36	100	DQ531486,DQ531487,DQ531488,DQ531489,DQ854730	NA-BLAST					FALSE
+AF264256	Junin virus strain PAn16288 nucleocapsid protein (NP) gene, partial cds.	Junin virus strain	Vertebrates	36	100	DQ531486,DQ531487,DQ531488,DQ531489,DQ854730	NA-BLAST					FALSE
+AF264202	Junin virus strain PAn19103 glycoprotein 1 (G1) gene, partial cds.	Junin virus strain	Vertebrates	36	100	DQ531486,DQ531487,DQ531488,DQ531489,DQ854730	NA-BLAST					FALSE
+AF264241	Junin virus strain PAn19103 nucleocapsid protein (NP) gene, partial cds.	Junin virus strain	Vertebrates	36	100	DQ531486,DQ531487,DQ531488,DQ531489,DQ854730	NA-BLAST					FALSE
+AF264201	Junin virus strain PAn19107 glycoprotein 1 (G1) gene, partial cds.	Junin virus strain	Vertebrates	36	100	DQ531486,DQ531487,DQ531488,DQ531489,DQ854730	NA-BLAST					FALSE
+AF264242	Junin virus strain PAn19107 nucleocapsid protein (NP) gene, partial cds.	Junin virus strain	Vertebrates	36	100	DQ531486,DQ531487,DQ531488,DQ531489,DQ854730	NA-BLAST					FALSE
+AF264204	Junin virus strain PAn19109 glycoprotein 1 (G1) gene, partial cds.	Junin virus strain	Vertebrates	36	100	DQ531486,DQ531487,DQ531488,DQ531489,DQ854730	NA-BLAST					FALSE
+AF264243	Junin virus strain PAn19109 nucleocapsid protein (NP) gene, partial cds.	Junin virus strain	Vertebrates	36	100	DQ531486,DQ531487,DQ531488,DQ531489,DQ854730	NA-BLAST					FALSE
+AF264223	Junin virus strain PAn19221 glycoprotein 1 (G1) gene, partial cds.	Junin virus strain	Vertebrates	36	100	DQ531486,DQ531487,DQ531488,DQ531489,DQ854730	NA-BLAST					FALSE
+AF264250	Junin virus strain PAn19221 nucleocapsid protein (NP) gene, partial cds.	Junin virus strain	Vertebrates	36	100	DQ531486,DQ531487,DQ531488,DQ531489,DQ854730	NA-BLAST					FALSE
+AF264224	Junin virus strain PAn9918 glycoprotein 1 (G1) gene, partial cds.	Junin virus strain	Vertebrates	36	100	DQ531486,DQ531487,DQ531488,DQ531489,DQ854730	NA-BLAST					FALSE
+AF264249	Junin virus strain PAn9918 nucleocapsid protein (NP) gene, partial cds.	Junin virus strain	Vertebrates	36	100	DQ531486,DQ531487,DQ531488,DQ531489,DQ854730	NA-BLAST					FALSE
+AF264273	Junin virus strain PH2290 nucleocapsid protein (NP) gene, partial cds.	Junin virus strain	Vertebrates	36	100	DQ531486,DQ531487,DQ531488,DQ531489,DQ854730	NA-BLAST					FALSE
+AF264232	Junin virus strain PH2412 glycoprotein 1 (G1) gene, partial cds.	Junin virus strain	Vertebrates	36	100	DQ531486,DQ531487,DQ531488,DQ531489,DQ854730	NA-BLAST					FALSE
+AF264270	Junin virus strain PH2412 nucleocapsid protein (NP) gene, partial cds.	Junin virus strain	Vertebrates	36	100	DQ531486,DQ531487,DQ531488,DQ531489,DQ854730	NA-BLAST					FALSE
+AF264231	Junin virus strain PH2697 glycoprotein 1 (G1) gene, partial cds.	Junin virus strain	Vertebrates	36	100	DQ531486,DQ531487,DQ531488,DQ531489,DQ854730	NA-BLAST					FALSE
+AF264269	Junin virus strain PH2697 nucleocapsid protein (NP) gene, partial cds.	Junin virus strain	Vertebrates	36	100	DQ531486,DQ531487,DQ531488,DQ531489,DQ854730	NA-BLAST					FALSE
+AF264235	Junin virus strain PH3190 glycoprotein 1 (G1) gene, partial cds.	Junin virus strain	Vertebrates	36	100	DQ531486,DQ531487,DQ531488,DQ531489,DQ854730	NA-BLAST					FALSE
+AF264272	Junin virus strain PH3190 nucleocapsid protein (NP) gene, partial cds.	Junin virus strain	Vertebrates	36	100	DQ531486,DQ531487,DQ531488,DQ531489,DQ854730	NA-BLAST					FALSE
+AF264221	Junin virus strain PH3235 glycoprotein 1 (G1) gene, partial cds.	Junin virus strain	Vertebrates	36	100	DQ531486,DQ531487,DQ531488,DQ531489,DQ854730	NA-BLAST					FALSE
+AF264264	Junin virus strain PH3235 nucleocapsid protein (NP) gene, partial cds.	Junin virus strain	Vertebrates	36	100	DQ531486,DQ531487,DQ531488,DQ531489,DQ854730	NA-BLAST					FALSE
+AF264230	Junin virus strain PH3470 glycoprotein 1 (G1) gene, partial cds.	Junin virus strain	Vertebrates	36	100	DQ531486,DQ531487,DQ531488,DQ531489,DQ854730	NA-BLAST					FALSE
+AF264268	Junin virus strain PH3470 nucleocapsid protein (NP) gene, partial cds.	Junin virus strain	Vertebrates	36	100	DQ531486,DQ531487,DQ531488,DQ531489,DQ854730	NA-BLAST					FALSE
+AF264229	Junin virus strain PH3790 glycoprotein 1 (G1) gene, partial cds.	Junin virus strain	Vertebrates	36	100	DQ531486,DQ531487,DQ531488,DQ531489,DQ854730	NA-BLAST					FALSE
+AF264267	Junin virus strain PH3790 nucleocapsid protein (NP) gene, partial cds.	Junin virus strain	Vertebrates	36	100	DQ531486,DQ531487,DQ531488,DQ531489,DQ854730	NA-BLAST					FALSE
+AF264218	Junin virus strain PH3878 glycoprotein 1 (G1) gene, partial cds.	Junin virus strain	Vertebrates	36	100	DQ531486,DQ531487,DQ531488,DQ531489,DQ854730	NA-BLAST					FALSE
+AF264263	Junin virus strain PH3878 nucleocapsid protein (NP) gene, partial cds.	Junin virus strain	Vertebrates	36	100	DQ531486,DQ531487,DQ531488,DQ531489,DQ854730	NA-BLAST					FALSE
+AF264217	Junin virus strain PH4757 glycoprotein 1 (G1) gene, partial cds.	Junin virus strain	Vertebrates	36	100	DQ531486,DQ531487,DQ531488,DQ531489,DQ854730	NA-BLAST					FALSE
+AF264260	Junin virus strain PH4757 nucleocapsid protein (NP) gene, partial cds.	Junin virus strain	Vertebrates	36	100	DQ531486,DQ531487,DQ531488,DQ531489,DQ854730	NA-BLAST					FALSE
+AF264211	Junin virus strain PH4795 glycoprotein 1 (G1) gene, partial cds.	Junin virus strain	Vertebrates	36	100	DQ531486,DQ531487,DQ531488,DQ531489,DQ854730	NA-BLAST					FALSE
+AF264259	Junin virus strain PH4795 nucleocapsid protein (NP) gene, partial cds.	Junin virus strain	Vertebrates	36	100	DQ531486,DQ531487,DQ531488,DQ531489,DQ854730	NA-BLAST					FALSE
+AF264215	Junin virus strain PH4842 glycoprotein 1 (G1) gene, partial cds.	Junin virus strain	Vertebrates	36	100	DQ531486,DQ531487,DQ531488,DQ531489,DQ854730	NA-BLAST					FALSE
+AF264262	Junin virus strain PH4842 nucleocapsid protein (NP) gene, partial cds.	Junin virus strain	Vertebrates	36	100	DQ531486,DQ531487,DQ531488,DQ531489,DQ854730	NA-BLAST					FALSE
+AF264226	Junin virus strain PH4906 glycoprotein 1 (G1) gene, partial cds.	Junin virus strain	Vertebrates	36	100	DQ531486,DQ531487,DQ531488,DQ531489,DQ854730	NA-BLAST					FALSE
+AF264255	Junin virus strain PH4906 nucleocapsid protein (NP) gene, partial cds.	Junin virus strain	Vertebrates	36	100	DQ531486,DQ531487,DQ531488,DQ531489,DQ854730	NA-BLAST					FALSE
+AF264210	Junin virus strain PH5893 glycoprotein 1 (G1) gene, partial cds.	Junin virus strain	Vertebrates	36	100	DQ531486,DQ531487,DQ531488,DQ531489,DQ854730	NA-BLAST					FALSE
+AF264275	Junin virus strain PH5893 nucleocapsid protein (NP) gene, partial cds.	Junin virus strain	Vertebrates	36	100	DQ531486,DQ531487,DQ531488,DQ531489,DQ854730	NA-BLAST					FALSE
+AF264208	Junin virus strain PH5949 glycoprotein 1 (G1) gene, partial cds.	Junin virus strain	Vertebrates	36	100	DQ531486,DQ531487,DQ531488,DQ531489,DQ854730	NA-BLAST					FALSE
+AF264252	Junin virus strain PH5949 nucleocapsid protein (NP) gene, partial cds.	Junin virus strain	Vertebrates	36	100	DQ531486,DQ531487,DQ531488,DQ531489,DQ854730	NA-BLAST					FALSE
+AF264220	Junin virus strain PH6101 glycoprotein 1 (G1) gene, partial cds.	Junin virus strain	Vertebrates	36	100	DQ531486,DQ531487,DQ531488,DQ531489,DQ854730	NA-BLAST					FALSE
+AF264247	Junin virus strain PH6101 nucleocapsid protein (NP) gene, partial cds.	Junin virus strain	Vertebrates	36	100	DQ531486,DQ531487,DQ531488,DQ531489,DQ854730	NA-BLAST					FALSE
+AF264207	Junin virus strain PH6699 glycoprotein 1 (G1) gene, partial cds.	Junin virus strain	Vertebrates	36	100	DQ531486,DQ531487,DQ531488,DQ531489,DQ854730	NA-BLAST					FALSE
+AF264251	Junin virus strain PH6699 nucleocapsid protein (NP) gene, partial cds.	Junin virus strain	Vertebrates	36	100	DQ531486,DQ531487,DQ531488,DQ531489,DQ854730	NA-BLAST					FALSE
+AF264216	Junin virus strain PH7007 glycoprotein 1 (G1) gene, partial cds.	Junin virus strain	Vertebrates	36	100	DQ531486,DQ531487,DQ531488,DQ531489,DQ854730	NA-BLAST					FALSE
+AF264261	Junin virus strain PH7007 nucleocapsid protein (NP) gene, partial cds.	Junin virus strain	Vertebrates	36	100	DQ531486,DQ531487,DQ531488,DQ531489,DQ854730	NA-BLAST					FALSE
+AF264222	Junin virus strain PH7367 glycoprotein 1 (G1) gene, partial cds.	Junin virus strain	Vertebrates	36	100	DQ531486,DQ531487,DQ531488,DQ531489,DQ854730	NA-BLAST					FALSE
+AF264209	Junin virus strain PH7734 glycoprotein 1 (G1) gene, partial cds.	Junin virus strain	Vertebrates	36	100	DQ531486,DQ531487,DQ531488,DQ531489,DQ854730	NA-BLAST					FALSE
+AF264276	Junin virus strain PH7734 nucleocapsid protein (NP) gene, partial cds.	Junin virus strain	Vertebrates	36	100	DQ531486,DQ531487,DQ531488,DQ531489,DQ854730	NA-BLAST					FALSE
+AF264234	Junin virus strain PH7994 glycoprotein 1 (G1) gene, partial cds.	Junin virus strain	Vertebrates	36	100	DQ531486,DQ531487,DQ531488,DQ531489,DQ854730	NA-BLAST					FALSE
+AF264274	Junin virus strain PH7994 nucleocapsid protein (NP) gene, partial cds.	Junin virus strain	Vertebrates	36	100	DQ531486,DQ531487,DQ531488,DQ531489,DQ854730	NA-BLAST					FALSE
+AF264244	Junin virus strain PH8840 nucleocapsid protein (NP) gene, partial cds.	Junin virus strain	Vertebrates	36	100	DQ531486,DQ531487,DQ531488,DQ531489,DQ854730	NA-BLAST					FALSE
+AF264206	Junin virus strain PH8845 glycoprotein 1 (G1) gene, partial cds.	Junin virus strain	Vertebrates	36	100	DQ531486,DQ531487,DQ531488,DQ531489,DQ854730	NA-BLAST					FALSE
+AF264245	Junin virus strain PH8845 nucleocapsid protein (NP) gene, partial cds.	Junin virus strain	Vertebrates	36	100	DQ531486,DQ531487,DQ531488,DQ531489,DQ854730	NA-BLAST					FALSE
+AF264219	Junin virus strain PHToledo glycoprotein 1 (G1) gene, partial cds.	Junin virus strain	Vertebrates	36	100	DQ531486,DQ531487,DQ531488,DQ531489,DQ854730	NA-BLAST					FALSE
+AF264246	Junin virus strain PHToledo nucleocapsid protein (NP) gene, partial cds.	Junin virus strain	Vertebrates	36	100	DQ531486,DQ531487,DQ531488,DQ531489,DQ854730	NA-BLAST					FALSE
+DQ489718	Junin virus strain XJ#44 segment L, complete sequence.	Junin virus strain	Vertebrates	36	100	DQ531486,DQ531487,DQ531488,DQ531489,DQ854730	NA-BLAST					FALSE
+AF264228	Junin virus strain XJ44 glycoprotein 1 (G1) gene, partial cds.	Junin virus strain	Vertebrates	36	100	DQ531486,DQ531487,DQ531488,DQ531489,DQ854730	NA-BLAST					FALSE
+AF264266	Junin virus strain XJ44 nucleocapsid protein (NP) gene, partial cds.	Junin virus strain	Vertebrates	36	100	DQ531486,DQ531487,DQ531488,DQ531489,DQ854730	NA-BLAST					FALSE
+AF264227	Junin virus strain XJCl3 glycoprotein 1 (G1) gene, partial cds.	Junin virus strain	Vertebrates	36	100	DQ531486,DQ531487,DQ531488,DQ531489,DQ854730	NA-BLAST					FALSE
+AF264265	Junin virus strain XJCl3 nucleocapsid protein (NP) gene, partial cds.	Junin virus strain	Vertebrates	36	100	DQ531486,DQ531487,DQ531488,DQ531489,DQ854730	NA-BLAST					FALSE
+S75739	LCMV viral protein, LCMV viral protein [lymphocytic choriomeningitis virus LCMV, host=mice, WE, CTL resistant variant CL1.2, mRNA Partial Mutant, 33 nt, segment 1 of 2].	LCMV	Vertebrates	15	100	FJ030874,HQ415780,HQ415781,HQ415782,HQ415785	NA-BLAST					FALSE
+S75741	LCMV viral protein, LCMV viral protein [lymphocytic choriomeningitis virus LCMV, host=mice, WE, CTL resistant variant CL1.2, mRNA Partial Mutant, 45 nt, segment 2 of 2].	LCMV	Vertebrates	15	100	FJ030874,HQ415780,HQ415781,HQ415782,HQ415785	NA-BLAST					FALSE
+S75748	S-RNA product, S-RNA product [lymphocytic choriomeningitis virus LCMV, host=mice, WE, CTL resistant variant 8.7, mRNA Partial Mutant, 33 nt, segment 1 of 2].	S-RNA	Vertebrates	15	100	AB209937,AB209938,AB209939,AB209940,AB209941	NA-BLAST					FALSE
+S75749	S-RNA product, S-RNA product [lymphocytic choriomeningitis virus LCMV, host=mice, WE, CTL resistant variant 8.7, mRNA Partial Mutant, 45 nt, segment 2 of 2].	S-RNA	Vertebrates	15	100	AB209937,AB209938,AB209939,AB209940,AB209941	NA-BLAST					FALSE
+S75751	S-RNA product, S-RNA product [lymphocytic choriomeningitis virus LCMV, host=mice, WE, CTL resistant variant 8.7-B23, mRNA Partial Mutant, 33 nt, segment 1 of 2].	S-RNA	Vertebrates	15	100	AB209937,AB209938,AB209939,AB209940,AB209941	NA-BLAST					FALSE
+S75753	S-RNA product, S-RNA product [lymphocytic choriomeningitis virus LCMV, host=mice, WE, CTL resistant variant 8.7-B23, mRNA Partial Mutant, 45 nt, segment 2 of 2].	S-RNA	Vertebrates	15	100	AB209937,AB209938,AB209939,AB209940,AB209941	NA-BLAST					FALSE
+AF079517	Lymphocytic choriomeningitis virus envelope glycoprotein precursor (Gp-C) gene, partial cds.	Lymphocytic choriomeningitis virus	Vertebrates	180	100	DQ118959,DQ182704,DQ182705,DQ182706,DQ182707	NA-BLAST					FALSE
+AF095783	Lymphocytic choriomeningitis virus envelope glycoprotein precursor (Gp-C) mRNA, partial cds.	Lymphocytic choriomeningitis virus	Vertebrates	180	100	DQ118959,DQ182704,DQ182705,DQ182706,DQ182707	NA-BLAST					FALSE
+AF186080	Lymphocytic choriomeningitis virus glycoprotein LCMVGP gene, complete cds.	Lymphocytic choriomeningitis virus glycoprotein	Vertebrates	2	100	EF164923,JN872495	NA-BLAST					FALSE
+AJ233183	Lymphocytic choriomeningitis virus GP1 gene, partial, clone 35.7.	Lymphocytic choriomeningitis virus	Vertebrates	180	100	DQ118959,DQ182704,DQ182705,DQ182706,DQ182707	NA-BLAST					FALSE
+AJ233192	Lymphocytic choriomeningitis virus GP1 gene, partial, clone AEv (ic) 1.	Lymphocytic choriomeningitis virus	Vertebrates	180	100	DQ118959,DQ182704,DQ182705,DQ182706,DQ182707	NA-BLAST					FALSE
+AJ233193	Lymphocytic choriomeningitis virus GP1 gene, partial, clone AEv (ic) 3.	Lymphocytic choriomeningitis virus	Vertebrates	180	100	DQ118959,DQ182704,DQ182705,DQ182706,DQ182707	NA-BLAST					FALSE
+AJ233194	Lymphocytic choriomeningitis virus GP1 gene, partial, clone AEv (ic) 4.	Lymphocytic choriomeningitis virus	Vertebrates	180	100	DQ118959,DQ182704,DQ182705,DQ182706,DQ182707	NA-BLAST					FALSE
+AJ233195	Lymphocytic choriomeningitis virus GP1 gene, partial, clone AEv (ic) 5.	Lymphocytic choriomeningitis virus	Vertebrates	180	100	DQ118959,DQ182704,DQ182705,DQ182706,DQ182707	NA-BLAST					FALSE
+AJ233176	Lymphocytic choriomeningitis virus GP1 gene, partial, clone AEv 10.	Lymphocytic choriomeningitis virus	Vertebrates	180	100	DQ118959,DQ182704,DQ182705,DQ182706,DQ182707	NA-BLAST					FALSE
+AJ233165	Lymphocytic choriomeningitis virus GP1 gene, partial, clone AEv 2.10.2.1.	Lymphocytic choriomeningitis virus	Vertebrates	180	100	DQ118959,DQ182704,DQ182705,DQ182706,DQ182707	NA-BLAST					FALSE
+AJ233162	Lymphocytic choriomeningitis virus GP1 gene, partial, clone AEv 2.5.2.2.	Lymphocytic choriomeningitis virus	Vertebrates	180	100	DQ118959,DQ182704,DQ182705,DQ182706,DQ182707	NA-BLAST					FALSE
+AJ233164	Lymphocytic choriomeningitis virus GP1 gene, partial, clone AEv 2.6.2.1.	Lymphocytic choriomeningitis virus	Vertebrates	180	100	DQ118959,DQ182704,DQ182705,DQ182706,DQ182707	NA-BLAST					FALSE
+AJ233177	Lymphocytic choriomeningitis virus GP1 gene, partial, clone AEv 20.	Lymphocytic choriomeningitis virus	Vertebrates	180	100	DQ118959,DQ182704,DQ182705,DQ182706,DQ182707	NA-BLAST					FALSE
+AJ233178	Lymphocytic choriomeningitis virus GP1 gene, partial, clone AEv 21.	Lymphocytic choriomeningitis virus	Vertebrates	180	100	DQ118959,DQ182704,DQ182705,DQ182706,DQ182707	NA-BLAST					FALSE
+AJ233179	Lymphocytic choriomeningitis virus GP1 gene, partial, clone AEv 30.	Lymphocytic choriomeningitis virus	Vertebrates	180	100	DQ118959,DQ182704,DQ182705,DQ182706,DQ182707	NA-BLAST					FALSE
+AJ233181	Lymphocytic choriomeningitis virus GP1 gene, partial, clone AEv 35.	Lymphocytic choriomeningitis virus	Vertebrates	180	100	DQ118959,DQ182704,DQ182705,DQ182706,DQ182707	NA-BLAST					FALSE
+AJ233185	Lymphocytic choriomeningitis virus GP1 gene, partial, clone AEv 35.11.	Lymphocytic choriomeningitis virus	Vertebrates	180	100	DQ118959,DQ182704,DQ182705,DQ182706,DQ182707	NA-BLAST					FALSE
+AJ233186	Lymphocytic choriomeningitis virus GP1 gene, partial, clone AEv 35.14.	Lymphocytic choriomeningitis virus	Vertebrates	180	100	DQ118959,DQ182704,DQ182705,DQ182706,DQ182707	NA-BLAST					FALSE
+AJ233187	Lymphocytic choriomeningitis virus GP1 gene, partial, clone AEv 35.15.	Lymphocytic choriomeningitis virus	Vertebrates	180	100	DQ118959,DQ182704,DQ182705,DQ182706,DQ182707	NA-BLAST					FALSE
+AJ233188	Lymphocytic choriomeningitis virus GP1 gene, partial, clone AEv 35.16.	Lymphocytic choriomeningitis virus	Vertebrates	180	100	DQ118959,DQ182704,DQ182705,DQ182706,DQ182707	NA-BLAST					FALSE
+AJ233189	Lymphocytic choriomeningitis virus GP1 gene, partial, clone AEv 35.17.	Lymphocytic choriomeningitis virus	Vertebrates	180	100	DQ118959,DQ182704,DQ182705,DQ182706,DQ182707	NA-BLAST					FALSE
+AJ233190	Lymphocytic choriomeningitis virus GP1 gene, partial, clone AEv 35.19.	Lymphocytic choriomeningitis virus	Vertebrates	180	100	DQ118959,DQ182704,DQ182705,DQ182706,DQ182707	NA-BLAST					FALSE
+AJ233191	Lymphocytic choriomeningitis virus GP1 gene, partial, clone AEv 35.22.	Lymphocytic choriomeningitis virus	Vertebrates	180	100	DQ118959,DQ182704,DQ182705,DQ182706,DQ182707	NA-BLAST					FALSE
+AJ233182	Lymphocytic choriomeningitis virus GP1 gene, partial, clone AEv 35.6.	Lymphocytic choriomeningitis virus	Vertebrates	180	100	DQ118959,DQ182704,DQ182705,DQ182706,DQ182707	NA-BLAST					FALSE
+AJ233184	Lymphocytic choriomeningitis virus GP1 gene, partial, clone AEv 35.8.	Lymphocytic choriomeningitis virus	Vertebrates	180	100	DQ118959,DQ182704,DQ182705,DQ182706,DQ182707	NA-BLAST					FALSE
+AJ233161	Lymphocytic choriomeningitis virus GP1 gene, partial, clone AEv 5.	Lymphocytic choriomeningitis virus	Vertebrates	180	100	DQ118959,DQ182704,DQ182705,DQ182706,DQ182707	NA-BLAST					FALSE
+AJ233166	Lymphocytic choriomeningitis virus GP1 gene, partial, clone AEv 6.	Lymphocytic choriomeningitis virus	Vertebrates	180	100	DQ118959,DQ182704,DQ182705,DQ182706,DQ182707	NA-BLAST					FALSE
+AJ233167	Lymphocytic choriomeningitis virus GP1 gene, partial, clone AEv 9.	Lymphocytic choriomeningitis virus	Vertebrates	180	100	DQ118959,DQ182704,DQ182705,DQ182706,DQ182707	NA-BLAST					FALSE
+AJ233168	Lymphocytic choriomeningitis virus GP1 gene, partial, clone AEv 9.1.1.1.	Lymphocytic choriomeningitis virus	Vertebrates	180	100	DQ118959,DQ182704,DQ182705,DQ182706,DQ182707	NA-BLAST					FALSE
+AJ233169	Lymphocytic choriomeningitis virus GP1 gene, partial, clone AEv 9.1.1.2.	Lymphocytic choriomeningitis virus	Vertebrates	180	100	DQ118959,DQ182704,DQ182705,DQ182706,DQ182707	NA-BLAST					FALSE
+AJ233170	Lymphocytic choriomeningitis virus GP1 gene, partial, clone AEv 9.2.2.1.	Lymphocytic choriomeningitis virus	Vertebrates	180	100	DQ118959,DQ182704,DQ182705,DQ182706,DQ182707	NA-BLAST					FALSE
+AJ233172	Lymphocytic choriomeningitis virus GP1 gene, partial, clone AEv 9.3.1.1.	Lymphocytic choriomeningitis virus	Vertebrates	180	100	DQ118959,DQ182704,DQ182705,DQ182706,DQ182707	NA-BLAST					FALSE
+AJ233163	Lymphocytic choriomeningitis virus GP1 gene, partial, clone AEv II.	Lymphocytic choriomeningitis virus	Vertebrates	180	100	DQ118959,DQ182704,DQ182705,DQ182706,DQ182707	NA-BLAST					FALSE
+AJ233171	Lymphocytic choriomeningitis virus GP1 gene, partial, clone AEv IX.	Lymphocytic choriomeningitis virus	Vertebrates	180	100	DQ118959,DQ182704,DQ182705,DQ182706,DQ182707	NA-BLAST					FALSE
+AJ233160	Lymphocytic choriomeningitis virus GP1 gene, partial, clone AEvI.	Lymphocytic choriomeningitis virus	Vertebrates	180	100	DQ118959,DQ182704,DQ182705,DQ182706,DQ182707	NA-BLAST					FALSE
+AJ233196	Lymphocytic choriomeningitis virus GP1 gene, partial, clone WE ZH.	Lymphocytic choriomeningitis virus	Vertebrates	180	100	DQ118959,DQ182704,DQ182705,DQ182706,DQ182707	NA-BLAST					FALSE
+AJ233197	Lymphocytic choriomeningitis virus GP1 gene, partial, clone WE5 (40) 2.	Lymphocytic choriomeningitis virus	Vertebrates	180	100	DQ118959,DQ182704,DQ182705,DQ182706,DQ182707	NA-BLAST					FALSE
+DQ286945	Lymphocytic choriomeningitis virus isolate Hs#1 nucleocapsid protein (NP) gene, partial cds.	Lymphocytic choriomeningitis virus isolate	Vertebrates	134	100	DQ275199,DQ275200,DQ275201,DQ275202,DQ275203	NA-BLAST					FALSE
+DQ286933	Lymphocytic choriomeningitis virus isolate Mm#1 nucleocapsid protein (NP) gene, partial cds.	Lymphocytic choriomeningitis virus isolate	Vertebrates	134	100	DQ275199,DQ275200,DQ275201,DQ275202,DQ275203	NA-BLAST					FALSE
+DQ286940	Lymphocytic choriomeningitis virus isolate Mm#12 nucleocapsid protein (NP) gene, partial cds.	Lymphocytic choriomeningitis virus isolate	Vertebrates	134	100	DQ275199,DQ275200,DQ275201,DQ275202,DQ275203	NA-BLAST					FALSE
+DQ286941	Lymphocytic choriomeningitis virus isolate Mm#13 nucleocapsid protein (NP) gene, partial cds.	Lymphocytic choriomeningitis virus isolate	Vertebrates	134	100	DQ275199,DQ275200,DQ275201,DQ275202,DQ275203	NA-BLAST					FALSE
+DQ286942	Lymphocytic choriomeningitis virus isolate Mm#16 nucleocapsid protein (NP) gene, partial cds.	Lymphocytic choriomeningitis virus isolate	Vertebrates	134	100	DQ275199,DQ275200,DQ275201,DQ275202,DQ275203	NA-BLAST					FALSE
+DQ286943	Lymphocytic choriomeningitis virus isolate Mm#17 nucleocapsid protein (NP) gene, partial cds.	Lymphocytic choriomeningitis virus isolate	Vertebrates	134	100	DQ275199,DQ275200,DQ275201,DQ275202,DQ275203	NA-BLAST					FALSE
+DQ286944	Lymphocytic choriomeningitis virus isolate Mm#20 nucleocapsid protein (NP) gene, partial cds.	Lymphocytic choriomeningitis virus isolate	Vertebrates	134	100	DQ275199,DQ275200,DQ275201,DQ275202,DQ275203	NA-BLAST					FALSE
+DQ286934	Lymphocytic choriomeningitis virus isolate Mm#4 nucleocapsid protein (NP) gene, partial cds.	Lymphocytic choriomeningitis virus isolate	Vertebrates	134	100	DQ275199,DQ275200,DQ275201,DQ275202,DQ275203	NA-BLAST					FALSE
+DQ286935	Lymphocytic choriomeningitis virus isolate Mm#5 nucleocapsid protein (NP) gene, partial cds.	Lymphocytic choriomeningitis virus isolate	Vertebrates	134	100	DQ275199,DQ275200,DQ275201,DQ275202,DQ275203	NA-BLAST					FALSE
+DQ286936	Lymphocytic choriomeningitis virus isolate Mm#6 nucleocapsid protein (NP) gene, partial cds.	Lymphocytic choriomeningitis virus isolate	Vertebrates	134	100	DQ275199,DQ275200,DQ275201,DQ275202,DQ275203	NA-BLAST					FALSE
+DQ286937	Lymphocytic choriomeningitis virus isolate Mm#7 nucleocapsid protein (NP) gene, partial cds.	Lymphocytic choriomeningitis virus isolate	Vertebrates	134	100	DQ275199,DQ275200,DQ275201,DQ275202,DQ275203	NA-BLAST					FALSE
+DQ286938	Lymphocytic choriomeningitis virus isolate Mm#8 nucleocapsid protein (NP) gene, partial cds.	Lymphocytic choriomeningitis virus isolate	Vertebrates	134	100	DQ275199,DQ275200,DQ275201,DQ275202,DQ275203	NA-BLAST					FALSE
+DQ286939	Lymphocytic choriomeningitis virus isolate Mm#9 nucleocapsid protein (NP) gene, partial cds.	Lymphocytic choriomeningitis virus isolate	Vertebrates	134	100	DQ275199,DQ275200,DQ275201,DQ275202,DQ275203	NA-BLAST					FALSE
+M22016	Lymphocytic choriomeningitis virus L protein RNA, 5' end.	Lymphocytic choriomeningitis virus	Vertebrates	180	100	DQ118959,DQ182704,DQ182705,DQ182706,DQ182707	NA-BLAST					FALSE
+M18381	Lymphocytic choriomeningitis virus L protein RNA, partial cds, clone L122.	Lymphocytic choriomeningitis virus	Vertebrates	180	100	DQ118959,DQ182704,DQ182705,DQ182706,DQ182707	NA-BLAST					FALSE
+M18383	Lymphocytic choriomeningitis virus L protein RNA, partial cds, clone L123.	Lymphocytic choriomeningitis virus	Vertebrates	180	100	DQ118959,DQ182704,DQ182705,DQ182706,DQ182707	NA-BLAST					FALSE
+AJ297484	Lymphocytic choriomeningitis virus mRNA for glycoprotein C (gp-C gene), strain WE.	Lymphocytic choriomeningitis virus	Vertebrates	180	100	DQ118959,DQ182704,DQ182705,DQ182706,DQ182707	NA-BLAST					FALSE
+AY876381	Lymphocytic choriomeningitis virus nucleoprotein gene, partial cds.	Lymphocytic choriomeningitis virus	Vertebrates	180	100	DQ118959,DQ182704,DQ182705,DQ182706,DQ182707	NA-BLAST					FALSE
+AJ249159	Lymphocytic choriomeningitis virus partial mRNA for Glycoprotein 1, clone Ctrl-29.10.	Lymphocytic choriomeningitis virus	Vertebrates	180	100	DQ118959,DQ182704,DQ182705,DQ182706,DQ182707	NA-BLAST					FALSE
+AJ249157	Lymphocytic choriomeningitis virus partial mRNA for Glycoprotein 1, clone Ctrl-29.8.	Lymphocytic choriomeningitis virus	Vertebrates	180	100	DQ118959,DQ182704,DQ182705,DQ182706,DQ182707	NA-BLAST					FALSE
+AJ249158	Lymphocytic choriomeningitis virus partial mRNA for Glycoprotein 1, clone Ctrl-29.9.	Lymphocytic choriomeningitis virus	Vertebrates	180	100	DQ118959,DQ182704,DQ182705,DQ182706,DQ182707	NA-BLAST					FALSE
+AJ249150	Lymphocytic choriomeningitis virus partial mRNA for Glycoprotein 1, clone H25-29.1.	Lymphocytic choriomeningitis virus	Vertebrates	180	100	DQ118959,DQ182704,DQ182705,DQ182706,DQ182707	NA-BLAST					FALSE
+AJ249151	Lymphocytic choriomeningitis virus partial mRNA for Glycoprotein 1, clone H25-29.2.	Lymphocytic choriomeningitis virus	Vertebrates	180	100	DQ118959,DQ182704,DQ182705,DQ182706,DQ182707	NA-BLAST					FALSE
+AJ249152	Lymphocytic choriomeningitis virus partial mRNA for Glycoprotein 1, clone H25-29.3.	Lymphocytic choriomeningitis virus	Vertebrates	180	100	DQ118959,DQ182704,DQ182705,DQ182706,DQ182707	NA-BLAST					FALSE
+AJ249153	Lymphocytic choriomeningitis virus partial mRNA for Glycoprotein 1, clone H25-29.4.	Lymphocytic choriomeningitis virus	Vertebrates	180	100	DQ118959,DQ182704,DQ182705,DQ182706,DQ182707	NA-BLAST					FALSE
+AJ249154	Lymphocytic choriomeningitis virus partial mRNA for Glycoprotein 1, clone H25-29.5.	Lymphocytic choriomeningitis virus	Vertebrates	180	100	DQ118959,DQ182704,DQ182705,DQ182706,DQ182707	NA-BLAST					FALSE
+AJ249155	Lymphocytic choriomeningitis virus partial mRNA for Glycoprotein 1, clone H25-29.6.	Lymphocytic choriomeningitis virus	Vertebrates	180	100	DQ118959,DQ182704,DQ182705,DQ182706,DQ182707	NA-BLAST					FALSE
+AJ249156	Lymphocytic choriomeningitis virus partial mRNA for Glycoprotein 1, clone H25-29.7.	Lymphocytic choriomeningitis virus	Vertebrates	180	100	DQ118959,DQ182704,DQ182705,DQ182706,DQ182707	NA-BLAST					FALSE
+AJ249149	Lymphocytic choriomeningitis virus partial mRNA for Glycoprotein 1.	Lymphocytic choriomeningitis virus	Vertebrates	180	100	DQ118959,DQ182704,DQ182705,DQ182706,DQ182707	NA-BLAST					FALSE
+M64449	Lymphocytic choriomeningitis virus polymerase gene, partial cds.	Lymphocytic choriomeningitis virus	Vertebrates	180	100	DQ118959,DQ182704,DQ182705,DQ182706,DQ182707	NA-BLAST					FALSE
+M64450	Lymphocytic choriomeningitis virus polymerase gene, partial cds.	Lymphocytic choriomeningitis virus	Vertebrates	180	100	DQ118959,DQ182704,DQ182705,DQ182706,DQ182707	NA-BLAST					FALSE
+M64451	Lymphocytic choriomeningitis virus polymerase gene, partial cds.	Lymphocytic choriomeningitis virus	Vertebrates	180	100	DQ118959,DQ182704,DQ182705,DQ182706,DQ182707	NA-BLAST					FALSE
+M64452	Lymphocytic choriomeningitis virus polymerase gene, partial cds.	Lymphocytic choriomeningitis virus	Vertebrates	180	100	DQ118959,DQ182704,DQ182705,DQ182706,DQ182707	NA-BLAST					FALSE
+AY216510	Lymphocytic choriomeningitis virus polymerase gene, partial cds.	Lymphocytic choriomeningitis virus	Vertebrates	180	100	DQ118959,DQ182704,DQ182705,DQ182706,DQ182707	NA-BLAST					FALSE
+DQ182703	Lymphocytic choriomeningitis virus strain 200501927 segment L polymerase gene, partial cds.	Lymphocytic choriomeningitis virus strain	Vertebrates	41	100	DQ182704,DQ182705,DQ182706,DQ182707,DQ888891	NA-BLAST					FALSE
+DQ888889	Lymphocytic choriomeningitis virus strain 200504261 segment L polymerase gene, partial cds.	Lymphocytic choriomeningitis virus strain	Vertebrates	41	100	DQ182704,DQ182705,DQ182706,DQ182707,DQ888891	NA-BLAST					FALSE
+EU195888	Lymphocytic choriomeningitis virus strain MX glycoprotein precursor (GPC) gene, complete cds.	Lymphocytic choriomeningitis virus strain	Vertebrates	41	100	DQ182704,DQ182705,DQ182706,DQ182707,DQ888891	NA-BLAST					FALSE
+AJ131281	Lymphocytic choriomeningitis virus z gene, partial, strain MX.	Lymphocytic choriomeningitis virus	Vertebrates	180	100	DQ118959,DQ182704,DQ182705,DQ182706,DQ182707	NA-BLAST					FALSE
+J02241	lymphocytic choriomeningitis-arm virus l rna 3' terminus.	NA-CAT	Vertebrates				NA-BLAST					FALSE
+J02242	lymphocytic choriomeningitis-arm virus s rna 3' terminus.	NA-CAT	Vertebrates				NA-BLAST					FALSE
+KT598242	Soybean-associated partitivirus 1 isolate SaParV1-1 segment RNA1, partial sequence.	Soybean-associated	Plants	5	50	KM015260,KT598226,KT598232,KT598235,KT598237	Invertebrates	GQ433359	29	96.67	52	FALSE
+KT013296	Papaya meleira virus strain RN Brazil, complete genome.	Papaya meleira virus	Plants	7	100	KF214786,KF781635,KT186130,KT186131,KT186132	Invertebrates	EU001263	27	100	54	FALSE
+KT202802	Coffee ringspot virus isolate L ORF1 gene, partial cds.	Coffee ringspot virus isolate	Plants	1	100	GQ979998	NA-BLAST					FALSE
+KT202803	Coffee ringspot virus isolate M ORF1 gene, partial cds.	Coffee ringspot virus isolate	Plants	1	100	GQ979998	NA-BLAST					FALSE
+KT202804	Coffee ringspot virus isolate R ORF1 gene, partial cds.	Coffee ringspot virus isolate	Plants	1	100	GQ979998	NA-BLAST					FALSE
+KT202805	Coffee ringspot virus isolate S ORF1 gene, partial cds.	Coffee ringspot virus isolate	Plants	1	100	GQ979998	NA-BLAST					FALSE
+KT202806	Coffee ringspot virus isolate I ORF1 gene, partial cds.	Coffee ringspot virus isolate	Plants	1	100	GQ979998	NA-BLAST					FALSE
+KT202807	Coffee ringspot virus isolate A1 ORF1 gene, partial cds.	Coffee ringspot virus isolate	Plants	1	100	GQ979998	NA-BLAST					FALSE
+KT202808	Coffee ringspot virus isolate N1 ORF1 gene, partial cds.	Coffee ringspot virus isolate	Plants	1	100	GQ979998	NA-BLAST					FALSE
+KT202809	Coffee ringspot virus isolate P1 ORF1 gene, partial cds.	Coffee ringspot virus isolate	Plants	1	100	GQ979998	NA-BLAST					FALSE
+KT202810	Coffee ringspot virus isolate T1 ORF1 gene, partial cds.	Coffee ringspot virus isolate	Plants	1	100	GQ979998	NA-BLAST					FALSE
+KT202813	Coffee ringspot virus isolate X1 ORF1 gene, partial cds.	Coffee ringspot virus isolate	Plants	1	100	GQ979998	NA-BLAST					FALSE
+KT202814	Coffee ringspot virus isolate T ORF1 gene, partial cds.	Coffee ringspot virus isolate	Plants	1	100	GQ979998	NA-BLAST					FALSE
+KT202816	Coffee ringspot virus isolate BE-2 ORF1 gene, partial cds.	Coffee ringspot virus isolate	Plants	1	100	GQ979998	NA-BLAST					FALSE
+KT202817	Coffee ringspot virus isolate BE-3 ORF1 gene, partial cds.	Coffee ringspot virus isolate	Plants	1	100	GQ979998	NA-BLAST					FALSE
+KT202818	Coffee ringspot virus isolate BE-4 ORF1 gene, partial cds.	Coffee ringspot virus isolate	Plants	1	100	GQ979998	NA-BLAST					FALSE
+KT202819	Coffee ringspot virus isolate BE-5 ORF1 gene, partial cds.	Coffee ringspot virus isolate	Plants	1	100	GQ979998	NA-BLAST					FALSE
+KT202820	Coffee ringspot virus isolate BE-6 ORF1 gene, partial cds.	Coffee ringspot virus isolate	Plants	1	100	GQ979998	NA-BLAST					FALSE
+KT202822	Coffee ringspot virus isolate BE-8 ORF1 gene, partial cds.	Coffee ringspot virus isolate	Plants	1	100	GQ979998	NA-BLAST					FALSE
+KT202823	Coffee ringspot virus isolate BE-9 ORF1 gene, partial cds.	Coffee ringspot virus isolate	Plants	1	100	GQ979998	NA-BLAST					FALSE
+KT202824	Coffee ringspot virus isolate BE-10 ORF1 gene, partial cds.	Coffee ringspot virus isolate	Plants	1	100	GQ979998	NA-BLAST					FALSE
+KT202825	Coffee ringspot virus isolate BE-11 ORF1 gene, partial cds.	Coffee ringspot virus isolate	Plants	1	100	GQ979998	NA-BLAST					FALSE
+KT202826	Coffee ringspot virus isolate BE-12 ORF1 gene, partial cds.	Coffee ringspot virus isolate	Plants	1	100	GQ979998	NA-BLAST					FALSE
+KT598229	Soybean-associated negative-stranded RNA virus 4 isolate SaNSRV1-1, partial sequence.	Soybean-associated	Plants	5	50	KM015260,KT598226,KT598232,KT598235,KT598237	NA-BLAST					FALSE
+KT598231	Soybean-associated single stranded RNA virus 1 isolate SaSSRV1-1, partial sequence.	Soybean-associated	Plants	5	50	KM015260,KT598226,KT598232,KT598235,KT598237	NA-BLAST					FALSE
+KT598233	Soybean-associated botybirnavirus 1 isolate SaBRV1-1 segment RNA2, partial sequence.	Soybean-associated	Plants	5	50	KM015260,KT598226,KT598232,KT598235,KT598237	NA-BLAST					FALSE
+KT598234	Soybean-associated single stranded RNA virus 2 isolate SaSSRV2-1, partial sequence.	Soybean-associated	Plants	5	50	KM015260,KT598226,KT598232,KT598235,KT598237	NA-BLAST					FALSE
+KT598241	Soybean-associated botybirnavirus 1 isolate SaBRV1-1 segment RNA1, partial sequence.	Soybean-associated	Plants	5	50	KM015260,KT598226,KT598232,KT598235,KT598237	NA-BLAST					FALSE
+KT598243	Soybean-associated single stranded RNA virus 3 isolate SaSSRV3-1, partial sequence.	Soybean-associated	Plants	5	50	KM015260,KT598226,KT598232,KT598235,KT598237	NA-BLAST					FALSE
+KT598245	Soybean-associated partitivirus 1 isolate SaParV1-1 segment RNA2, partial sequence.	Soybean-associated	Plants	5	50	KM015260,KT598226,KT598232,KT598235,KT598237	NA-BLAST					FALSE
+KF360262	Aphis glycines virus 1 isolate ApGlV1 capsid polyprotein gene, partial cds; and non-structural polyprotein gene, complete cds.	Aphis glycines virus 1 isolate	Invertebrates	1	100	KR912180	Plants	KM015260	8304	99.99	1.65E+04	FALSE
+KP272045	Capira virus strain VP-366G M protein gene, partial cds.	NA-CAT	Vertebrates				Vertebrates	AY129748	552	100	1094	TRUE
+AF204184	Guanarito virus strain S-27704 nucleocapsid protein mRNA, partial cds.	Guanarito virus strain	Vertebrates	47	100	JF412365,JF412366,JF412369,JF412370,JF412371	Invertebrates	KR260726	619	100	1227	FALSE
+KP272044	Capira virus strain VP-366G N protein and NS protein genes, complete cds.	NA-CAT	Vertebrates				Vertebrates	EF201838	1779	100	3527	TRUE
+KP272042	Campana virus strain VP-334K N protein and NS protein genes, complete cds.	NA-CAT	Vertebrates				Vertebrates	EF201842	1821	100	3610	TRUE
+KP272040	Campana virus strain VP-334K L protein gene, complete cds.	borrow KP272042	Vertebrates				Invertebrates	GQ165521	56	91.8	81.8	FALSE
+KP272041	Campana virus strain VP-334K M protein gene, complete cds.	borrow KP272042	Vertebrates				Invertebrates	EF656362	27	100	54	FALSE
+D10072	Junin virus GPC, N genes for glycoproteins, nucleocapsid protein, complete cds.	Junin virus	Vertebrates	62	100	DQ531486,DQ531487,DQ531488,DQ531489,DQ854730	Vertebrates	JF446285	433	92.13	638	TRUE
+DQ010030	Lassa virus strain Nig04-02 glycoprotein precursor (GPC) gene, partial cds.	Lassa virus strain	Vertebrates	512	100	GU481056,GU481057,GU481058,GU481059,GU481060	Vertebrates	HM143877	224	98.68	426	TRUE
+DQ010031	Lassa virus strain Nig04-010 glycoprotein precursor (GPC) gene, partial cds.	Lassa virus strain	Vertebrates	512	100	GU481056,GU481057,GU481058,GU481059,GU481060	Vertebrates	JQ511991	268	95.37	454	TRUE
+DQ272266	Junin virus strain Cba IV4454 segment S, complete sequence.	Junin virus strain	Vertebrates	36	100	DQ531486,DQ531487,DQ531488,DQ531489,DQ854730	Vertebrates	JF446285	474	96.93	850	TRUE
+DQ286931	Lymphocytic choriomeningitis virus isolate Marseille #12 segment S, complete sequence.	Lymphocytic choriomeningitis virus isolate	Vertebrates	134	100	DQ275199,DQ275200,DQ275201,DQ275202,DQ275203	Vertebrates	JX845170	201	80.08	111	TRUE
+DQ286932	Lymphocytic choriomeningitis virus isolate Marseille #12 segment L, complete sequence.	Lymphocytic choriomeningitis virus isolate	Vertebrates	134	100	DQ275199,DQ275200,DQ275201,DQ275202,DQ275203	Vertebrates	FJ607022	4399	81.87	2886	TRUE
+DQ328874	Mopeia virus strain Mozambique segment S, complete sequence.	Mopeia virus	Vertebrates	17	100	KF926391,KF926392,KF926393,KF926394,KF926395	Vertebrates	AB586644	100	86.21	103	TRUE
+DQ328875	Mopeia virus strain Mozambique segment L, complete sequence.	Mopeia virus	Vertebrates	17	100	KF926391,KF926392,KF926393,KF926394,KF926395	Vertebrates	AB586645	139	84.76	127	TRUE
+DQ328876	Mobala virus strain Acar 3080 segment L, complete sequence.	Mobala virus strain	Vertebrates	3	100	JQ956481,JQ956482,JQ956483	Vertebrates	AB702941	330	81.28	186	TRUE
+DQ328878	Ippy virus strain Dak An B 188 d segment L, complete sequence.	Ippy	Vertebrates	1	100	HE814063	Plants	AB896720	27	96.43	48.1	FALSE
+DQ361065	Lymphocytic choriomeningitis virus clone 13 segment S, complete sequence.	Lymphocytic choriomeningitis virus	Vertebrates	180	100	DQ118959,DQ182704,DQ182705,DQ182706,DQ182707	Vertebrates	KJ603308	3365	100	6671	TRUE
+DQ361066	Lymphocytic choriomeningitis virus clone 13 segment L, complete sequence.	Lymphocytic choriomeningitis virus	Vertebrates	180	100	DQ118959,DQ182704,DQ182705,DQ182706,DQ182707	Vertebrates	KJ603307	6677	99.97	1.32E+04	TRUE
+DQ832669	Lassa virus isolate BA263 nucleoprotein (NP) gene, partial cds.	Lassa virus isolate	Vertebrates	111	100	FJ824031,JX845167,JX845169,JX845171,KF926390	Vertebrates	GU830839	624	99.36	1217	TRUE
+DQ832670	Lassa virus isolate BA289 nucleoprotein (NP) gene, partial cds.	Lassa virus isolate	Vertebrates	111	100	FJ824031,JX845167,JX845169,JX845171,KF926390	Vertebrates	GU830839	625	99.52	1221	TRUE
+DQ832675	Lassa virus isolate BA366 nucleoprotein (NP) gene, partial cds.	Lassa virus isolate	Vertebrates	111	100	FJ824031,JX845167,JX845169,JX845171,KF926390	Vertebrates	GU830839	628	100	1245	TRUE
+DQ868483	Lymphocytic choriomeningitis virus strain CH-5692 segment S, complete sequence.	Lymphocytic choriomeningitis virus strain CH-5692	Vertebrates	1	100	AF325214	Vertebrates	AF325214	3336	99.97	6607	TRUE
+DQ868484	Lymphocytic choriomeningitis virus strain CH-5692 segment L, complete sequence.	Lymphocytic choriomeningitis virus strain CH-5692	Vertebrates	1	100	AF325214	Vertebrates	AY510020	48	92.31	71.9	TRUE
+DQ868485	Lymphocytic choriomeningitis virus strain Pasteur segment S, complete sequence.	Lymphocytic choriomeningitis virus strain	Vertebrates	41	100	DQ182704,DQ182705,DQ182706,DQ182707,DQ888891	Vertebrates	FJ607035	2906	86.28	3005	TRUE
+DQ868486	Lymphocytic choriomeningitis virus strain Pasteur segment L, complete sequence.	Lymphocytic choriomeningitis virus strain	Vertebrates	41	100	DQ182704,DQ182705,DQ182706,DQ182707,DQ888891	Vertebrates	FJ607025	5846	82.1	3903	TRUE
+DQ868487	Lymphocytic choriomeningitis virus strain Traub segment S, complete sequence.	Lymphocytic choriomeningitis virus strain	Vertebrates	41	100	DQ182704,DQ182705,DQ182706,DQ182707,DQ888891	Vertebrates	FJ607028	3065	91.47	4367	TRUE
+DQ868488	Lymphocytic choriomeningitis virus strain Traub segment L, complete sequence.	Lymphocytic choriomeningitis virus strain	Vertebrates	41	100	DQ182704,DQ182705,DQ182706,DQ182707,DQ888891	Vertebrates	JN687950	302	89.88	396	TRUE
+DQ888890	Lymphocytic choriomeningitis virus strain 200501927 segment S nucleoprotein (NP) gene, partial cds.	Lymphocytic choriomeningitis virus strain	Vertebrates	41	100	DQ182704,DQ182705,DQ182706,DQ182707,DQ888891	Vertebrates	DQ888891	610	99.84	1203	TRUE
+DQ888892	Lymphocytic choriomeningitis virus strain 200501966 segment S nucleoprotein (NP) gene, partial cds.	Lymphocytic choriomeningitis virus strain	Vertebrates	41	100	DQ182704,DQ182705,DQ182706,DQ182707,DQ888891	Vertebrates	DQ888891	610	99.84	1203	TRUE
+DQ888893	Lymphocytic choriomeningitis virus strain 200504261 segment S nucleoprotein (NP) gene, partial cds.	Lymphocytic choriomeningitis virus strain	Vertebrates	41	100	DQ182704,DQ182705,DQ182706,DQ182707,DQ888891	Vertebrates	DQ888891	610	99.84	1203	TRUE
+EU195889	Lymphocytic choriomeningitis virus strain MX L protein gene, complete cds.	Lymphocytic choriomeningitis virus strain	Vertebrates	41	100	DQ182704,DQ182705,DQ182706,DQ182707,DQ888891	Vertebrates	JN546574	314	87.22	349	TRUE
+EU480450	Lymphocytic choriomeningitis virus segment S, complete sequence.	Lymphocytic choriomeningitis virus segment	Vertebrates	1	100	DQ118959	Vertebrates	FJ607034	3370	99.82	6645	TRUE
+EU480451	Lymphocytic choriomeningitis virus segment L, complete sequence.	Lymphocytic choriomeningitis virus segment	Vertebrates	1	100	DQ118959	Vertebrates	FJ607025	7157	99.15	1.38E+04	TRUE
+EU480452	Lymphocytic choriomeningitis virus segment S, complete sequence.	Lymphocytic choriomeningitis virus segment	Vertebrates	1	100	DQ118959	Vertebrates	FJ607034	3364	99.64	6597	TRUE
+EU480453	Lymphocytic choriomeningitis virus segment L, complete sequence.	Lymphocytic choriomeningitis virus segment	Vertebrates	1	100	DQ118959	Vertebrates	FJ607025	7166	99.28	1.39E+04	TRUE
+EU627612	Latino virus strain MARU 10924 segment L, complete sequence.	Latino virus strain MARU 10924	Vertebrates	2	100	AY935533,AY960333	Vertebrates	AY935533	2158	99.49	4205	TRUE
+EU627613	Parana virus strain 12056 segment L, complete sequence.	Parana	Vertebrates	63	79.75	HM212633,JF327421,JF327422,JF795513,JF795525	Vertebrates	AY562384	97	83.62	79.9	TRUE
+EU627614	Tamiami virus strain W 10777 segment L, complete sequence.	Tamiami virus strain W 10777 segment L, complete	Vertebrates	1	100	AY924393	Vertebrates	AY924393	7124	99.87	1.41E+04	TRUE
+EU646186	Whitewater Arroyo virus segment L, complete sequence.	Whitewater Arroyo virus	Vertebrates	34	100	EU938660,EU938661,EU938662,EU938667,JF430466	Vertebrates	EU938670	2162	99.63	4238	TRUE
+FJ607021	Lymphocytic choriomeningitis virus strain 200501927 segment L, complete sequence.	Lymphocytic choriomeningitis virus strain	Vertebrates	41	100	DQ182704,DQ182705,DQ182706,DQ182707,DQ888891	Vertebrates	KM882857	991	82.93	751	TRUE
+FJ607026	Lymphocytic choriomeningitis virus strain 200504261 segment L, complete sequence.	Lymphocytic choriomeningitis virus strain	Vertebrates	41	100	DQ182704,DQ182705,DQ182706,DQ182707,DQ888891	Vertebrates	KM882857	3114	82.36	2206	TRUE
+FJ607030	Lymphocytic choriomeningitis virus strain 200501927 segment S, complete sequence.	Lymphocytic choriomeningitis virus strain	Vertebrates	41	100	DQ182704,DQ182705,DQ182706,DQ182707,DQ888891	Vertebrates	DQ888891	610	99.84	1203	TRUE
+FJ607037	Lymphocytic choriomeningitis virus strain 200504261 segment S, complete sequence.	Lymphocytic choriomeningitis virus strain	Vertebrates	41	100	DQ182704,DQ182705,DQ182706,DQ182707,DQ888891	Vertebrates	DQ888891	610	99.84	1203	TRUE
+FJ805377	Junin virus strain XJ13 segment L, complete sequence.	Junin virus strain	Vertebrates	36	100	DQ531486,DQ531487,DQ531488,DQ531489,DQ854730	Vertebrates	KR260731	6889	96.85	1.23E+04	TRUE
+FJ805378	Junin virus strain XJ13 segment S, complete sequence.	Junin virus strain	Vertebrates	36	100	DQ531486,DQ531487,DQ531488,DQ531489,DQ854730	Vertebrates	DQ854733	3326	97.77	6139	TRUE
+FJ805379	Junin virus strain rXJ13 segment L, complete sequence.	Junin virus strain	Vertebrates	36	100	DQ531486,DQ531487,DQ531488,DQ531489,DQ854730	Vertebrates	KR260731	6889	96.85	1.23E+04	TRUE
+FJ805380	Junin virus strain rXJ13 segment S, complete sequence.	Junin virus strain	Vertebrates	36	100	DQ531486,DQ531487,DQ531488,DQ531489,DQ854730	Vertebrates	KR260730	3314	97.21	5997	TRUE
+FJ969442	Junin virus strain Candid #1 segment S, complete sequence.	Junin virus strain	Vertebrates	36	100	DQ531486,DQ531487,DQ531488,DQ531489,DQ854730	Vertebrates	JF446289	489	100	969	TRUE
+FR832710	Lassa virus L segment, strain AV, genomic RNA.	Lassa virus	Vertebrates	679	100	FJ824031,GU481056,GU481057,GU481058,GU481059	Vertebrates	GU573544	664	88.06	781	TRUE
+FR832711	Lassa virus S segment, strain AV, genomic RNA.	Lassa virus	Vertebrates	679	100	FJ824031,GU481056,GU481057,GU481058,GU481059	Vertebrates	AB586644	77	90.59	97.6	TRUE
+GQ121040	Junin virus strain XJ#44 segment S, complete sequence.	Junin virus strain	Vertebrates	36	100	DQ531486,DQ531487,DQ531488,DQ531489,DQ854730	Vertebrates	JX657710	78	87.64	89.7	TRUE
+GQ862981	Lymphocytic choriomeningitis virus strain Bulgaria segment L, complete sequence.	Lymphocytic choriomeningitis virus strain	Vertebrates	41	100	DQ182704,DQ182705,DQ182706,DQ182707,DQ888891	Vertebrates	AB477530	1250	81.17	737	TRUE
+GQ862982	Lymphocytic choriomeningitis virus strain Bulgaria segment S, complete sequence.	Lymphocytic choriomeningitis virus strain	Vertebrates	41	100	DQ182704,DQ182705,DQ182706,DQ182707,DQ888891	Vertebrates	EU136038	2670	81.08	1574	TRUE
+AB261990	Lymphocytic choriomeningitis virus genomic RNA, segment S, nearly complete sequence including cds, strain: M2.	Lymphocytic choriomeningitis virus	Vertebrates	180	100	DQ118959,DQ182704,DQ182705,DQ182706,DQ182707	Vertebrates	EU136038	2872	86.98	3112	TRUE
+AB261991	Lymphocytic choriomeningitis virus genomic RNA, segment S, nearly complete sequence including cds, strain: M1.	Lymphocytic choriomeningitis virus	Vertebrates	180	100	DQ118959,DQ182704,DQ182705,DQ182706,DQ182707	Vertebrates	EU136038	2872	86.98	3112	TRUE
+AB627951	Lymphocytic choriomeningitis virus genomic RNA, segment: S, complete sequence, strain: WE, sub strain: Nagasaki.	Lymphocytic choriomeningitis virus	Vertebrates	180	100	DQ118959,DQ182704,DQ182705,DQ182706,DQ182707	Vertebrates	FJ607035	2945	87.23	3259	TRUE
+AB627952	Lymphocytic choriomeningitis virus genomic RNA, segment: S, complete sequence, strain: OQ28.	Lymphocytic choriomeningitis virus	Vertebrates	180	100	DQ118959,DQ182704,DQ182705,DQ182706,DQ182707	Vertebrates	FJ607028	3052	90.86	4216	TRUE
+AB627953	Lymphocytic choriomeningitis virus genomic RNA, segment: S, complete sequence, strain: BRC.	Lymphocytic choriomeningitis virus	Vertebrates	180	100	DQ118959,DQ182704,DQ182705,DQ182706,DQ182707	Vertebrates	EU136038	2872	86.95	3114	TRUE
+AB627955	Lymphocytic choriomeningitis virus genomic RNA, segment: L, complete sequence, strain: OQ28.	Lymphocytic choriomeningitis virus	Vertebrates	180	100	DQ118959,DQ182704,DQ182705,DQ182706,DQ182707	Vertebrates	FJ607022	5738	84.78	5233	TRUE
+AB627956	Lymphocytic choriomeningitis virus genomic RNA, segment: L, complete sequence, strain: BRC.	Lymphocytic choriomeningitis virus	Vertebrates	180	100	DQ118959,DQ182704,DQ182705,DQ182706,DQ182707	Vertebrates	AB477530	7132	98.99	1.37E+04	TRUE
+HQ126698	Junin virus strain Candid1-wt segment L, complete sequence.	Junin virus strain	Vertebrates	36	100	DQ531486,DQ531487,DQ531488,DQ531489,DQ854730	Vertebrates	EF036522	554	96.68	985	TRUE
+HQ126699	Junin virus strain Candid1-wt segment S, complete sequence.	Junin virus strain	Vertebrates	36	100	DQ531486,DQ531487,DQ531488,DQ531489,DQ854730	Vertebrates	JF446289	489	100	969	TRUE
+HQ126700	Junin virus strain Candid1-rec segment L, complete sequence.	Junin virus strain	Vertebrates	36	100	DQ531486,DQ531487,DQ531488,DQ531489,DQ854730	Vertebrates	EF036522	554	96.68	985	TRUE
+HQ126701	Junin virus strain Candid1-rec segment S, complete sequence.	Junin virus strain	Vertebrates	36	100	DQ531486,DQ531487,DQ531488,DQ531489,DQ854730	Vertebrates	JF446289	488	99.8	961	TRUE
+HQ688672	Lassa virus strain Josiah segment S, complete sequence.	Lassa virus strain Josiah segment S,	Vertebrates	1	100	JN650517	Vertebrates	JN650517	3396	99.97	6726	TRUE
+HQ688673	Lassa virus strain recombinant Josiah segment S, complete sequence.	Lassa virus strain	Vertebrates	512	100	GU481056,GU481057,GU481058,GU481059,GU481060	Vertebrates	JN650517	3396	99.97	6726	TRUE
+HQ688674	Lassa virus strain Josiah segment L, complete sequence.	Lassa virus strain Josiah segment L,	Vertebrates	1	100	JN650518	Vertebrates	JN650518	7271	99.82	1.43E+04	TRUE
+HQ688675	Lassa virus strain recombinant Josiah segment L, complete sequence.	Lassa virus strain	Vertebrates	512	100	GU481056,GU481057,GU481058,GU481059,GU481060	Vertebrates	JN650518	7269	99.79	1.43E+04	TRUE
+J04324	Lassa virus S genome encoding the nucleoprotein and glycoprotein mRNAs, complete cds.	Lassa virus	Vertebrates	679	100	FJ824031,GU481056,GU481057,GU481058,GU481059	Vertebrates	AY772168	3396	99.82	6696	TRUE
+J04331	Lymphocytic choriomeningitis virus putative RNA polymerase L gene, complete cds.	Lymphocytic choriomeningitis virus	Vertebrates	180	100	DQ118959,DQ182704,DQ182705,DQ182706,DQ182707	Vertebrates	KJ603309	6667	99.91	1.32E+04	TRUE
+J04340	Tacaribe virus L protein and P-11 protein genes, complete cds.	Tacaribe virus	Invertebrates	2	100	KF923400,KF923401	Invertebrates	KF923401	7088	99.79	1.40E+04	TRUE
+JF799977	Junin virus strain XJ17 segment L, complete sequence.	Junin virus strain	Vertebrates	36	100	DQ531486,DQ531487,DQ531488,DQ531489,DQ854730	Vertebrates	KR260733	6513	97.27	1.18E+04	TRUE
+JF799978	Junin virus strain XJ34 segment L, complete sequence.	Junin virus strain	Vertebrates	36	100	DQ531486,DQ531487,DQ531488,DQ531489,DQ854730	Vertebrates	KR260733	6513	97.27	1.18E+04	TRUE
+JF799979	Junin virus strain XJ39 segment L, complete sequence.	Junin virus strain	Vertebrates	36	100	DQ531486,DQ531487,DQ531488,DQ531489,DQ854730	Vertebrates	EF036522	554	96.68	985	TRUE
+JF799980	Junin virus strain XJ48 segment L, complete sequence.	Junin virus strain	Vertebrates	36	100	DQ531486,DQ531487,DQ531488,DQ531489,DQ854730	Vertebrates	EF036522	554	96.68	985	TRUE
+JF799981	Junin virus strain XJ17 segment S, complete sequence.	Junin virus strain	Vertebrates	36	100	DQ531486,DQ531487,DQ531488,DQ531489,DQ854730	Vertebrates	KR260730	3315	97.24	6005	TRUE
+JF799982	Junin virus strain XJ34 segment S, complete sequence.	Junin virus strain	Vertebrates	36	100	DQ531486,DQ531487,DQ531488,DQ531489,DQ854730	Vertebrates	JF446302	376	100	745	TRUE
+JF799983	Junin virus strain XJ39 segment S, complete sequence.	Junin virus strain	Vertebrates	36	100	DQ531486,DQ531487,DQ531488,DQ531489,DQ854730	Vertebrates	JF446302	376	100	745	TRUE
+JF799984	Junin virus strain XJ48 segment S, complete sequence.	Junin virus strain	Vertebrates	36	100	DQ531486,DQ531487,DQ531488,DQ531489,DQ854730	Vertebrates	JF446289	487	99.59	954	TRUE
+JN200801	Junin virus strain recXJ13 segment S, complete sequence.	Junin virus strain	Vertebrates	36	100	DQ531486,DQ531487,DQ531488,DQ531489,DQ854730	Vertebrates	DQ854733	3325	97.74	6131	TRUE
+JN561684	Mopeia virus strain AN 21366-BNI segment S glycoprotein precursor (GPC) and nucleoprotein (NP) genes, complete cds.	Mopeia virus	Vertebrates	17	100	KF926391,KF926392,KF926393,KF926394,KF926395	Vertebrates	EU914103	337	79.86	163	TRUE
+JN561685	Mopeia virus strain AN 21366-BNI segment L, complete sequence.	Mopeia virus	Vertebrates	17	100	KF926391,KF926392,KF926393,KF926394,KF926395	Vertebrates	AY772167	7268	99.96	1.44E+04	TRUE
+JN714129	Junin virus strain P3790 segment S, complete sequence.	Junin virus strain P3790 segment S, complete	Vertebrates	1	100	DQ854739	Vertebrates	DQ854735	3392	99.97	6718	TRUE
+JN714130	Junin virus strain P3790 segment L, complete sequence.	Junin virus strain P3790 segment	Vertebrates	1	100	DQ854739	Vertebrates	EF028115	2144	100	4250	TRUE
+JN794583	Machupo virus strain Carvallo isolate USAMRIID ID 18464 segment L, complete sequence.	Machupo virus strain Carvallo	Vertebrates	2	100	AY571927,AY571954	Vertebrates	AY935529	2176	99.91	4302	TRUE
+JN794584	Machupo virus strain Carvallo isolate USAMRIID ID 18464 segment S, complete sequence.	Machupo virus strain Carvallo	Vertebrates	2	100	AY571927,AY571954	Vertebrates	AY571925	842	100	1669	TRUE
+JN794586	Machupo virus strain Mallele isolate USAMRIID ID 780 segment S, complete sequence.	Machupo virus strain	Vertebrates	77	100	AY571905,AY571906,AY571907,AY571908,AY571909	Vertebrates	AY571930	837	99.41	1649	TRUE
+JN801476	Junin virus strain Rumero segment S, complete sequence.	Junin virus strain	Vertebrates	36	100	DQ531486,DQ531487,DQ531488,DQ531489,DQ854730	Vertebrates	DQ854733	3325	97.77	6145	TRUE
+JN801477	Junin virus strain Rumero segment L, complete sequence.	Junin virus strain	Vertebrates	36	100	DQ531486,DQ531487,DQ531488,DQ531489,DQ854730	Vertebrates	KR260731	6949	97.69	1.28E+04	TRUE
+JX017360	Lujo virus segment S, complete sequence.	Lujo virus segment	Vertebrates	2	100	FJ952384,FJ952385	Vertebrates	EU938664	25	100	50.1	TRUE
+JX017361	Lujo virus strain IGR104 segment L, complete sequence.	Lujo virus	Vertebrates	2	100	FJ952384,FJ952385	Vertebrates	FJ952385	7163	100	1.42E+04	TRUE
+JX017362	Lujo virus strain IGR140 segment L, complete sequence.	Lujo virus	Vertebrates	2	100	FJ952384,FJ952385	Vertebrates	FJ952385	6787	100	1.35E+04	TRUE
+JX985096	Mopeia virus AN20410 strain IGS-28 segment L Z protein (Z) gene, complete cds; and polymerase RDRP (L) pseudogene, complete sequence.	Mopeia virus	Vertebrates	17	100	KF926391,KF926392,KF926393,KF926394,KF926395	Vertebrates	AY772167	6762	99.91	1.34E+04	TRUE
+JX985097	Mopeia virus AN20410 strain IGS-28 segment S glycoprotein precursor (GPC) gene, complete cds; and nucleocapsid protein (NP) gene, partial cds.	Mopeia virus	Vertebrates	17	100	KF926391,KF926392,KF926393,KF926394,KF926395	Vertebrates	FJ383127	404	79.84	194	TRUE
+K03362	Lassa virus (strain GA391) nucleocapsid gene, complete cds.	Lassa virus	Vertebrates	679	100	FJ824031,GU481056,GU481057,GU481058,GU481059	Vertebrates	GU481064	462	85.56	452	TRUE
+KC329849	Tacaribe virus strain TRVL-11573 nucleoprotein gene, complete cds.	Tacaribe virus	Invertebrates	2	100	KF923400,KF923401	Invertebrates	KF923400	1711	99.88	3380	TRUE
+KF471034	Bhendi yellow vein betasatellite clone VIRO 490, complete sequence.	Bhendi yellow vein betasatellite	Plants	8	100	HM590504,HM590506,KC222955,KJ462079,KJ462080	Plants	KT390365	141	100	280	TRUE
+KF471035	Bhendi yellow vein betasatellite clone VIRO 491, complete sequence.	Bhendi yellow vein betasatellite	Plants	8	100	HM590504,HM590506,KC222955,KJ462079,KJ462080	Plants	KT390365	141	100	280	TRUE
+KF471036	Bhendi yellow vein betasatellite clone VIRO 489, complete sequence.	Bhendi yellow vein betasatellite	Plants	8	100	HM590504,HM590506,KC222955,KJ462079,KJ462080	Plants	KT390365	141	99.3	266	TRUE
+KF471037	Chilli leaf curl India alphasatellite clone VIRO 391, complete sequence.	Chilli leaf curl India alphasatellite clone VIRO	Plants	1	100	KF471038	Plants	KF471038	1336	97.16	2416	TRUE
+KF471039	Chilli leaf curl India alphasatellite clone VIRO 457, complete sequence.	Chilli leaf curl India alphasatellite clone VIRO	Plants	1	100	KF471038	Plants	KF471038	1376	99.71	2696	TRUE
+KF471040	Chilli leaf curl India alphasatellite clone VIRO 450, complete sequence.	Chilli leaf curl India alphasatellite clone VIRO	Plants	1	100	KF471038	Plants	KF471038	1375	100	2726	TRUE
+KF471042	Gossypium mustilinum symptomless alphasatellite clone VIRO 483, complete sequence.	Gossypium mustilinum symptomless alphasatellite clone VIRO	Plants	1	100	KF471041	Plants	KF471041	1369	99.93	2700	TRUE
+KF471043	Chilli leaf curl alphasatellite clone VIRO 273, complete sequence.	Chilli leaf curl alphasatellite clone VIRO	Plants	1	100	KF471047	Plants	KF471047	1365	99.42	2642	TRUE
+KF471044	Chilli leaf curl alphasatellite clone VIRO 340, complete sequence.	Chilli leaf curl alphasatellite clone VIRO	Plants	1	100	KF471047	Plants	KF471047	1367	99.56	2658	TRUE
+KF471045	Chilli leaf curl alphasatellite clone VIRO 453, complete sequence.	Chilli leaf curl alphasatellite clone VIRO	Plants	1	100	KF471047	Plants	KF471047	1368	99.35	2627	TRUE
+KF471046	Chilli leaf curl alphasatellite clone VIRO 354, complete sequence.	Chilli leaf curl alphasatellite clone VIRO	Plants	1	100	KF471047	Plants	KF471047	1364	99.34	2635	TRUE
+KF471048	Chilli leaf curl alphasatellite clone VIRO 368, complete sequence.	Chilli leaf curl alphasatellite clone VIRO	Plants	1	100	KF471047	Plants	KF471047	1365	99.42	2642	TRUE
+KF471049	Chilli leaf curl alphasatellite clone VIRO 409, complete sequence.	Chilli leaf curl alphasatellite clone VIRO	Plants	1	100	KF471047	Plants	FR772086	51	98.08	95.6	TRUE
+KF471050	Chilli leaf curl alphasatellite clone VIRO 306, complete sequence.	Chilli leaf curl alphasatellite clone VIRO	Plants	1	100	KF471047	Plants	FR772086	51	98.08	95.6	TRUE
+KF471051	Chilli leaf curl alphasatellite clone VIRO 313, complete sequence.	Chilli leaf curl alphasatellite clone VIRO	Plants	1	100	KF471047	Plants	FR772086	51	98.08	95.6	TRUE
+KF471052	Chilli leaf curl alphasatellite clone VIRO 317, complete sequence.	Chilli leaf curl alphasatellite clone VIRO	Plants	1	100	KF471047	Plants	AJ512951	43	100	85.7	TRUE
+KF471053	Okra leaf curl alphasatellite clone VIRO 383, complete sequence.	Okra leaf curl alphasatellite clone VIRO	Plants	1	100	KF471056	Plants	KT390408	1351	97.9	2506	TRUE
+KF471054	Okra leaf curl alphasatellite clone VIRO 390, complete sequence.	Okra leaf curl alphasatellite clone VIRO	Plants	1	100	KF471056	Plants	KT390408	1351	98.18	2522	TRUE
+KF471055	Okra leaf curl alphasatellite clone VIRO 408, complete sequence.	Okra leaf curl alphasatellite clone VIRO	Plants	1	100	KF471056	Plants	KT390408	1355	98.19	2529	TRUE
+KF471058	Chilli leaf curl Dhanbad alphasatellite clone VIRO 482, complete sequence.	Chilli leaf curl	Plants	133	100	DQ114477,DQ343289,DQ445255,DQ989326,EU582020	Plants	AJ512954	38	100	75.8	TRUE
+KF471059	Bhendi yellow vein mosaic alphasatellite clone VIRO 481, complete sequence.	Bhendi yellow vein mosaic	Plants	175	100	EF417918,EF417919,EU184017,EU188922,EU482411	Plants	AM711116	71	100	141	TRUE
+AF004519	Lymphocytic choriomeningitis virus Z protein and L protein genes, complete cds.	Lymphocytic choriomeningitis virus Z protein and	Vertebrates	1	100	JN872494	Vertebrates	AY510019	47	88.68	58	TRUE
+AF012530	Mobala virus nucleocapsid protein gene, partial cds.	Mobala virus	Vertebrates	3	100	JQ956481,JQ956482,JQ956483	Vertebrates	KJ855308	280	79.32	121	TRUE
+AF181853	Lassa virus strain LP glycoprotein precursor and nucleoprotein genes, complete cds.	Lassa virus strain	Vertebrates	512	100	GU481056,GU481057,GU481058,GU481059,GU481060	Vertebrates	AJ969407	712	99.03	1322	TRUE
+AF181854	Lassa virus strain 803213 glycoprotein precursor and nucleoprotein genes, complete cds.	Lassa virus strain	Vertebrates	512	100	GU481056,GU481057,GU481058,GU481059,GU481060	Vertebrates	KM821976	3151	93.45	4932	TRUE
+AF182219	Lassa virus strain las803213 nucleoprotein gene, partial cds.	Lassa virus strain	Vertebrates	512	100	GU481056,GU481057,GU481058,GU481059,GU481060	Vertebrates	KM821974	600	95.54	1023	TRUE
+AF182220	Lassa virus strain las803214 nucleoprotein gene, partial cds.	Lassa virus strain	Vertebrates	512	100	GU481056,GU481057,GU481058,GU481059,GU481060	Vertebrates	KM821974	600	95.54	1023	TRUE
+AF182221	Lassa virus strain las806316 nucleoprotein gene, partial cds.	Lassa virus strain	Vertebrates	512	100	GU481056,GU481057,GU481058,GU481059,GU481060	Vertebrates	KM821925	615	98.09	1148	TRUE
+AF182222	Lassa virus strain las808031 nucleoprotein gene, partial cds.	Lassa virus strain	Vertebrates	512	100	GU481056,GU481057,GU481058,GU481059,GU481060	Vertebrates	KM822031	613	97.15	1108	TRUE
+AF182225	Lassa virus strain las806321 nucleoprotein gene, partial cds.	Lassa virus strain	Vertebrates	512	100	GU481056,GU481057,GU481058,GU481059,GU481060	Vertebrates	KJ855308	111	86.72	119	TRUE
+AF182230	Lassa virus strain las803212 nucleoprotein gene, partial cds.	Lassa virus strain	Vertebrates	512	100	GU481056,GU481057,GU481058,GU481059,GU481060	Vertebrates	GU481064	183	92.42	274	TRUE
+AF182231	Lassa virus strain las807975 nucleoprotein gene, partial cds.	Lassa virus strain	Vertebrates	512	100	GU481056,GU481057,GU481058,GU481059,GU481060	Vertebrates	GU481064	183	92.42	274	TRUE
+AF182232	Lassa virus strain las803208 nucleoprotein gene, partial cds.	Lassa virus strain	Vertebrates	512	100	GU481056,GU481057,GU481058,GU481059,GU481060	Vertebrates	GU481070	581	92.52	872	TRUE
+AF182235	Lassa virus strain las803205 nucleoprotein gene, partial cds.	Lassa virus strain	Vertebrates	512	100	GU481056,GU481057,GU481058,GU481059,GU481060	Vertebrates	KM406531	594	95.65	1017	TRUE
+AF182237	Lassa virus strain las9607290 nucleoprotein gene, partial cds.	Lassa virus strain	Vertebrates	512	100	GU481056,GU481057,GU481058,GU481059,GU481060	Vertebrates	KM406552	609	98.07	1136	TRUE
+AF182238	Lassa virus strain las806827 nucleoprotein gene, partial cds.	Lassa virus strain	Vertebrates	512	100	GU481056,GU481057,GU481058,GU481059,GU481060	Vertebrates	KM406552	603	97.1	1088	TRUE
+AF182239	Lassa virus strain las801105 nucleoprotein gene, partial cds.	Lassa virus strain	Vertebrates	512	100	GU481056,GU481057,GU481058,GU481059,GU481060	Vertebrates	KM406533	606	97.58	1112	TRUE
+AF182240	Lassa virus strain las801107 nucleoprotein gene, partial cds.	Lassa virus strain	Vertebrates	512	100	GU481056,GU481057,GU481058,GU481059,GU481060	Vertebrates	KM406533	606	97.58	1112	TRUE
+AF182241	Lassa virus strain las801104 nucleoprotein gene, partial cds.	Lassa virus strain	Vertebrates	512	100	GU481056,GU481057,GU481058,GU481059,GU481060	Vertebrates	KM406533	607	97.75	1120	TRUE
+AF182242	Lassa virus strain las801106 nucleoprotein gene, partial cds.	Lassa virus strain	Vertebrates	512	100	GU481056,GU481057,GU481058,GU481059,GU481060	Vertebrates	KM406533	607	97.75	1120	TRUE
+AF182243	Lassa virus strain las801109 nucleoprotein gene, partial cds.	Lassa virus strain	Vertebrates	512	100	GU481056,GU481057,GU481058,GU481059,GU481060	Vertebrates	KM406533	604	97.26	1096	TRUE
+AF182245	Lassa virus strain las807875 nucleoprotein gene, partial cds.	Lassa virus strain	Vertebrates	512	100	GU481056,GU481057,GU481058,GU481059,GU481060	Vertebrates	KM406522	602	96.94	1080	TRUE
+AF182246	Lassa virus strain las807976 nucleoprotein gene, partial cds.	Lassa virus strain	Vertebrates	512	100	GU481056,GU481057,GU481058,GU481059,GU481060	Vertebrates	KM406522	600	96.62	1065	TRUE
+AF182247	Lassa virus strain las803211 nucleoprotein gene, partial cds.	Lassa virus strain	Vertebrates	512	100	GU481056,GU481057,GU481058,GU481059,GU481060	Vertebrates	KM406521	601	96.78	1072	TRUE
+AF182248	Lassa virus strain las801101 nucleoprotein gene, partial cds.	Lassa virus strain	Vertebrates	512	100	GU481056,GU481057,GU481058,GU481059,GU481060	Vertebrates	KM406521	602	96.94	1080	TRUE
+AF182249	Lassa virus strain las801103 nucleoprotein gene, partial cds.	Lassa virus strain	Vertebrates	512	100	GU481056,GU481057,GU481058,GU481059,GU481060	Vertebrates	KM406519	589	95.93	1019	TRUE
+AF182250	Lassa virus strain las803206 nucleoprotein gene, partial cds.	Lassa virus strain	Vertebrates	512	100	GU481056,GU481057,GU481058,GU481059,GU481060	Vertebrates	KM406521	601	96.78	1072	TRUE
+AF182251	Lassa virus strain las801102 nucleoprotein gene, partial cds.	Lassa virus strain	Vertebrates	512	100	GU481056,GU481057,GU481058,GU481059,GU481060	Vertebrates	KM406521	605	97.42	1104	TRUE
+AF182255	Lassa virus strain las9607302 nucleoprotein gene, partial cds.	Lassa virus strain	Vertebrates	512	100	GU481056,GU481057,GU481058,GU481059,GU481060	Vertebrates	KM406555	607	97.75	1120	TRUE
+AF204180	Guanarito virus strain VHF-1608 clone B nucleocapsid protein mRNA, partial cds.	Guanarito virus strain VHF-1608	Vertebrates	2	100	AY510022,AY562388	Vertebrates	AY497548	610	98.55	1160	TRUE
+AF204182	Guanarito virus strain VHF-1750 nucleocapsid protein mRNA, partial cds.	Guanarito virus strain VHF-1750	Vertebrates	3	100	AY512334,AY562390,AY572559	Vertebrates	AY572559	618	99.84	1219	TRUE
+AF204185	Guanarito virus strain VHF-623 nucleocapsid protein mRNA, partial cds.	Guanarito virus strain	Vertebrates	47	100	JF412365,JF412366,JF412369,JF412370,JF412371	Vertebrates	JF412365	618	99.84	1211	TRUE
+AF204186	Guanarito virus strain VHF-864 nucleocapsid protein mRNA, partial cds.	Guanarito virus strain	Vertebrates	47	100	JF412365,JF412366,JF412369,JF412370,JF412371	Vertebrates	AY572557	612	98.87	1172	TRUE
+AF204187	Guanarito virus strain VHF-383 nucleocapsid protein mRNA, partial cds.	Guanarito virus strain	Vertebrates	47	100	JF412365,JF412366,JF412369,JF412370,JF412371	Vertebrates	U62563	619	100	1227	TRUE
+AF204188	Guanarito virus strain VHF-390 nucleocapsid protein mRNA, partial cds.	Guanarito virus strain	Vertebrates	47	100	JF412365,JF412366,JF412369,JF412370,JF412371	Vertebrates	U62564	619	100	1227	TRUE
+AF204189	Guanarito virus strain VHF-3900 nucleocapsid protein mRNA, partial cds.	Guanarito virus strain	Vertebrates	47	100	JF412365,JF412366,JF412369,JF412370,JF412371	Vertebrates	AY576604	618	99.84	1219	TRUE
+AF204190	Guanarito virus strain VHF-4194 nucleocapsid protein mRNA, partial cds.	Guanarito virus strain	Vertebrates	47	100	JF412365,JF412366,JF412369,JF412370,JF412371	Vertebrates	KR260720	607	98.06	1132	TRUE
+AF204191	Guanarito virus strain VHF-1701 nucleocapsid protein mRNA, partial cds.	Guanarito virus strain	Vertebrates	47	100	JF412365,JF412366,JF412369,JF412370,JF412371	Vertebrates	AY572557	613	99.03	1181	TRUE
+AF204194	Guanarito virus strain VHF-2040 nucleocapsid protein mRNA, partial cds.	Guanarito virus strain	Vertebrates	47	100	JF412365,JF412366,JF412369,JF412370,JF412371	Vertebrates	AY572556	619	100	1227	TRUE
+AF204195	Guanarito virus strain VHF-2008 nucleocapsid protein mRNA, partial cds.	Guanarito virus strain	Vertebrates	47	100	JF412365,JF412366,JF412369,JF412370,JF412371	Vertebrates	AY572560	567	91.75	823	TRUE
+AF204196	Guanarito virus strain VHF-4016 nucleocapsid protein mRNA, partial cds.	Guanarito virus strain	Vertebrates	47	100	JF412365,JF412366,JF412369,JF412370,JF412371	Vertebrates	AY572556	608	98.22	1140	TRUE
+AF204198	Guanarito virus strain S-163806 nucleocapsid protein mRNA, partial cds.	Guanarito virus strain	Vertebrates	47	100	JF412365,JF412366,JF412369,JF412370,JF412371	Vertebrates	AY572558	619	100	1227	TRUE
+AF204199	Guanarito virus strain S-164120 nucleocapsid protein mRNA, partial cds.	Guanarito virus strain	Vertebrates	47	100	JF412365,JF412366,JF412369,JF412370,JF412371	Vertebrates	AY572555	608	98.22	1140	TRUE
+AF204200	Guanarito virus strain S-161231 nucleocapsid protein mRNA, partial cds.	Guanarito virus strain	Vertebrates	47	100	JF412365,JF412366,JF412369,JF412370,JF412371	Vertebrates	AY572557	619	100	1227	TRUE
+AF204201	Guanarito virus strain S-163992 nucleocapsid protein mRNA, partial cds.	Guanarito virus strain	Vertebrates	47	100	JF412365,JF412366,JF412369,JF412370,JF412371	Vertebrates	AY572556	619	100	1227	TRUE
+AF204202	Guanarito virus strain S-163792 nucleocapsid protein mRNA, partial cds.	Guanarito virus strain	Vertebrates	47	100	JF412365,JF412366,JF412369,JF412370,JF412371	Vertebrates	AY497548	619	100	1227	TRUE
+AF204203	Guanarito virus strain VHF-3892 nucleocapsid protein mRNA, partial cds.	Guanarito virus strain	Vertebrates	47	100	JF412365,JF412366,JF412369,JF412370,JF412371	Vertebrates	AY576604	611	98.87	1170	TRUE
+AF204204	Guanarito virus strain VHF-3990 nucleocapsid protein mRNA, partial cds.	Guanarito virus strain VHF-3990	Vertebrates	3	100	AY512335,AY562391,AY576604	Vertebrates	AY576604	619	100	1227	TRUE
+AF204205	Guanarito virus strain S-16995 nucleocapsid protein mRNA, partial cds.	Guanarito virus strain	Vertebrates	47	100	JF412365,JF412366,JF412369,JF412370,JF412371	Vertebrates	AY572561	618	99.84	1219	TRUE
+AF204206	Guanarito virus strain VHF-1150 nucleocapsid protein mRNA, partial cds.	Guanarito virus strain	Vertebrates	47	100	JF412365,JF412366,JF412369,JF412370,JF412371	Vertebrates	JF412376	615	99.51	1201	TRUE
+AF204207	Guanarito virus strain VHF-5603 nucleocapsid protein mRNA, partial cds.	Guanarito virus strain	Vertebrates	47	100	JF412365,JF412366,JF412369,JF412370,JF412371	Vertebrates	AY572559	576	93.2	892	TRUE
+AF228063	Whitewater Arroyo virus S segment, complete sequence.	Whitewater Arroyo virus	Vertebrates	34	100	EU938660,EU938661,EU938662,EU938667,JF430466	Vertebrates	AY012721	518	100	1027	TRUE
+AF246121	Lassa virus strain AV glycoprotein precursor (GPC) and nucleoprotein (NP) genes, complete cds.	Lassa virus strain	Vertebrates	512	100	GU481056,GU481057,GU481058,GU481059,GU481060	Vertebrates	AB586644	77	90.59	97.6	TRUE
+AF277659	Pirital virus segment S glycoprotein precursor (GPC) and nucleocapsid protein (N) genes, complete cds.	Pirital virus segment	Vertebrates	1	100	AY494081	Vertebrates	AY573921	2081	78.97	777	TRUE
+KF824532	Macrobrachium rosenbergii nodavirus strain Yogyakarta capsid protein gene, partial cds.	Macrobrachium rosenbergii nodavirus strain	Invertebrates	10	100	DQ459203,DQ459204,DQ459205,DQ459206,DQ459207	Invertebrates	DQ521575	1093	98.29	2054	TRUE
+KF824533	Macrobrachium rosenbergii nodavirus strain Yogyakarta RNA-dependent RNA polymerase gene, partial cds.	Macrobrachium rosenbergii nodavirus strain	Invertebrates	10	100	DQ459203,DQ459204,DQ459205,DQ459206,DQ459207	Invertebrates	JQ418295	1286	98.32	2420	TRUE
+KJ955449	Temperate fruit decay-associated virus isolate MFB15S1, complete genome.	Temperate fruit decay-associated virus isolate	Plants	44	100	KJ955447,KJ955448,KJ955450,KJ955451,KR134311	Plants	KJ955447	3441	99.97	6807	TRUE
+KM105951	Parvovirus NIH-CQV-Co, complete genome.	Parvovirus	Vertebrates	282	83.93	FN295577,FN295578,FN295579,FN295580,FN295581	Vertebrates	KC617868	3361	100	6663	TRUE
+KM198592	Machupo virus strain Carvallo segment S, complete sequence.	Machupo virus strain Carvallo	Vertebrates	2	100	AY571927,AY571954	Vertebrates	AY571925	842	100	1669	TRUE
+KM198593	Machupo virus strain Carvallo segment L, complete sequence.	Machupo virus strain Carvallo	Vertebrates	2	100	AY571927,AY571954	Vertebrates	AY935529	2168	99.91	4286	TRUE
+KM215146	Bat coronavirus strain BatCoV1 RNA-dependent RNA polymerase gene, partial cds.	Bat coronavirus strain	Vertebrates	3	100	AY864196,AY864197,AY864198	Vertebrates	DQ648795	57	89.06	80	TRUE
+KM215147	Bat coronavirus strain BatCoV2 RNA-dependent RNA polymerase gene, partial cds.	Bat coronavirus strain	Vertebrates	3	100	AY864196,AY864197,AY864198	Vertebrates	AB354579	30	100	60	TRUE
+KM401565	Astrovirus PA strain Paris, complete genome.	Astrovirus	Vertebrates	293	100	FJ222451,FJ227120,FJ227121,FJ227122,FJ227123	Vertebrates	AF361253	37	100	73.8	TRUE
+KM822127	Lassa virus strain Pinneo-NIG-1969 segment L Z protein (Z) and polymerase (L) genes, complete cds.	Lassa virus strain	Vertebrates	512	100	GU481056,GU481057,GU481058,GU481059,GU481060	Vertebrates	KM821978	61	89.71	79.8	TRUE
+KM822128	Lassa virus strain Pinneo-NIG-1969 segment S glycoprotein precursor (GPC) and nucleoprotein (NP) genes, complete cds.	Lassa virus strain	Vertebrates	512	100	GU481056,GU481057,GU481058,GU481059,GU481060	Vertebrates	AJ969407	723	99.04	1344	TRUE
+KM874306	Avon-Heathcote Estuary associated circular virus 6 isolate AHEaCV-6-NZ-2974SG-2012, complete genome.	Avon-Heathcote Estuary associated circular virus 6 isolate	Invertebrates	4	100	KM874304,KM874305,KM874307,KM874308	Invertebrates	KM874308	2095	99.95	4147	TRUE
+KM874314	Avon-Heathcote Estuary associated circular virus 8 isolate AHEaCV-8-NZ-3072SG-2012, complete genome.	Avon-Heathcote Estuary associated circular virus 8 isolate	Invertebrates	4	100	KM874310,KM874311,KM874312,KM874313	Invertebrates	KM874312	2184	100	4329	TRUE
+KM874318	Avon-Heathcote Estuary associated circular virus 9 isolate AHEaCV-9-NZ-3131SG-2012, complete genome.	Avon-Heathcote Estuary associated circular virus 9 isolate	Invertebrates	3	100	KM874315,KM874316,KM874317	Invertebrates	KM874316	1806	100	3580	TRUE
+KM874322	Avon-Heathcote Estuary associated circular virus 10 isolate AHEaCV-10-NZ-2599SG-2012, complete genome.	Avon-Heathcote Estuary associated circular virus 10 isolate	Invertebrates	3	100	KM874319,KM874320,KM874321	Invertebrates	KM874319	1978	99.85	3903	TRUE
+KM874326	Avon-Heathcote Estuary associated circular virus 11 isolate AHEaCV-11-NZ-3130SG-2012, complete genome.	Avon-Heathcote Estuary associated circular virus 11 isolate	Invertebrates	4	100	KM874323,KM874324,KM874325,KM874327	Invertebrates	KM874324	2305	99.91	4557	TRUE
+KM874330	Avon-Heathcote Estuary associated circular virus 13 isolate AHEaCV-13-NZ-1986SG-2012, complete genome.	Avon-Heathcote Estuary associated circular virus 13 isolate	Invertebrates	2	100	KM874329,KM874331	Invertebrates	KM874329	2212	100	4385	TRUE
+KM874334	Avon-Heathcote Estuary associated circular virus 14 isolate AHEaCV-14-NZ-3341SG-2012, complete genome.	Avon-Heathcote Estuary associated circular virus 14 isolate	Invertebrates	3	100	KM874332,KM874333,KM874335	Invertebrates	KM874335	2165	95.97	3735	TRUE
+KM874339	Avon-Heathcote Estuary associated circular virus 15 isolate AHEaCV-15-NZ-2957SG-2012, complete genome.	Avon-Heathcote Estuary associated circular virus 15 isolate	Invertebrates	3	100	KM874336,KM874337,KM874338	Invertebrates	KM874338	968	95.84	1669	TRUE
+KM874342	Avon-Heathcote Estuary associated circular virus 16 isolate AHEaCV-16-NZ-2991SG-2012, complete genome.	Avon-Heathcote Estuary associated circular virus 16 isolate	Invertebrates	2	100	KM874340,KM874341	Invertebrates	KM874340	1989	99.95	3937	TRUE
+KM874352	Avon-Heathcote Estuary associated circular virus 22 isolate AHEaCV-22-NZ-3009SG-2012, complete genome.	Avon-Heathcote Estuary associated circular virus 22 isolate	Invertebrates	1	100	KM874351	Invertebrates	KM874351	2107	99.91	4165	TRUE
+KM874357	Avon-Heathcote Estuary associated circular virus 25 isolate AHEaCV-25-NZ-1935SG-2012, complete genome.	Avon-Heathcote Estuary associated circular virus 25 isolate	Invertebrates	3	100	KM874355,KM874356,KM874358	Invertebrates	KM874355	2131	99.49	4159	TRUE
+KM874364	Avon-Heathcote Estuary associated circular virus 28 isolate AHEaCV-28-NZ-2426SG-2012, complete genome.	Avon-Heathcote Estuary associated circular virus 28 isolate	Invertebrates	3	100	KM874362,KM874363,KM874365	Invertebrates	KM874362	2357	97.32	4286	TRUE
+KP133075	Gemycircularvirus SL1, complete genome.	Gemycircularvirus	Vertebrates	2	100	KP987887,KR912221	Vertebrates	KP263544	258	83.5	208	TRUE
+KP133076	Gemycircularvirus SL2, complete genome.	Gemycircularvirus	Vertebrates	2	100	KP987887,KR912221	Vertebrates	AB021506	32	100	63.9	TRUE
+KP133077	Gemycircularvirus SL3, complete genome.	Gemycircularvirus	Vertebrates	2	100	KP987887,KR912221	Vertebrates	AB021506	32	100	63.9	TRUE
+KP133078	Gemycircularvirus BZ1, complete genome.	Gemycircularvirus	Vertebrates	2	100	KP987887,KR912221	Vertebrates	AB021506	35	100	69.9	TRUE
+KP133079	Gemycircularvirus BZ2, complete genome.	Gemycircularvirus	Vertebrates	2	100	KP987887,KR912221	Vertebrates	AB021506	32	100	63.9	TRUE
+KP133080	Gemycircularvirus NP, complete genome.	Gemycircularvirus	Vertebrates	2	100	KP987887,KR912221	Vertebrates	AB021506	35	100	69.9	TRUE
+KP146140	Groundnut chlorotic fan-spot virus isolate PD2 RNA-dependent RNA polymerase gene, complete cds.	Groundnut	Plants	275	100	DQ513184,DQ973171,EF205025,EF528556,EU014165	Plants	AJ493271	39	97.5	71.9	TRUE
+KP146141	Groundnut chlorotic fan-spot virus isolate PD2 movement protein (NSm) and glycoprotein precursor, genes, complete cds.	Groundnut	Plants	275	100	DQ513184,DQ973171,EF205025,EF528556,EU014165	Plants	AF080526	32	96.97	58	TRUE
+KP159416	Tacaribe mammarenavirus isolate Geneva glycoprotein gene, complete cds.	Tacaribe	Invertebrates	2	100	KF923400,KF923401	Invertebrates	KF923400	1448	99.72	2847	TRUE
+KP221200	Avian hepatitis E virus strain CaHEV-0202 capsid protein gene, partial cds.	Avian hepatitis E virus strain	Vertebrates	22	100	GQ398039,GQ398040,GQ398041,GQ398042,GU954430	Vertebrates	GQ398042	237	99.16	458	TRUE
+KP221201	Avian hepatitis E virus strain CaHEV-908 capsid protein gene, partial cds.	Avian hepatitis E virus strain	Vertebrates	22	100	GQ398039,GQ398040,GQ398041,GQ398042,GU954430	Vertebrates	GQ398042	237	99.16	458	TRUE
+KP221202	Avian hepatitis E virus strain CaHEV-902 capsid protein gene, partial cds.	Avian hepatitis E virus strain	Vertebrates	22	100	GQ398039,GQ398040,GQ398041,GQ398042,GU954430	Vertebrates	GQ398042	234	99.57	458	TRUE
+KP256133	Bamboo mosaic virus satellite RNA isolate satBaMV-MJZ1 P20 protein gene, partial cds.	Bamboo mosaic virus satellite RNA isolate	Plants	37	100	KP233223,KP256110,KP256111,KP256112,KP256113	Plants	KP256120	371	99.46	724	TRUE
+KP271123	Teviot virus isolate Geelong, complete genome.	Teviot virus isolate	Vertebrates	1	100	KP271124	Vertebrates	KJ716814	606	99.84	1195	TRUE
+KP701414	Bovine papillomavirus isolate 01AC12 L1 (L1) gene, partial cds.	Bovine papillomavirus isolate	Vertebrates	74	100	DQ098910,DQ098911,DQ098912,DQ098914,DQ098916	Vertebrates	HE603636	153	100	303	TRUE
+KP701415	Bovine papillomavirus isolate 02AC12 L1 (L1) gene, partial cds.	Bovine papillomavirus isolate	Vertebrates	74	100	DQ098910,DQ098911,DQ098912,DQ098914,DQ098916	Vertebrates	AY426550	136	94.44	222	TRUE
+KP701416	Bovine papillomavirus isolate 03AC12 L1 (L1) gene, partial cds.	Bovine papillomavirus isolate	Vertebrates	74	100	DQ098910,DQ098911,DQ098912,DQ098914,DQ098916	Vertebrates	KC256805	153	100	303	TRUE
+KP701417	Bovine papillomavirus isolate 01RO10 L1 (L1) gene, partial cds.	Bovine papillomavirus isolate	Vertebrates	74	100	DQ098910,DQ098911,DQ098912,DQ098914,DQ098916	Vertebrates	EU293540	153	100	303	TRUE
+KP701418	Bovine papillomavirus isolate 07RO11 L1 (L1) gene, partial cds.	Bovine papillomavirus isolate	Vertebrates	74	100	DQ098910,DQ098911,DQ098912,DQ098914,DQ098916	Vertebrates	GU201950	292	92.26	418	TRUE
+KP701419	Bovine papillomavirus isolate 12RO12 L1 (L1) gene, partial cds.	Bovine papillomavirus isolate	Vertebrates	74	100	DQ098910,DQ098911,DQ098912,DQ098914,DQ098916	Vertebrates	EU293540	153	100	303	TRUE
+KP701420	Bovine papillomavirus isolate 02RO10 L1 (L1) gene, partial cds.	Bovine papillomavirus isolate	Vertebrates	74	100	DQ098910,DQ098911,DQ098912,DQ098914,DQ098916	Vertebrates	EU293540	153	100	303	TRUE
+KP701421	Bovine papillomavirus isolate 08RO11 L1 (L1) gene, partial cds.	Bovine papillomavirus isolate	Vertebrates	74	100	DQ098910,DQ098911,DQ098912,DQ098914,DQ098916	Vertebrates	HE603636	153	100	303	TRUE
+KP701422	Bovine papillomavirus isolate 03RO10 L1 (L1) gene, partial cds.	Bovine papillomavirus isolate	Vertebrates	74	100	DQ098910,DQ098911,DQ098912,DQ098914,DQ098916	Vertebrates	AY300819	153	100	303	TRUE
+KP701423	Bovine papillomavirus isolate 13RO12 L1 (L1) gene, partial cds.	Bovine papillomavirus isolate	Vertebrates	74	100	DQ098910,DQ098911,DQ098912,DQ098914,DQ098916	Vertebrates	AB626705	153	100	303	TRUE
+KP701424	Bovine papillomavirus isolate 14RO12 L1 (L1) gene, partial cds.	Bovine papillomavirus isolate	Vertebrates	74	100	DQ098910,DQ098911,DQ098912,DQ098914,DQ098916	Vertebrates	AF121426	51	89.47	65.9	TRUE
+KP701425	Bovine papillomavirus isolate 09RO11 L1 (L1) gene, partial cds.	Bovine papillomavirus isolate	Vertebrates	74	100	DQ098910,DQ098911,DQ098912,DQ098914,DQ098916	Vertebrates	AF121426	51	89.47	65.9	TRUE
+KP701426	Bovine papillomavirus isolate 15RO12 L1 (L1) gene, partial cds.	Bovine papillomavirus isolate	Vertebrates	74	100	DQ098910,DQ098911,DQ098912,DQ098914,DQ098916	Vertebrates	HE603636	153	100	303	TRUE
+KP701427	Bovine papillomavirus isolate 16RO12 L1 (L1) gene, partial cds.	Bovine papillomavirus isolate	Vertebrates	74	100	DQ098910,DQ098911,DQ098912,DQ098914,DQ098916	Vertebrates	HE603636	153	100	303	TRUE
+KP701428	Bovine papillomavirus isolate 10RO11 L1 (L1) gene, partial cds.	Bovine papillomavirus isolate	Vertebrates	74	100	DQ098910,DQ098911,DQ098912,DQ098914,DQ098916	Vertebrates	AY300819	153	100	303	TRUE
+KP701429	Bovine papillomavirus isolate 17RO12 L1 (L1) gene, partial cds.	Bovine papillomavirus isolate	Vertebrates	74	100	DQ098910,DQ098911,DQ098912,DQ098914,DQ098916	Vertebrates	EU293540	153	100	303	TRUE
+KP701430	Bovine papillomavirus isolate 11RO11 L1 (L1) gene, partial cds.	Bovine papillomavirus isolate	Vertebrates	74	100	DQ098910,DQ098911,DQ098912,DQ098914,DQ098916	Vertebrates	HE603636	153	100	303	TRUE
+KP701431	Bovine papillomavirus isolate 04RO10 L1 (L1) gene, partial cds.	Bovine papillomavirus isolate	Vertebrates	74	100	DQ098910,DQ098911,DQ098912,DQ098914,DQ098916	Vertebrates	EU293541	153	100	303	TRUE
+KP701432	Bovine papillomavirus isolate 05RO10 L1 (L1) gene, partial cds.	Bovine papillomavirus isolate	Vertebrates	74	100	DQ098910,DQ098911,DQ098912,DQ098914,DQ098916	Vertebrates	EU293538	288	90.91	387	TRUE
+KP701433	Bovine papillomavirus isolate 06AC14 L1 (L1) gene, partial cds.	Bovine papillomavirus isolate	Vertebrates	74	100	DQ098910,DQ098911,DQ098912,DQ098914,DQ098916	Vertebrates	AF485375	98	83.76	81.8	TRUE
+KP701434	Bovine papillomavirus isolate 06RO10 L1 (L1) gene, partial cds.	Bovine papillomavirus isolate	Vertebrates	74	100	DQ098910,DQ098911,DQ098912,DQ098914,DQ098916	Vertebrates	KC256805	153	100	303	TRUE
+KP710232	Jonchet virus strain B81-CI-2004 segment L, complete sequence.	Jonchet virus strain	Invertebrates	10	100	KP710234,KP710235,KP710236,KP710237,KP710238	Invertebrates	KP710235	1161	98.14	2171	TRUE
+KP710233	Jonchet virus strain B66-CI-2004 RNA-dependent RNA polymerase (RdRp) gene, partial cds.	Jonchet virus strain	Invertebrates	10	100	KP710234,KP710235,KP710236,KP710237,KP710238	Invertebrates	KP710238	1002	98.24	1879	TRUE
+KP710240	Jonchet virus strain B81-CI-2004 segment M, complete sequence.	Jonchet virus strain	Invertebrates	10	100	KP710234,KP710235,KP710236,KP710237,KP710238	Invertebrates	KP710242	5228	96.12	9651	TRUE
+KP710243	Jonchet virus strain B81-CI-2004 segment S, complete sequence.	Jonchet virus strain	Invertebrates	10	100	KP710234,KP710235,KP710236,KP710237,KP710238	Invertebrates	KP710245	1663	95.74	3032	TRUE
+KP710249	Ferak virus strain D59-CI-2004 RNA-dependent RNA polymerase (RdRp) gene, partial cds.	Ferak virus strain	Invertebrates	20	100	KP710246,KP710247,KP710248,KP710250,KP710251	Invertebrates	KP710248	916	98.49	1733	TRUE
+KP710255	Ferak virus strain B66-CI-2004 RNA-dependent RNA polymerase (RdRp) gene, partial cds.	Ferak virus strain	Invertebrates	20	100	KP710246,KP710247,KP710248,KP710250,KP710251	Invertebrates	KP710246	960	98.16	1804	TRUE
+KP710256	Ferak virus strain B40-CI-2004 RNA-dependent RNA polymerase (RdRp) gene, partial cds.	Ferak virus strain	Invertebrates	20	100	KP710246,KP710247,KP710248,KP710250,KP710251	Invertebrates	KP710254	912	100	1808	TRUE
+KP710257	Ferak virus strain A52-CI-2004 RNA-dependent RNA polymerase (RdRp) gene, partial cds.	Ferak virus strain	Invertebrates	20	100	KP710246,KP710247,KP710248,KP710250,KP710251	Invertebrates	KP710250	901	99.45	1756	TRUE
+KP714072	Thika virus putative polyprotein gene, complete cds.	Thika virus	Invertebrates	26	100	KP969480,KP969481,KP969482,KP969483,KP969484	Invertebrates	KP969484	4279	96.02	7422	TRUE
+KP714073	La Jolla virus putative polyprotein gene, partial cds.	La Jolla virus	Invertebrates	59	100	KP969709,KP969710,KP969711,KP969712,KP969713	Invertebrates	KP969710	9674	100	1.92E+04	TRUE
+KP714074	La Jolla virus putative polyprotein gene, complete cds.	La Jolla virus	Invertebrates	59	100	KP969709,KP969710,KP969711,KP969712,KP969713	Invertebrates	KP969709	9667	99.99	1.92E+04	TRUE
+KP714076	Motts Mill virus note fragment 1 orf1 gene, complete cds; and orf2 gene, partial cds.	Motts Mill virus	Invertebrates	89	100	KP969548,KP969549,KP969550,KP969551,KP969552	Invertebrates	KP970001	1395	93.44	2183	TRUE
+KP714077	Motts Mill virus note fragment 2 orf1 gene, complete cds; and orf2 gene, partial cds.	Motts Mill virus	Invertebrates	89	100	KP969548,KP969549,KP969550,KP969551,KP969552	Invertebrates	KP969566	787	99.75	1548	TRUE
+KP714084	Craigies Hill virus segment RNA1 putative replicase gene, complete cds.	Craigies Hill virus	Invertebrates	36	100	KP969507,KP969508,KP969509,KP969510,KP969511	Invertebrates	KP969972	2375	98.67	4528	TRUE
+KP714085	Craigies Hill virus segment RNA2 orf1 and orf2 genes, complete cds.	Craigies Hill virus	Invertebrates	36	100	KP969507,KP969508,KP969509,KP969510,KP969511	Invertebrates	KP969514	1247	98.42	2353	TRUE
+KP714086	Dansoman virus segment 1 orf1 and putative replicase genes, complete cds.	Dansoman virus	Invertebrates	54	100	KP969454,KP969455,KP969456,KP969457,KP969458	Invertebrates	KP969594	1433	99.79	2823	TRUE
+KP714087	Dansoman virus segment 2 orf1 gene, complete cds.	Dansoman virus	Invertebrates	54	100	KP969454,KP969455,KP969456,KP969457,KP969458	Invertebrates	KP969457	1690	99.82	3332	TRUE
+KP714088	Chaq virus orf1 gene, complete cds.	Chaq virus	Invertebrates	67	100	KP969770,KP969771,KP969772,KP969773,KP969774	Invertebrates	KP969817	434	99.77	854	TRUE
+KP714099	Galbut virus note fragment 1 ORF1 gene, partial cds.	Galbut virus	Invertebrates	108	100	KP969610,KP969611,KP969612,KP969613,KP969614	Invertebrates	KP969863	491	97.61	902	TRUE
+KP714100	Galbut virus note fragment 2 nonfunctional hypothetical protein gene, partial sequence.	Galbut virus	Invertebrates	108	100	KP969610,KP969611,KP969612,KP969613,KP969614	Invertebrates	KP969622	511	100	1013	TRUE
+KP714102	Kallithea virus note fragment 2 hypothetical protein, putative vp39, putative polh/gran, putative pif-2, putative gp67-like protein, putative p47, ORF5, ORF7, ORF6, putative gp72-like protein, putative guanylate kinase-like protein, putative gp75-like protein, putative gp76-like protein, hypothetical protein, putative odv-e56, putative gp78-like protein, hypothetical protein, putative vlf-1, and putative gp81-like protein genes, complete cds.	Kallithea virus	Invertebrates	39	100	KP969687,KP969689,KP969690,KP969691,KP969692	Invertebrates	JN680862	59	92.19	87.7	TRUE
+KP714105	Kallithea virus note fragment 5 hypothetical protein, putative gp17-like protein, putative dnapol B, putative trypsin-like serine protease-like protein, putative gp13-like protein, and putative Ac81-like protein genes, complete cds.	Kallithea virus	Invertebrates	39	100	KP969687,KP969689,KP969690,KP969691,KP969692	Invertebrates	AB289929	37	100	73.8	TRUE
+KP892556	Lake Sinai virus 4 clone 2014MT RNA-dependent RNA polymerase gene, partial cds.	Lake Sinai virus 4	Invertebrates	1	100	JX878492	Invertebrates	KM886903	596	95.67	1021	TRUE
+KP969492	Thika virus isolate IM19_Thika putative polyprotein gene, partial cds.	Thika virus isolate	Invertebrates	26	100	KP969480,KP969481,KP969482,KP969483,KP969484	Invertebrates	KP969493	4143	100	8213	TRUE
+KP969556	Motts Mill virus isolate IM19_MottsMill note fragment B ORF1 and ORF2 genes, partial cds.	Motts Mill virus isolate	Invertebrates	89	100	KP969548,KP969549,KP969550,KP969551,KP969552	Invertebrates	KP969554	789	100	1564	TRUE
+KP969688	Kallithea virus isolate GEO07_Kallithea DNApol B-like protein gene, partial cds.	Kallithea virus isolate	Invertebrates	39	100	KP969687,KP969689,KP969690,KP969691,KP969692	Invertebrates	KP969687	780	100	1546	TRUE
+KP969734	La Jolla virus isolate MRSBULK03_LaJolla polyprotein genes, partial cds.	La Jolla virus isolate	Invertebrates	59	100	KP969709,KP969710,KP969711,KP969712,KP969713	Invertebrates	KP969710	1200	99.67	2355	TRUE
+KP969755	La Jolla virus isolate LISMEL01_LaJolla polyprotein gene, partial cds.	La Jolla virus isolate	Invertebrates	59	100	KP969709,KP969710,KP969711,KP969712,KP969713	Invertebrates	KP969760	672	99.41	1308	TRUE
+KP969804	Chaq virus isolate MRSBULK03_Chaq hypothetical protein gene, partial cds.	Chaq virus isolate	Invertebrates	67	100	KP969770,KP969771,KP969772,KP969773,KP969774	Invertebrates	KP969801	431	99.08	831	TRUE
+KP969844	Galbut virus isolate GEO19_Galbut hypothetical protein mRNA, partial cds.	Galbut virus isolate	Invertebrates	108	100	KP969610,KP969611,KP969612,KP969613,KP969614	Invertebrates	KP969842	498	99.6	975	TRUE
+KP969867	Galbut virus isolate GA07_Galbut hypothetical protein mRNA, partial cds.	Galbut virus isolate	Invertebrates	108	100	KP969610,KP969611,KP969612,KP969613,KP969614	Invertebrates	KP969859	469	97.91	870	TRUE
+KP969886	Galbut virus isolate REEF34_Galbut hypothetical protein mRNA, partial cds.	Galbut virus isolate	Invertebrates	108	100	KP969610,KP969611,KP969612,KP969613,KP969614	Invertebrates	KP969884	340	99.42	662	TRUE
+KP969935	Drosophila A virus isolate GEO07_DrosophilaA RNA-dependent RNA polymerase gene, partial cds.	Drosophila A virus isolate	Invertebrates	47	100	FJ150422,KP969905,KP969906,KP969907,KP969908	Invertebrates	KP969927	433	100	858	TRUE
+KP969954	Kallithea virus isolate GEO07_Kallithea per os infectivity gene, partial cds.	Kallithea virus isolate	Invertebrates	39	100	KP969687,KP969689,KP969690,KP969691,KP969692	Invertebrates	KP969952	573	100	1136	TRUE
+KP970006	Motts Mill virus isolate IM19_MottsMill note fragment A ORF1 gene, partial cds.	Motts Mill virus isolate	Invertebrates	89	100	KP969548,KP969549,KP969550,KP969551,KP969552	Invertebrates	KP970002	1493	100	2960	TRUE
+KP970123	Raspberry leaf blotch virus isolate Pittenweem segment RNA8, complete sequence.	Raspberry leaf blotch virus isolate	Plants	2	100	KP709057,KP709058	Plants	AB088385	66	91.67	87.7	TRUE
+KP970124	Raspberry leaf blotch virus isolate Pittenweem segment RNA8, complete sequence.	Raspberry leaf blotch virus isolate	Plants	2	100	KP709057,KP709058	Plants	AB042650	45	88.24	54	TRUE
+KP972428	Avian bornavirus isolate CG-N1489, complete genome.	Avian bornavirus isolate	Vertebrates	68	100	GQ496343,GQ496344,GQ496345,GQ496346,GQ496347	Vertebrates	JN251073	1173	99.49	2290	TRUE
+KR021356	Lake Sinai virus 1 clone 2014MT RNA-dependent RNA polymerase (RdRp) gene, partial cds.	Lake Sinai virus 1	Invertebrates	1	100	HQ871931	Invertebrates	HQ871931	644	97.72	1187	TRUE
+KR021357	Lake Sinai virus 6 clone 2014MT RNA-dependent RNA polymerase and Orf1 genes, partial cds.	Lake Sinai virus	Invertebrates	42	100	HQ871931,HQ888865,JQ480620,JX045859,JX878492	Invertebrates	HQ871931	567	82.77	406	TRUE
+KR022002	Lake Sinai virus 2 clone 2014MT-LSV2 Orf1 gene, partial cds.	Lake Sinai virus 2	Invertebrates	1	100	HQ888865	Invertebrates	HQ888865	240	96	416	TRUE
+KR022003	Lake Sinai virus 1 clone 2014MT-LSV1 capsid protein gene, partial cds.	Lake Sinai virus 1	Invertebrates	1	100	HQ871931	Invertebrates	HQ871931	601	98.36	1132	TRUE
+KR022004	Lake Sinai virus 2 clone 2014MT-LSV2 capsid protein gene, partial cds.	Lake Sinai virus 2	Invertebrates	1	100	HQ888865	Invertebrates	HQ888865	637	99.84	1257	TRUE
+KR068482	Okra enation leaf curl betasatellite isolate Theni MKU-1, complete sequence.	Okra enation leaf curl betasatellite isolate	Plants	15	100	KC019310,KT390347,KT390350,KT390351,KT390353	Plants	GU111971	1021	94.6	1639	TRUE
+KR068483	Bhendi yellow vein mosaic virus betasatellite isolate Madurai MKU-1, complete sequence.	Bhendi yellow vein mosaic virus	Plants	127	100	EF417918,EF417919,EU184017,EU188922,EU482411	Plants	AF397216	100	100	198	TRUE
+KR068484	Bhendi yellow vein mosaic alphasatellite isolate Madurai MKU-2, complete sequence.	Bhendi yellow vein mosaic	Plants	175	100	EF417918,EF417919,EU184017,EU188922,EU482411	Plants	KT192029	1339	97.74	2470	TRUE
+KR075030	Avian bornavirus isolate DTU_VET ID025 nucleoprotein gene, partial cds; x protein and phospoprotein genes, complete cds; and matrix protein gene, partial cds.	Avian bornavirus isolate	Vertebrates	68	100	GQ496343,GQ496344,GQ496345,GQ496346,GQ496347	Vertebrates	KF578398	1985	97.83	3673	TRUE
+KR075031	Avian bornavirus isolate DTU_VET ID097 nucleoprotein gene, partial cds; x protein and phospoprotein genes, complete cds; and matrix protein gene, partial cds.	Avian bornavirus isolate	Vertebrates	68	100	GQ496343,GQ496344,GQ496345,GQ496346,GQ496347	Vertebrates	KF578398	1994	98.03	3743	TRUE
+KR075032	Avian bornavirus isolate DTU_VET ID170 nucleoprotein gene, partial cds; x protein and phospoprotein genes, complete cds; and matrix protein gene, partial cds.	Avian bornavirus isolate	Vertebrates	68	100	GQ496343,GQ496344,GQ496345,GQ496346,GQ496347	Vertebrates	KF578398	1978	97.49	3653	TRUE
+KR075033	Avian bornavirus isolate DTU_VET ID199 nucleoprotein gene, partial cds; x protein and phospoprotein genes, complete cds; and matrix protein gene, partial cds.	Avian bornavirus isolate	Vertebrates	68	100	GQ496343,GQ496344,GQ496345,GQ496346,GQ496347	Vertebrates	HQ123584	208	98.58	394	TRUE
+KR075034	Avian bornavirus isolate DTU_VET ID212 nucleoprotein gene, partial cds; x protein and phospoprotein genes, complete cds; and matrix protein gene, partial cds.	Avian bornavirus isolate	Vertebrates	68	100	GQ496343,GQ496344,GQ496345,GQ496346,GQ496347	Vertebrates	KF578398	1988	97.98	3697	TRUE
+KR075035	Avian bornavirus isolate DTU_VET ID245 nucleoprotein gene, partial cds; x protein and phospoprotein genes, complete cds; and matrix protein gene, partial cds.	Avian bornavirus isolate	Vertebrates	68	100	GQ496343,GQ496344,GQ496345,GQ496346,GQ496347	Vertebrates	HQ123584	207	98.1	387	TRUE
+KR075036	Avian bornavirus isolate DTU_VET ID332 nucleoprotein gene, partial cds; x protein and phospoprotein genes, complete cds; and matrix protein gene, partial cds.	Avian bornavirus isolate	Vertebrates	68	100	GQ496343,GQ496344,GQ496345,GQ496346,GQ496347	Vertebrates	HQ123584	207	98.1	391	TRUE
+KR347108	Piscine reovirus isolate BCK1435_14 sigma 3 gene, partial cds; and protein p13 gene, complete cds.	Piscine reovirus isolate	Vertebrates	151	100	JN991006,JN991007,JN991008,JN991009,JN991010	Vertebrates	KR478635	829	99.88	1641	TRUE
+KR347109	Piscine reovirus isolate BCK1436_14 sigma 3 gene, partial cds; and protein p13 gene, complete cds.	Piscine reovirus isolate	Vertebrates	151	100	JN991006,JN991007,JN991008,JN991009,JN991010	Vertebrates	KR347078	830	100	1645	TRUE
+KR820510	Cherry green ring mottle virus isolate Fch-yt-3 capsid protein gene, complete cds.	Cherry green ring mottle virus isolate	Plants	115	100	EF174471,EF182749,EF182750,EF182752,EF182753	Plants	KR820514	792	98.14	1481	TRUE
+KR820540	Cherry green ring mottle virus isolate FCh-yt-3 triple gene block protein 1 (TGBp1), hypothetical protein 2a (ORF2a), triple gene block protein 2 (TGBp2), and triple gene block protein 3 (TGBp3) genes, complete cds.	Cherry green ring mottle virus isolate	Plants	115	100	EF174471,EF182749,EF182750,EF182752,EF182753	Plants	KR820535	1126	97.91	2089	TRUE
+KT002575	Avian hepatitis E virus isolate BJ-HGL1 capsid protein gene, partial cds.	Avian hepatitis E virus isolate	Vertebrates	102	100	DQ111980,DQ111981,DQ660974,DQ660975,DQ660976	Vertebrates	KF648530	333	99.7	654	TRUE
+KT202811	Coffee ringspot virus isolate H1 ORF1 gene, partial cds.	Coffee ringspot virus isolate	Plants	1	100	GQ979998	Plants	KF812525	487	98.98	936	TRUE
+KT202812	Coffee ringspot virus isolate I1 ORF1 gene, partial cds.	Coffee ringspot virus isolate	Plants	1	100	GQ979998	Plants	KF812525	486	98.78	928	TRUE
+KT202815	Coffee ringspot virus isolate BE-1 ORF1 gene, partial cds.	Coffee ringspot virus isolate	Plants	1	100	GQ979998	Plants	KF812525	490	99.59	959	TRUE
+KT202821	Coffee ringspot virus isolate BE-7 ORF1 gene, partial cds.	Coffee ringspot virus isolate	Plants	1	100	GQ979998	Plants	KF812525	492	100	975	TRUE
+KT202827	Coffee ringspot virus isolate BE-13 ORF1 gene, partial cds.	Coffee ringspot virus isolate	Plants	1	100	GQ979998	Plants	KF812525	492	100	975	TRUE
+KT254265	Duck-dominant coronavirus isolate DdCoV/DK/Guangdong/F11/2014 ADP-ribose-1-phosphatase (1ab) gene, partial cds.	Duck-dominant coronavirus isolate DdCoV/DK/Guangdong/F11/2014	Vertebrates	1	100	KP033062	Vertebrates	KP006682	182	94.79	301	TRUE
+KT254266	Duck-dominant coronavirus isolate DdCoV/DK/Guangdong/F40/2014 ADP-ribose-1-phosphatase (1ab) gene, partial cds.	Duck-dominant coronavirus isolate	Vertebrates	48	100	KP033030,KP033031,KP033032,KP033033,KP033034	Vertebrates	KP006683	219	95.22	369	TRUE
+KT254270	Duck-dominant coronavirus isolate DdCoV/DK/Guangdong/F11/2014 NSP5 (1ab) gene, partial cds.	Duck-dominant coronavirus isolate DdCoV/DK/Guangdong/F11/2014	Vertebrates	1	100	KP033062	Vertebrates	AY392067	99	84.62	89.7	TRUE
+KT254271	Duck-dominant coronavirus isolate DdCoV/DK/Guangdong/F40/2014 NSP5 (1ab) gene, partial cds.	Duck-dominant coronavirus isolate	Vertebrates	48	100	KP033030,KP033031,KP033032,KP033033,KP033034	Vertebrates	AY392067	100	85.47	97.6	TRUE
+KT254275	Duck-dominant coronavirus isolate DdCoV/DK/Guangdong/F11/2014 NSP12 (1ab) gene, partial cds.	Duck-dominant coronavirus isolate DdCoV/DK/Guangdong/F11/2014	Vertebrates	1	100	KP033062	Vertebrates	KP033062	425	99.77	837	TRUE
+KT254276	Duck-dominant coronavirus isolate DdCoV/DK/Guangdong/F40/2014 NSP12 (1ab) gene, partial cds.	Duck-dominant coronavirus isolate	Vertebrates	48	100	KP033030,KP033031,KP033032,KP033033,KP033034	Vertebrates	KP033052	425	99.77	837	TRUE
+KT254280	Duck-dominant coronavirus isolate DdCoV/DK/Guangdong/F11/2014 NSP13 (1ab) gene, partial cds.	Duck-dominant coronavirus isolate DdCoV/DK/Guangdong/F11/2014	Vertebrates	1	100	KP033062	Vertebrates	KM454473	1697	94.8	2811	TRUE
+KT254281	Duck-dominant coronavirus isolate DdCoV/DK/Guangdong/F40/2014 NSP13 (1ab) gene, partial cds.	Duck-dominant coronavirus isolate	Vertebrates	48	100	KP033030,KP033031,KP033032,KP033033,KP033034	Vertebrates	KC623650	720	95.74	1237	TRUE
+KT254285	Duck-dominant coronavirus isolate DdCoV/DK/Guangdong/F11/2014 NSP14 (1ab) gene, partial cds.	Duck-dominant coronavirus isolate DdCoV/DK/Guangdong/F11/2014	Vertebrates	1	100	KP033062	Vertebrates	KF793824	46	97.87	85.7	TRUE
+KT254286	Duck-dominant coronavirus isolate DdCoV/DK/Guangdong/F40/2014 NSP14 (1ab) gene, partial cds.	Duck-dominant coronavirus isolate	Vertebrates	48	100	KP033030,KP033031,KP033032,KP033033,KP033034	Vertebrates	AB354579	28	100	56	TRUE
+KT254290	Duck-dominant coronavirus isolate DdCoV/DK/Guangdong/F11/2014 NSP15 (1ab) gene, partial cds.	Duck-dominant coronavirus isolate DdCoV/DK/Guangdong/F11/2014	Vertebrates	1	100	KP033062	Vertebrates	KC869934	233	97.9	432	TRUE
+KT254291	Duck-dominant coronavirus isolate DdCoV/DK/Guangdong/F40/2014 NSP15 (1ab) gene, partial cds.	Duck-dominant coronavirus isolate	Vertebrates	48	100	KP033030,KP033031,KP033032,KP033033,KP033034	Vertebrates	KC869934	235	98.74	448	TRUE
+KT254295	Duck-dominant coronavirus isolate DdCoV/DK/Guangdong/F11/2014 NSP16 (1ab) gene, partial cds.	Duck-dominant coronavirus isolate DdCoV/DK/Guangdong/F11/2014	Vertebrates	1	100	KP033062	Vertebrates	AY747109	250	86.51	264	TRUE
+KT254296	Duck-dominant coronavirus isolate DdCoV/DK/Guangdong/F40/2014 NSP16 (1ab) gene, partial cds.	Duck-dominant coronavirus isolate	Vertebrates	48	100	KP033030,KP033031,KP033032,KP033033,KP033034	Vertebrates	AY747109	249	86.16	256	TRUE
+KT365828	Human papillomavirus isolate HPV18-1 L1 protein gene, partial cds.	Human papillomavirus isolate	Vertebrates	2348	100	DQ027814,DQ111012,DQ111013,DQ111014,DQ111015	Vertebrates	AY863163	315	100	624	TRUE
+KT365829	Human papillomavirus isolate HPV18-2 L1 protein gene, partial cds.	Human papillomavirus isolate	Vertebrates	2348	100	DQ027814,DQ111012,DQ111013,DQ111014,DQ111015	Vertebrates	EF202153	312	100	618	TRUE
+KT365830	Human papillomavirus isolate HPV18-3 L1 protein gene, partial cds.	Human papillomavirus isolate	Vertebrates	2348	100	DQ027814,DQ111012,DQ111013,DQ111014,DQ111015	Vertebrates	AY863163	315	100	624	TRUE
+KT365831	Human papillomavirus isolate HPV16-1 L1 protein gene, partial cds.	Human papillomavirus isolate	Vertebrates	2348	100	DQ027814,DQ111012,DQ111013,DQ111014,DQ111015	Vertebrates	AB818692	316	100	626	TRUE
+KT365832	Human papillomavirus isolate HPV18-4 L1 protein gene, partial cds.	Human papillomavirus isolate	Vertebrates	2348	100	DQ027814,DQ111012,DQ111013,DQ111014,DQ111015	Vertebrates	U45890	314	100	622	TRUE
+KT365833	Human papillomavirus isolate HPV18-5 L1 protein gene, partial cds.	Human papillomavirus isolate	Vertebrates	2348	100	DQ027814,DQ111012,DQ111013,DQ111014,DQ111015	Vertebrates	AY863163	311	100	617	TRUE
+KT365834	Human papillomavirus isolate HPV18-6 L1 protein gene, partial cds.	Human papillomavirus isolate	Vertebrates	2348	100	DQ027814,DQ111012,DQ111013,DQ111014,DQ111015	Vertebrates	AY262282	314	100	622	TRUE
+KT365835	Human papillomavirus isolate HPV16-2 L1 protein gene, partial cds.	Human papillomavirus isolate	Vertebrates	2348	100	DQ027814,DQ111012,DQ111013,DQ111014,DQ111015	Vertebrates	AF134177	309	100	613	TRUE
+KT365836	Human papillomavirus isolate HPV16-3 L1 protein gene, partial cds.	Human papillomavirus isolate	Vertebrates	2348	100	DQ027814,DQ111012,DQ111013,DQ111014,DQ111015	Vertebrates	AF134178	312	100	618	TRUE
+KT365837	Human papillomavirus isolate HPV11-1 L1 protein gene, partial cds.	Human papillomavirus isolate	Vertebrates	2348	100	DQ027814,DQ111012,DQ111013,DQ111014,DQ111015	Vertebrates	AF217526	311	100	617	TRUE
+KT365838	Human papillomavirus isolate HPV18-7 L1 protein gene, partial cds.	Human papillomavirus isolate	Vertebrates	2348	100	DQ027814,DQ111012,DQ111013,DQ111014,DQ111015	Vertebrates	AY262282	316	100	626	TRUE
+KT365839	Human papillomavirus isolate HPV18-8 L1 protein gene, partial cds.	Human papillomavirus isolate	Vertebrates	2348	100	DQ027814,DQ111012,DQ111013,DQ111014,DQ111015	Vertebrates	AY262282	315	100	624	TRUE
+KT365840	Human papillomavirus isolate HPV18-9 L1 protein gene, partial cds.	Human papillomavirus isolate	Vertebrates	2348	100	DQ027814,DQ111012,DQ111013,DQ111014,DQ111015	Vertebrates	EF202150	315	100	624	TRUE
+KT365841	Human papillomavirus isolate HPV18-10 L1 protein gene, partial cds.	Human papillomavirus isolate	Vertebrates	2348	100	DQ027814,DQ111012,DQ111013,DQ111014,DQ111015	Vertebrates	EF422111	244	100	484	TRUE
+KT365842	Human papillomavirus isolate HPV18-11 L1 protein gene, partial cds.	Human papillomavirus isolate	Vertebrates	2348	100	DQ027814,DQ111012,DQ111013,DQ111014,DQ111015	Vertebrates	JF728186	319	100	632	TRUE
+KT365843	Human papillomavirus isolate HPV16-4 L1 protein gene, partial cds.	Human papillomavirus isolate	Vertebrates	2348	100	DQ027814,DQ111012,DQ111013,DQ111014,DQ111015	Vertebrates	AY177679	313	100	620	TRUE
+KT365844	Human papillomavirus isolate HPV18-12 L1 protein gene, partial cds.	Human papillomavirus isolate	Vertebrates	2348	100	DQ027814,DQ111012,DQ111013,DQ111014,DQ111015	Vertebrates	AY262282	321	100	636	TRUE
+KT365845	Human papillomavirus isolate HPV16-5 L1 protein gene, partial cds.	Human papillomavirus isolate	Vertebrates	2348	100	DQ027814,DQ111012,DQ111013,DQ111014,DQ111015	Vertebrates	AY177679	316	100	626	TRUE
+KT365846	Human papillomavirus isolate HPV18-13 L1 protein gene, partial cds.	Human papillomavirus isolate	Vertebrates	2348	100	DQ027814,DQ111012,DQ111013,DQ111014,DQ111015	Vertebrates	EF202146	312	100	618	TRUE
+KT365847	Human papillomavirus isolate HPV18-14 L1 protein gene, partial cds.	Human papillomavirus isolate	Vertebrates	2348	100	DQ027814,DQ111012,DQ111013,DQ111014,DQ111015	Vertebrates	AY863158	313	100	620	TRUE
+KT378600	Avian bornavirus isolate Cockg5, complete genome.	Avian bornavirus isolate	Vertebrates	68	100	GQ496343,GQ496344,GQ496345,GQ496346,GQ496347	Vertebrates	AB519144	1562	97.56	2864	TRUE
+KT429730	Piscine reovirus isolate BCJ19943_13 core shell protein mRNA, complete cds.	Piscine reovirus isolate BCJ19943_13	Vertebrates	1	100	KR347083	Vertebrates	KC776256	3876	99.77	7630	TRUE
+KT429731	Piscine reovirus isolate BCJ19943_13 core turret protein mRNA, complete cds.	Piscine reovirus isolate BCJ19943_13	Vertebrates	1	100	KR347083	Vertebrates	KC715680	3895	99.8	7674	TRUE
+KT429732	Piscine reovirus isolate BCJ19943_13 core RNA-dependent RNA polymerase mRNA, partial cds.	Piscine reovirus isolate BCJ19943_13	Vertebrates	1	100	KR347083	Vertebrates	KC715681	3865	99.79	7614	TRUE
+KT429733	Piscine reovirus isolate BCJ19943_13 core NTPase mRNA, complete cds.	Piscine reovirus isolate BCJ19943_13	Vertebrates	1	100	KR347083	Vertebrates	KC776259	2324	99.74	4571	TRUE
+KT429734	Piscine reovirus isolate BCJ19943_13 outer shell protein mRNA, complete cds.	Piscine reovirus isolate BCJ19943_13	Vertebrates	1	100	KR347083	Vertebrates	KC776260	2144	99.77	4220	TRUE
+KT429735	Piscine reovirus isolate BCJ19943_13 non-structural factory protein mRNA, complete cds.	Piscine reovirus isolate BCJ19943_13	Vertebrates	1	100	KR347083	Vertebrates	KC715684	2380	99.83	4694	TRUE
+KT429736	Piscine reovirus isolate BCJ19943_13 sigma 1 and sigma 1S mRNAs, complete cds.	Piscine reovirus isolate BCJ19943_13 sigma	Vertebrates	1	100	KR347083	Vertebrates	KC473452	1052	99.72	2068	TRUE
+KT429737	Piscine reovirus isolate BCJ19943_13 core clamp protein mRNA, complete cds.	Piscine reovirus isolate BCJ19943_13	Vertebrates	1	100	KR347083	Vertebrates	KC715685	1296	99.92	2563	TRUE
+KT429738	Piscine reovirus isolate BCJ19943_13 non-structural RNA protein mRNA, complete cds.	Piscine reovirus isolate BCJ19943_13	Vertebrates	1	100	KR347083	Vertebrates	KC776263	1116	99.91	2206	TRUE
+KT429739	Piscine reovirus isolate BCJ19943_13 outer fiber protein mRNA, complete cds.	Piscine reovirus isolate BCJ19943_13	Vertebrates	1	100	KR347083	Vertebrates	KC715687	1012	100	2006	TRUE
+KT429740	Piscine reovirus isolate BCJ31915_13 core shell protein mRNA, partial cds.	Piscine reovirus isolate BCJ31915_13	Vertebrates	1	100	KR347090	Vertebrates	KC776256	3844	99.82	7579	TRUE
+KT429741	Piscine reovirus isolate BCJ31915_13 core turret protein mRNA, partial cds.	Piscine reovirus isolate BCJ31915_13	Vertebrates	1	100	KR347090	Vertebrates	KC776257	3784	99.89	7477	TRUE
+KT429742	Piscine reovirus isolate BCJ31915_13 core RNA-dependent RNA polymerase mRNA, partial cds.	Piscine reovirus isolate BCJ31915_13	Vertebrates	1	100	KR347090	Vertebrates	KC715681	3829	99.79	7543	TRUE
+KT429743	Piscine reovirus isolate BCJ31915_13 core NTPase mRNA, partial cds.	Piscine reovirus isolate BCJ31915_13	Vertebrates	1	100	KR347090	Vertebrates	KC776259	2292	100	4544	TRUE
+KT429744	Piscine reovirus isolate BCJ31915_13 outer shell protein mRNA, partial cds.	Piscine reovirus isolate BCJ31915_13	Vertebrates	1	100	KR347090	Vertebrates	KC776260	2122	99.95	4201	TRUE
+KT429745	Piscine reovirus isolate BCJ31915_13 non-structural factory protein mRNA, partial cds.	Piscine reovirus isolate BCJ31915_13	Vertebrates	1	100	KR347090	Vertebrates	KC715684	2344	99.79	4617	TRUE
+KT429746	Piscine reovirus isolate BCJ31915_13 sigma 1 and sigma 1S mRNAs, complete cds.	Piscine reovirus isolate BCJ31915_13 sigma	Vertebrates	1	100	KR347090	Vertebrates	KC473452	1032	99.71	2028	TRUE
+KT429747	Piscine reovirus isolate BCJ31915_13 core clamp protein mRNA, partial cds.	Piscine reovirus isolate BCJ31915_13	Vertebrates	1	100	KR347090	Vertebrates	KC776262	1280	99.84	2526	TRUE
+KT429748	Piscine reovirus isolate BCJ31915_13 non-structural RNA protein mRNA, partial cds.	Piscine reovirus isolate BCJ31915_13	Vertebrates	1	100	KR347090	Vertebrates	KC776263	1105	99.91	2185	TRUE
+KT429749	Piscine reovirus isolate BCJ31915_13 outer fiber protein mRNA, complete cds.	Piscine reovirus isolate BCJ31915_13	Vertebrates	1	100	KR347090	Vertebrates	KC715687	994	99.9	1965	TRUE
+KT429750	Piscine reovirus isolate WSKFH12_14 core shell protein mRNA, complete cds.	Piscine reovirus isolate WSKFH12_14	Vertebrates	1	100	KR478638	Vertebrates	KC776256	3890	99.79	7664	TRUE
+KT429751	Piscine reovirus isolate WSKFH12_14 core turret protein mRNA, complete cds.	Piscine reovirus isolate WSKFH12_14	Vertebrates	1	100	KR478638	Vertebrates	KC715680	3919	99.87	7739	TRUE
+KT429752	Piscine reovirus isolate WSKFH12_14 core RNA-dependent RNA polymerase mRNA, partial cds.	Piscine reovirus isolate WSKFH12_14	Vertebrates	1	100	KR478638	Vertebrates	KC715681	3894	99.79	7672	TRUE
+KT429753	Piscine reovirus isolate WSKFH12_14 core NTPase mRNA, complete cds.	Piscine reovirus isolate WSKFH12_14	Vertebrates	1	100	KR478638	Vertebrates	KC776259	2371	99.83	4676	TRUE
+KT429754	Piscine reovirus isolate WSKFH12_14 outer shell protein mRNA, complete cds.	Piscine reovirus isolate WSKFH12_14	Vertebrates	1	100	KR478638	Vertebrates	KC776260	2148	99.63	4211	TRUE
+KT429755	Piscine reovirus isolate WSKFH12_14 non-structural factory protein mRNA, complete cds.	Piscine reovirus isolate WSKFH12_14	Vertebrates	1	100	KR478638	Vertebrates	KC715684	2392	99.87	4724	TRUE
+KT429756	Piscine reovirus isolate WSKFH12_14 sigma 1 and sigma 1S mRNAs, complete cds.	Piscine reovirus isolate WSKFH12_14 sigma	Vertebrates	1	100	KR478638	Vertebrates	KC795600	1071	99.81	2111	TRUE
+KT429757	Piscine reovirus isolate WSKFH12_14 core clamp protein mRNA, complete cds.	Piscine reovirus isolate WSKFH12_14	Vertebrates	1	100	KR478638	Vertebrates	KC715685	1314	99.77	2571	TRUE
+KT429758	Piscine reovirus isolate WSKFH12_14 non-structural RNA protein mRNA, complete cds.	Piscine reovirus isolate WSKFH12_14	Vertebrates	1	100	KR478638	Vertebrates	KC776263	1132	99.91	2238	TRUE
+KT429759	Piscine reovirus isolate WSKFH12_14 outer fiber protein mRNA, complete cds.	Piscine reovirus isolate WSKFH12_14	Vertebrates	1	100	KR478638	Vertebrates	KC715687	1023	99.8	2016	TRUE
+KT598225	Soybean-associated negative-stranded RNA virus 1 isolate SaNSRV1-1, partial sequence.	Soybean-associated	Plants	5	50	KM015260,KT598226,KT598232,KT598235,KT598237	Plants	KC601997	40	90.91	56	TRUE
+KT598227	Soybean-associated negative-stranded RNA virus 2 isolate SaNSRV1-1, partial sequence.	Soybean-associated	Plants	5	50	KM015260,KT598226,KT598232,KT598235,KT598237	Plants	KC601997	72	85.71	71.9	TRUE
+KT598228	Soybean-associated negative-stranded RNA virus 3 isolate SaNSRV1-1, partial sequence.	Soybean-associated	Plants	5	50	KM015260,KT598226,KT598232,KT598235,KT598237	Plants	KP900930	48	88.89	60	TRUE
+KT598236	Soybean-associated double-stranded RNA virus 1 isolate SaDSRV1-1, partial sequence.	Soybean-associated	Plants	5	50	KM015260,KT598226,KT598232,KT598235,KT598237	Plants	AF039080	36	94.74	60	TRUE
+KT598244	Soybean-associated partitivirus 2 isolate SaParV2-R1-1 segment RNA1, partial sequence.	Soybean-associated	Plants	5	50	KM015260,KT598226,KT598232,KT598235,KT598237	Plants	AB428575	26	100	52	TRUE
+LC006253	Rosellinia necatrix mycovirus 2-W1032/S6 genomic RNA, complete genome.	Rosellinia necatrix mycovirus 2-W1032/S6	Plants	1	100	AB698497	Plants	AB698497	1895	100	3757	TRUE
+LC006255	Rosellinia necatrix mycovirus 1-W1032/S5 genes for protein 1, protein 2, RNA dependent RNA polymerase, complete cds, note: Yado-nushi virus W1032 defective RNA.	Rosellinia necatrix mycovirus 1-W1032/S5	Plants	2	100	AB698496,LC061478	Plants	LC061478	6460	92.49	9700	TRUE
+LC009665	Human astrovirus MLB2 gene for ORF1b protein precursor, partial cds, isolate: MLBAstV2007NoV, strain: Influent2b.	Human astrovirus MLB2	Vertebrates	17	100	AB769871,JQ673582,JQ673583,KJ807476,KJ807477	Vertebrates	GQ502192	640	99.22	1239	TRUE
+LC009666	Human astrovirus MLB2 gene for ORF1b protein precursor, partial cds, isolate: MLBAstV2007NoV, strain: Influent3b.	Human astrovirus MLB2	Vertebrates	17	100	AB769871,JQ673582,JQ673583,KJ807476,KJ807477	Vertebrates	GQ502192	639	99.07	1231	TRUE
+LC009667	Human astrovirus MLB2 gene for ORF1b protein precursor, partial cds, isolate: MLBAstV2008Feb, strain: Influent1b.	Human astrovirus MLB2	Vertebrates	17	100	AB769871,JQ673582,JQ673583,KJ807476,KJ807477	Vertebrates	GQ502192	640	99.22	1239	TRUE
+LC009668	Human astrovirus MLB2 gene for ORF1b protein precursor, partial cds, isolate: MLBAstV2008Feb, strain: Influent2b.	Human astrovirus MLB2	Vertebrates	17	100	AB769871,JQ673582,JQ673583,KJ807476,KJ807477	Vertebrates	GQ502192	639	99.07	1231	TRUE
+LC009669	Human astrovirus MLB2 gene for ORF1b protein precursor, partial cds, isolate: MLBAstV2007NoV, strain: Influent1b.	Human astrovirus MLB2	Vertebrates	17	100	AB769871,JQ673582,JQ673583,KJ807476,KJ807477	Vertebrates	GQ502192	639	99.07	1231	TRUE
+LC009670	Human astrovirus MLB2 gene for ORF1b protein precursor, partial cds, isolate: MLBAstV2008Feb, strain: Influent3b.	Human astrovirus MLB2	Vertebrates	17	100	AB769871,JQ673582,JQ673583,KJ807476,KJ807477	Vertebrates	GQ502191	375	99.21	726	TRUE
+LC009671	Human astrovirus MLB2 gene for ORF1b protein precursor, partial cds, isolate: MLBAstV2008Mar, strain: Influent1b.	Human astrovirus MLB2	Vertebrates	17	100	AB769871,JQ673582,JQ673583,KJ807476,KJ807477	Vertebrates	KJ807479	375	99.21	726	TRUE
+LC009672	Human astrovirus MLB2 gene for ORF1b protein precursor, partial cds, isolate: MLBAstV2008Feb, strain: Influent5b.	Human astrovirus MLB2	Vertebrates	17	100	AB769871,JQ673582,JQ673583,KJ807476,KJ807477	Vertebrates	AB823731	114	85.71	113	TRUE
+LC009673	Human astrovirus MLB2 gene for ORF1b protein precursor, partial cds, isolate: MLBAstV2008Feb, strain: Influent6b.	Human astrovirus MLB2	Vertebrates	17	100	AB769871,JQ673582,JQ673583,KJ807476,KJ807477	Vertebrates	AB823731	114	85.71	113	TRUE
+LC009674	Human astrovirus MLB2 gene for ORF1b protein precursor, partial cds, isolate: MLBAstV2007Dec, strain: Influent1b.	Human astrovirus MLB2	Vertebrates	17	100	AB769871,JQ673582,JQ673583,KJ807476,KJ807477	Vertebrates	AB769871	249	99.2	482	TRUE
+LC009675	Human astrovirus MLB2 gene for ORF1b protein precursor, partial cds, isolate: MLBAstV2008Feb, strain: Influent4b.	Human astrovirus MLB2	Vertebrates	17	100	AB769871,JQ673582,JQ673583,KJ807476,KJ807477	Vertebrates	JQ673583	385	99.74	757	TRUE
+LC009676	Human astrovirus MLB2 gene for ORF1b protein precursor, partial cds, isolate: MLBAstV2008Jan, strain: Influent1b.	Human astrovirus MLB2	Vertebrates	17	100	AB769871,JQ673582,JQ673583,KJ807476,KJ807477	Vertebrates	KJ807478	366	96.83	654	TRUE
+LC009677	Human astrovirus MLB2 gene for ORF1b protein precursor, partial cds, isolate: MLBAstV2008Mar, strain: Influent2b.	Human astrovirus MLB2	Vertebrates	17	100	AB769871,JQ673582,JQ673583,KJ807476,KJ807477	Vertebrates	FJ222451	98	89.91	129	TRUE
+LC009678	Astrovirus VA2 gene for capsid protein precursor, partial cds, isolate: VAAstV2008Mar, strain: Influent1c.	Astrovirus VA2	Vertebrates	3	100	GQ502193,GQ502194,GQ502195	Vertebrates	GQ502193	597	96.6	1059	TRUE
+LC009679	Astrovirus VA2 gene for capsid protein precursor, partial cds, isolate: VAAstV2008Jan, strain: Influent1c.	Astrovirus VA2	Vertebrates	3	100	GQ502193,GQ502194,GQ502195	Vertebrates	GQ502193	598	96.76	1066	TRUE
+LC009680	Astrovirus VA2 gene for capsid protein precursor, partial cds, isolate: VAAstV2008Jan, strain: Influent2c.	Astrovirus VA2	Vertebrates	3	100	GQ502193,GQ502194,GQ502195	Vertebrates	GQ502193	579	96.5	1023	TRUE
+LC009681	Astrovirus VA1 gene for capsid protein precursor, partial cds, isolate: VAAstV2007Oct, strain: Influent3c.	Astrovirus VA1	Vertebrates	4	100	FJ973620,KJ807515,KJ920196,KJ920197	Vertebrates	GQ267696	609	98.54	1154	TRUE
+LC009682	Astrovirus VA1 gene for capsid protein precursor, partial cds, isolate: VAAstV2008Jan, strain: Influent3c.	Astrovirus VA1	Vertebrates	4	100	FJ973620,KJ807515,KJ920196,KJ920197	Vertebrates	GQ267696	610	98.71	1162	TRUE
+LC009683	Astrovirus VA1 gene for capsid protein precursor, partial cds, isolate: VAAstV2007Oct, strain: Influent2c.	Astrovirus VA1	Vertebrates	4	100	FJ973620,KJ807515,KJ920196,KJ920197	Vertebrates	GQ267696	613	99.19	1186	TRUE
+LC009684	Astrovirus VA1 gene for capsid protein precursor, partial cds, isolate: VAAstV2007Oct, strain: Influent1c.	Astrovirus VA1	Vertebrates	4	100	FJ973620,KJ807515,KJ920196,KJ920197	Vertebrates	GQ267696	613	99.19	1186	TRUE
+LN610699	Beauveria bassiana RNA virus 1, complete genome.	Beauveria bassiana RNA virus	Plants	1	100	KM233415	Plants	KM233415	2897	91.27	4080	TRUE
+LN827952	Sclerotinia sclerotiorum dsRNA mycovirus-L RdRp gene for RNA dependent RNA polymerase, isolate HAZ3-7.	Sclerotinia sclerotiorum dsRNA mycovirus-L	Plants	1	100	JQ513382	Plants	KJ549662	398	84.98	325	TRUE
+LN849779	Megavirus balcon partial DNA polymerase gene for DNA polymerase B-family.	Megavirus	Invertebrates	28	100	JF979170,JF979172,JF979179,JN258408,JN885990	Invertebrates	GU265561	1086	99.09	2093	TRUE
+LN849780	Megavirus feuillage partial DNA polymerase gene for B-family DNA polymerase.	Megavirus	Invertebrates	28	100	JF979170,JF979172,JF979179,JN258408,JN885990	Invertebrates	JX885207	1825	92.73	2767	TRUE
+LN849781	Megavirus montadette1 partial DNA polymerase gene for B-family DNA polymerase.	Megavirus	Invertebrates	28	100	JF979170,JF979172,JF979179,JN258408,JN885990	Invertebrates	JN885991	2241	100	4442	TRUE
+LN849782	Megavirus potager partial DNA polymerase gene for B-family DNA polymerase.	Megavirus	Invertebrates	28	100	JF979170,JF979172,JF979179,JN258408,JN885990	Invertebrates	KF217135	1047	100	2076	TRUE
+LN849783	Megavirus sete2 partial DNA polymerase gene for B-family DNA polymerase.	Megavirus	Invertebrates	28	100	JF979170,JF979172,JF979179,JN258408,JN885990	Invertebrates	GU265561	1271	99.53	2484	TRUE
+LN849784	Megavirus terrain_en_construction partial DNA polymerase gene for B-family DNA polymerase.	Megavirus	Invertebrates	28	100	JF979170,JF979172,JF979179,JN258408,JN885990	Invertebrates	GU265561	1470	100	2914	TRUE
+LN849785	Mimivirus montadette2 partial DNA polymerase gene for B-family DNA polymerase.	Mimivirus	Invertebrates	32	71.11	JF979161,JF979162,JF979166,JF979167,JF979168	Invertebrates	KF493709	1890	100	3747	TRUE
+LN849786	Mimivirus univirus partial DNA polymerase gene for B-family DNA polymerase.	Mimivirus	Invertebrates	32	71.11	JF979161,JF979162,JF979166,JF979167,JF979168	Invertebrates	AY606804	2952	100	5852	TRUE
+LN849787	Moumouvirus boug1 partial DNA polymerase gene for B-family DNA polymerase.	Moumouvirus	Invertebrates	20	100	JF979180,JF979181,JN885994,JN885995,JN885996	Invertebrates	KC008572	1443	99.18	2789	TRUE
+LN849788	Moumouvirus istres partial DNA polymerase gene for B-family DNA polymerase.	Moumouvirus	Invertebrates	20	100	JF979180,JF979181,JN885994,JN885995,JN885996	Invertebrates	JQ063130	973	99.49	1899	TRUE
+M15076	Lassa virus glycoprotein gene, complete cds.	Lassa virus	Vertebrates	679	100	FJ824031,GU481056,GU481057,GU481058,GU481059	Vertebrates	JX985075	1547	99.81	3049	TRUE
+M18382	Lymphocytic choriomeningitis virus L protein RNA, partial cds, clone L39.	Lymphocytic choriomeningitis virus	Vertebrates	180	100	DQ118959,DQ182704,DQ182705,DQ182706,DQ182707	Vertebrates	EU938669	31	96.88	56	TRUE
+M20304	Tacaribe virus glycoprotein and nucleoprotein mRNAs, complete cds.	Tacaribe virus	Invertebrates	2	100	KF923400,KF923401	Invertebrates	KF923400	2970	99.1	5687	TRUE
+M20869	Lymphocytic choriomeningitis virus envelope glycoprotein (GP-C) and nucleoprotein (NP) genes, complete cds.	Lymphocytic choriomeningitis virus	Vertebrates	180	100	DQ118959,DQ182704,DQ182705,DQ182706,DQ182707	Vertebrates	KJ603310	3369	99.85	6649	TRUE
+M22017	Lymphocytic choriomeningitis virus S protein RNA, complete cds.	Lymphocytic choriomeningitis virus	Vertebrates	180	100	DQ118959,DQ182704,DQ182705,DQ182706,DQ182707	Vertebrates	JN546576	420	86.6	438	TRUE
+M22138	Lymphocytic choriomeningitis virus S RNA, complete cds.	Lymphocytic choriomeningitis virus	Vertebrates	180	100	DQ118959,DQ182704,DQ182705,DQ182706,DQ182707	Vertebrates	FJ607035	2931	86.82	3148	TRUE
+M33879	Mopeia virus strain AN 21366 glycoprotein and nucleocapsid protein genes, complete cds.	Mopeia virus	Vertebrates	17	100	KF926391,KF926392,KF926393,KF926394,KF926395	Vertebrates	FJ383127	405	80.04	202	TRUE
+M65833	Tacaribe virus long long segment RNA, 3' end.	Tacaribe virus	Invertebrates	2	100	KF923400,KF923401	Invertebrates	KF923401	88	98.88	161	TRUE
+U10157	Lymphocytic choriomeningitis virus isolate CHV1 envelope glycoprotein C (GP-C) mRNA, partial cds.	Lymphocytic choriomeningitis virus isolate	Vertebrates	134	100	DQ275199,DQ275200,DQ275201,DQ275202,DQ275203	Vertebrates	JN546575	261	82.59	190	TRUE
+U10158	Lymphocytic choriomeningitis virus isolate CHV2 envelope glycoprotein C (GP-C) mRNA, complete cds.	Lymphocytic choriomeningitis virus isolate	Vertebrates	134	100	DQ275199,DQ275200,DQ275201,DQ275202,DQ275203	Vertebrates	DQ275286	193	86.94	210	TRUE
+U10159	Lymphocytic choriomeningitis virus isolate CHV3 envelope glycoprotein C (GP-C) mRNA, partial cds.	Lymphocytic choriomeningitis virus isolate	Vertebrates	134	100	DQ275199,DQ275200,DQ275201,DQ275202,DQ275203	Vertebrates	DQ275286	194	87.39	218	TRUE
+U43688	Latino virus nucleocapsid protein gene, partial cds.	Latino virus	Vertebrates	27	100	KM233886,KM233887,KM233888,KM233889,KM233890	Vertebrates	KM233886	503	81.92	321	TRUE
+U43690	Tamiami virus nucleocapsid protein gene, partial cds.	Tamiami virus	Vertebrates	4	100	EU486821,EU938668,JF430474,AY924393	Vertebrates	EU486821	516	84.45	458	TRUE
+U52180	Whitewater Arroyo virus nucleocapsid protein gene, partial cds.	Whitewater Arroyo virus	Vertebrates	34	100	EU938660,EU938661,EU938662,EU938667,JF430466	Vertebrates	AY012721	518	100	1027	TRUE
+U63094	Lassa virus L protein gene, complete cds.	Lassa virus	Vertebrates	679	100	FJ824031,GU481056,GU481057,GU481058,GU481059	Vertebrates	JN650518	6823	99.72	1.34E+04	TRUE
+U70799	Junin virus glycoprotein precursor (GPC) gene, complete cds.	Junin virus	Vertebrates	62	100	DQ531486,DQ531487,DQ531488,DQ531489,DQ854730	Vertebrates	KM272988	78	89.66	101	TRUE
+U70800	Junin virus glycoprotein precursor (GPC) gene, complete cds.	Junin virus	Vertebrates	62	100	DQ531486,DQ531487,DQ531488,DQ531489,DQ854730	Vertebrates	JF446287	428	91.65	617	TRUE
+U70801	Junin virus glycoprotein precursor (GPC) gene, complete cds.	Junin virus	Vertebrates	62	100	DQ531486,DQ531487,DQ531488,DQ531489,DQ854730	Vertebrates	JF446285	433	92.13	638	TRUE
+U70802	Junin virus nucleocapsid protein (N) gene, complete cds.	Junin virus	Vertebrates	62	100	DQ531486,DQ531487,DQ531488,DQ531489,DQ854730	Vertebrates	JF446298	350	93.58	551	TRUE
+U70803	Junin virus nucleocapsid protein (N) gene, complete cds.	Junin virus	Vertebrates	62	100	DQ531486,DQ531487,DQ531488,DQ531489,DQ854730	Vertebrates	JF446298	350	93.58	551	TRUE
+U70804	Junin virus nucleocapsid protein (N) gene, complete cds.	Junin virus	Vertebrates	62	100	DQ531486,DQ531487,DQ531488,DQ531489,DQ854730	Vertebrates	JF446298	350	93.58	551	TRUE
+U73034	Lassa virus Z protein and L protein genes, complete cds.	Lassa virus	Vertebrates	679	100	FJ824031,GU481056,GU481057,GU481058,GU481059	Vertebrates	JN650518	7255	99.74	1.43E+04	TRUE
+U73035	Lassa virus ring-finger protein gene, complete cds.	Lassa virus	Vertebrates	679	100	FJ824031,GU481056,GU481057,GU481058,GU481059	Vertebrates	KM821793	4765	94.11	7642	TRUE
+U80007	Mobala virus nucleocapsid protein gene, partial cds.	Mobala virus	Vertebrates	3	100	JQ956481,JQ956482,JQ956483	Vertebrates	KJ855308	280	79.32	121	TRUE
+U80008	Mobala virus nucleocapsid protein gene, partial cds.	Mobala virus	Vertebrates	3	100	JQ956481,JQ956482,JQ956483	Vertebrates	KJ855308	280	79.32	121	TRUE
+X15827	Junin arenavirus S RNA gene for nucleocapsid protein.	Junin	Vertebrates	73	100	DQ531486,DQ531487,DQ531488,DQ531489,DQ854730	Vertebrates	JF446298	349	93.32	543	TRUE
+X52400	Nigeria Lassa virus S (small) RNA for glycoprotein precursor (GPC) and nucleocapsid protein.	Nigeria	Vertebrates	3184	99.28	DQ013268,DQ013269,DQ013270,DQ013271,DQ013272	Vertebrates	GU481070	2741	84.26	2361	TRUE
+X62616	Machupo virus RNA for nucleocapsid protein, 3'-region.	Machupo virus	Vertebrates	83	100	FJ696411,FJ696412,FJ696413,FJ696414,FJ696415	Vertebrates	AY571954	634	100	1257	TRUE
+Y16308	Lymphocytic choriomeningitis virus gene for nucleoprotein.	Lymphocytic choriomeningitis virus	Vertebrates	180	100	DQ118959,DQ182704,DQ182705,DQ182706,DQ182707	Vertebrates	JN546576	386	87.33	432	TRUE
+AF333969	Lassa virus glycoprotein precursor (GP) and nucleoprotein (NP) genes, complete cds.	Lassa virus	Vertebrates	679	100	FJ824031,GU481056,GU481057,GU481058,GU481059	Vertebrates	JN651374	231	98.72	440	TRUE
+AF371440	Pirital virus strain 1575 nucleoprotein (N) gene, partial cds.	Pirital virus strain	Vertebrates	25	100	JF412367,JF412368,JF412381,JF412382,JF412383	Vertebrates	AY573921	532	86.93	583	TRUE
+AF371441	Pirital virus strain 1583 nucleoprotein (N) gene, partial cds.	Pirital virus strain	Vertebrates	25	100	JF412367,JF412368,JF412381,JF412382,JF412383	Vertebrates	AY573921	602	97.73	1110	TRUE
+AF371442	Pirital virus strain 1645 nucleoprotein (N) gene, partial cds.	Pirital virus strain 1645	Vertebrates	2	100	AY510020,AY562386	Vertebrates	AY573921	606	100	1201	TRUE
+AF371444	Pirital virus strain 1743 nucleoprotein (N) gene, partial cds.	Pirital virus strain 1743	Vertebrates	2	100	AY515511,AY562384	Vertebrates	AY575850	616	100	1221	TRUE
+AF371445	Pirital virus strain 1881 nucleoprotein (N) gene, partial cds.	Pirital virus strain	Vertebrates	25	100	JF412367,JF412368,JF412381,JF412382,JF412383	Vertebrates	JF412381	585	95.28	987	TRUE
+AF371447	Pirital virus strain 2148 nucleoprotein (N) gene, partial cds.	Pirital virus strain	Vertebrates	25	100	JF412367,JF412368,JF412381,JF412382,JF412383	Vertebrates	JF412368	483	82.71	357	TRUE
+AF371448	Pirital virus strain 2508 nucleoprotein (N) gene, partial cds.	Pirital virus strain	Vertebrates	25	100	JF412367,JF412368,JF412381,JF412382,JF412383	Vertebrates	U62561	614	99.68	1205	TRUE
+AF371451	Pirital virus strain 2731 nucleoprotein (N) gene, partial cds.	Pirital virus strain	Vertebrates	25	100	JF412367,JF412368,JF412381,JF412382,JF412383	Vertebrates	U62561	609	98.86	1189	TRUE
+AF371454	Pirital virus strain 393 nucleoprotein (N) gene, partial cds.	Pirital virus strain	Vertebrates	25	100	JF412367,JF412368,JF412381,JF412382,JF412383	Vertebrates	U62561	615	99.84	1213	TRUE
+AF371455	Pirital virus strain 4214 nucleoprotein (N) gene, partial cds.	Pirital virus strain	Vertebrates	25	100	JF412367,JF412368,JF412381,JF412382,JF412383	Vertebrates	U62562	590	95.78	1015	TRUE
+AF371456	Pirital virus strain 4219 nucleoprotein (N) gene, partial cds.	Pirital virus strain	Vertebrates	25	100	JF412367,JF412368,JF412381,JF412382,JF412383	Vertebrates	U62562	588	95.61	1005	TRUE
+AF371457	Pirital virus strain 4274 nucleoprotein (N) gene, partial cds.	Pirital virus strain	Vertebrates	25	100	JF412367,JF412368,JF412381,JF412382,JF412383	Vertebrates	U62562	593	96.42	1045	TRUE
+AF371458	Pirital virus strain 452 nucleoprotein (N) gene, partial cds.	Pirital virus strain	Vertebrates	25	100	JF412367,JF412368,JF412381,JF412382,JF412383	Vertebrates	AY575850	502	82.98	379	TRUE
+AF371459	Pirital virus strain 4648 nucleoprotein (N) gene, partial cds.	Pirital virus strain	Vertebrates	25	100	JF412367,JF412368,JF412381,JF412382,JF412383	Vertebrates	AY012712	54	87.1	60	TRUE
+AF371460	Pirital virus strain 535 nucleoprotein (N) gene, partial cds.	Pirital virus strain	Vertebrates	25	100	JF412367,JF412368,JF412381,JF412382,JF412383	Vertebrates	AY575850	495	82.5	357	TRUE
+AF371461	Pirital virus strain 681 nucleoprotein (N) gene, partial cds.	Pirital virus strain	Vertebrates	25	100	JF412367,JF412368,JF412381,JF412382,JF412383	Vertebrates	JF412385	541	87.97	632	TRUE
+AF371462	Pirital virus strain 770 nucleoprotein (N) gene, partial cds.	Pirital virus strain	Vertebrates	25	100	JF412367,JF412368,JF412381,JF412382,JF412383	Vertebrates	JF412387	538	87.48	613	TRUE
+AF371463	Pirital virus strain 3876 nucleoprotein (N) gene, partial cds.	Pirital virus strain	Vertebrates	25	100	JF412367,JF412368,JF412381,JF412382,JF412383	Vertebrates	AY574571	586	95.13	983	TRUE
+AF371464	Pirital virus strain 3945 nucleoprotein (N) gene, partial cds.	Pirital virus strain 3945	Vertebrates	5	100	AY510019,AY562385,AY574571,AY574572,AY574573	Vertebrates	AY574571	616	100	1221	TRUE
+AF371465	Pirital virus strain 3367 nucleoprotein (N) gene, partial cds.	Pirital virus strain	Vertebrates	25	100	JF412367,JF412368,JF412381,JF412382,JF412383	Vertebrates	JF412367	500	83.47	402	TRUE
+AF371466	Pirital virus strain 3673 nucleoprotein (N) gene, partial cds.	Pirital virus strain	Vertebrates	25	100	JF412367,JF412368,JF412381,JF412382,JF412383	Vertebrates	JF412385	507	85.79	505	TRUE
+AF485258	Guanarito virus strain INH-95551 segment S, complete sequence.	Guanarito virus strain	Vertebrates	47	100	JF412365,JF412366,JF412369,JF412370,JF412371	Vertebrates	AY497548	3282	98.2	6149	TRUE
+AF485260	Machupo virus strain Carvallo segment S, complete sequence.	Machupo virus strain Carvallo	Vertebrates	2	100	AY571927,AY571954	Vertebrates	AY924206	3433	99.8	6756	TRUE
+AF485261	Parana virus strain 12056 segment S, complete sequence.	Parana	Vertebrates	63	79.75	HM212633,JF327421,JF327422,JF795513,JF795525	Vertebrates	KJ668824	121	82.88	91.7	TRUE
+AF485262	Pirital virus strain VAV-488 segment S, complete sequence.	Pirital virus strain	Vertebrates	25	100	JF412367,JF412368,JF412381,JF412382,JF412383	Vertebrates	AY575850	2751	80.92	1552	TRUE
+AF485263	Tamiami virus strain CDC W-10777 segment S, complete sequence.	Tamiami virus strain	Vertebrates	4	100	EU486821,EU938668,JF430474,AY924393	Vertebrates	EU486821	1502	85.33	1372	TRUE
+AF485264	Whitewater Arroyo virus strain 9310141 segment S, complete sequence.	Whitewater Arroyo virus strain	Vertebrates	34	100	EU938660,EU938661,EU938662,EU938667,JF430466	Vertebrates	AY012721	518	100	1027	TRUE
+AF492669	Latino virus glycoprotein precursor, gene, partial cds.	Latino virus	Vertebrates	27	100	KM233886,KM233887,KM233888,KM233889,KM233890	Vertebrates	KP027667	61	89.71	79.8	TRUE
+AF492673	Tamiami virus glycoprotein precursor, gene, partial cds.	Tamiami virus	Vertebrates	4	100	EU486821,EU938668,JF430474,AY924393	Vertebrates	EU486821	95	85.59	93.7	TRUE
+AF497572	Bear Canyon virus strain AV A0060209 nucleocapsid protein gene, partial cds.	Bear Canyon virus strain AV	Vertebrates	9	100	EU938656,FJ907243,FJ907244,FJ907245,JF430462	Vertebrates	FJ907245	484	98.98	930	TRUE
+AF497573	Bear Canyon virus strain AV A0060210 nucleocapsid protein gene, partial cds.	Bear Canyon virus strain AV	Vertebrates	9	100	EU938656,FJ907243,FJ907244,FJ907245,JF430462	Vertebrates	FJ907245	483	98.77	922	TRUE
+AF497574	Bear Canyon virus strain AV A0060211 nucleocapsid protein gene, partial cds.	Bear Canyon virus strain AV	Vertebrates	9	100	EU938656,FJ907243,FJ907244,FJ907245,JF430462	Vertebrates	FJ907245	483	98.77	922	TRUE
+AF512828	Tamiami virus strain W 10777 glycoprotein precursor and nucleocapsid protein genes, complete cds.	Tamiami virus strain W 10777	Vertebrates	1	100	AY924393	Vertebrates	EU486821	1488	85.03	1384	TRUE
+AF512829	Parana virus strain 10256 glycoprotein precursor and nucleocapsid protein genes, complete cds.	Parana	Vertebrates	63	79.75	HM212633,JF327421,JF327422,JF795513,JF795525	Vertebrates	JQ289296	83	83.84	69.9	TRUE
+AF512833	Bear canyon virus strain A0060209 glycoprotein precursor and nucleocapsid protein genes, complete cds.	Bear	Vertebrates	10	90.91	EU938656,FJ907243,FJ907244,FJ907245,JF430462	Vertebrates	AY924391	3227	96.38	5662	TRUE
+AJ233173	Lymphocytic choriomeningitis virus GP1 gene, partial, clone AEv 9.5.2.1.	Lymphocytic choriomeningitis virus	Vertebrates	180	100	DQ118959,DQ182704,DQ182705,DQ182706,DQ182707	Vertebrates	DQ275199	168	89.36	214	TRUE
+AJ233174	Lymphocytic choriomeningitis virus GP1 gene, partial, clone AEv 9.5.2.2.	Lymphocytic choriomeningitis virus	Vertebrates	180	100	DQ118959,DQ182704,DQ182705,DQ182706,DQ182707	Vertebrates	DQ275199	168	89.36	214	TRUE
+AJ233175	Lymphocytic choriomeningitis virus GP1 gene, partial, clone AEv 9.7.1.1.	Lymphocytic choriomeningitis virus	Vertebrates	180	100	DQ118959,DQ182704,DQ182705,DQ182706,DQ182707	Vertebrates	DQ275199	168	89.36	214	TRUE
+AJ233180	Lymphocytic choriomeningitis virus GP1 gene, partial, clone AEv 31.	Lymphocytic choriomeningitis virus	Vertebrates	180	100	DQ118959,DQ182704,DQ182705,DQ182706,DQ182707	Vertebrates	DQ275199	169	89.89	222	TRUE
+AJ233198	Lymphocytic choriomeningitis virus GP1 gene, partial, clone WE5 (40) 5.	Lymphocytic choriomeningitis virus	Vertebrates	180	100	DQ118959,DQ182704,DQ182705,DQ182706,DQ182707	Vertebrates	DQ275206	171	90	226	TRUE
+AJ233199	Lymphocytic choriomeningitis virus GP1 gene, partial, clone WE5 (80) 1.	Lymphocytic choriomeningitis virus	Vertebrates	180	100	DQ118959,DQ182704,DQ182705,DQ182706,DQ182707	Vertebrates	DQ275206	171	90	226	TRUE
+AJ233200	Lymphocytic choriomeningitis virus GP1 gene, partial, clone WE5 (80) 3.	Lymphocytic choriomeningitis virus	Vertebrates	180	100	DQ118959,DQ182704,DQ182705,DQ182706,DQ182707	Vertebrates	DQ275206	171	90	226	TRUE
+AJ233201	Lymphocytic choriomeningitis virus GP1 gene, partial, clone WE5 (80) 4.	Lymphocytic choriomeningitis virus	Vertebrates	180	100	DQ118959,DQ182704,DQ182705,DQ182706,DQ182707	Vertebrates	DQ275206	171	90	226	TRUE
+AJ233202	Lymphocytic choriomeningitis virus GP1 gene, partial, clone WE5 (80) 5.	Lymphocytic choriomeningitis virus	Vertebrates	180	100	DQ118959,DQ182704,DQ182705,DQ182706,DQ182707	Vertebrates	DQ275206	171	90	226	TRUE
+AJ310764	Lassa virus partial genomic RNA for putative glycoprotein precursor (gpc gene), isolate IJ531.	Lassa virus partial	Vertebrates	10	100	LN823982,LN823983,LN823984,LN823985,AJ969404	Vertebrates	GU979505	285	99.65	559	TRUE
+AY081210	Allpahuayo virus CLHP-2098 glycoprotein precursor and nucleocapsid protein genes, complete cds.	Allpahuayo virus	Vertebrates	2	100	AY012686,AY012687	Vertebrates	AY012686	3354	99.97	6643	TRUE
+AY129247	Guanarito virus strain INH-95551 segment S, complete sequence.	Guanarito virus strain	Vertebrates	47	100	JF412365,JF412366,JF412369,JF412370,JF412371	Vertebrates	AY497548	3274	98.2	6125	TRUE
+AY129248	Machupo virus strain Carvallo segment S, complete sequence.	Machupo virus strain Carvallo	Vertebrates	2	100	AY571927,AY571954	Vertebrates	AY571925	842	100	1669	TRUE
+AY179171	Lassa virus strain AV RING finger protein (Z) and polymerase (L) genes, complete cds.	Lassa virus strain	Vertebrates	512	100	GU481056,GU481057,GU481058,GU481059,GU481060	Vertebrates	GU573544	664	88.06	781	TRUE
+AY179172	Lassa virus strain NL RING finger protein (Z) and polymerase (L) genes, complete cds.	Lassa virus strain	Vertebrates	512	100	GU481056,GU481057,GU481058,GU481059,GU481060	Vertebrates	KM821860	6029	85.22	5705	TRUE
+AY179173	Lassa virus strain NL glycoprotein precursor (GPC) and nucleoprotein (NP) genes, complete cds.	Lassa virus strain	Vertebrates	512	100	GU481056,GU481057,GU481058,GU481059,GU481060	Vertebrates	JN650517	3142	93.43	4906	TRUE
+AY179174	Lassa virus strain CSF polymerase (L) gene, complete cds.	Lassa virus strain	Vertebrates	512	100	GU481056,GU481057,GU481058,GU481059,GU481060	Vertebrates	KM052323	290	86.57	307	TRUE
+AY216502	Allpahuayo virus strain CLHP-2472 segment L, complete sequence.	Allpahuayo virus strain CLHP-2472	Vertebrates	1	100	AY012687	Vertebrates	EU938665	44	95.65	75.8	TRUE
+AY216503	Bear Canyon virus strain A0060209 segment L, complete sequence.	Bear Canyon virus strain	Vertebrates	9	100	EU938656,FJ907243,FJ907244,FJ907245,JF430462	Vertebrates	AY924390	6882	96.89	1.23E+04	TRUE
+AY216504	Guanarito virus strain INH-95551 segment L, complete sequence.	Guanarito virus strain	Vertebrates	47	100	JF412365,JF412366,JF412369,JF412370,JF412371	Vertebrates	KR260725	6906	97.75	1.27E+04	TRUE
+AY216505	Pirital virus strain VAV-488 segment L, complete sequence.	Pirital virus strain	Vertebrates	25	100	JF412367,JF412368,JF412381,JF412382,JF412383	Vertebrates	AY494081	7059	99.8	1.39E+04	TRUE
+AY216507	Junin virus strain MC2 segment L, complete sequence.	Junin virus strain	Vertebrates	36	100	DQ531486,DQ531487,DQ531488,DQ531489,DQ854730	Vertebrates	KR260731	6947	97.67	1.28E+04	TRUE
+AY216511	Machupo virus strain Carvallo segment L, complete sequence.	Machupo virus strain Carvallo	Vertebrates	2	100	AY571927,AY571954	Vertebrates	AY935529	2168	99.91	4286	TRUE
+AY216514	Oliveros virus strain 3229 segment L, complete sequence.	Oliveros virus	Vertebrates	3	100	KP027657,KP027668,KP027677	Vertebrates	AY935533	68	88.31	81.8	TRUE
+AY216515	Tamiami virus polymerase gene, partial cds.	Tamiami virus	Vertebrates	4	100	EU486821,EU938668,JF430474,AY924393	Vertebrates	AY924393	321	100	636	TRUE
+AY216516	Whitewater Arroyo virus polymerase gene, partial cds.	Whitewater Arroyo virus	Vertebrates	34	100	EU938660,EU938661,EU938662,EU938667,JF430466	Vertebrates	AY494081	86	86	87.7	TRUE
+AY216520	Tacaribe virus polymerase gene, partial cds.	Tacaribe virus	Invertebrates	2	100	KF923400,KF923401	Invertebrates	KF923401	338	99.71	664	TRUE
+AY342390	Mobala virus strain ACAR 3080 MRC5 P2 glycoprotein precursor and nucleocapsid protein genes, complete cds.	Mobala virus strain	Vertebrates	3	100	JQ956481,JQ956482,JQ956483	Vertebrates	AB586644	293	79.62	135	TRUE
+AY358021	Machupo virus strain Carvallo segment L, complete sequence.	Machupo virus strain Carvallo	Vertebrates	2	100	AY571927,AY571954	Vertebrates	AY935529	2175	99.86	4294	TRUE
+AY358022	Junin virus strain XJ13 segment L, complete sequence.	Junin virus strain	Vertebrates	36	100	DQ531486,DQ531487,DQ531488,DQ531489,DQ854730	Vertebrates	KR260733	6509	97.28	1.18E+04	TRUE
+AY358023	Junin virus strain XJ13 segment S, complete sequence.	Junin virus strain	Vertebrates	36	100	DQ531486,DQ531487,DQ531488,DQ531489,DQ854730	Vertebrates	DQ854736	3302	97.06	5951	TRUE
+AY358024	Guanarito virus strain INH-95551 segment L, complete sequence.	Guanarito virus strain	Vertebrates	47	100	JF412365,JF412366,JF412369,JF412370,JF412371	Vertebrates	KR260725	6907	97.78	1.28E+04	TRUE
+AY363903	Lymphocytic choriomeningitis virus strain CH-5692 polymerase (L) gene, partial cds.	Lymphocytic choriomeningitis virus strain CH-5692	Vertebrates	1	100	AF325214	Vertebrates	KM882879	320	86.96	349	TRUE
+AY363904	Mopeia virus strain AN 21366 polymerase (L) gene, partial cds.	Mopeia virus	Vertebrates	17	100	KF926391,KF926392,KF926393,KF926394,KF926395	Vertebrates	AY772167	1324	99.77	2607	TRUE
+AY363905	Lassa virus strain SL620 polymerase (L) gene, partial cds.	Lassa virus strain	Vertebrates	512	100	GU481056,GU481057,GU481058,GU481059,GU481060	Vertebrates	KM406572	363	97.84	672	TRUE
+AY363906	Lassa virus strain SL15 polymerase (L) gene, partial cds.	Lassa virus strain SL15	Vertebrates	1	100	GU979506	Vertebrates	GU979511	385	85.37	371	TRUE
+AY363908	Lassa virus strain SL21 polymerase (L) gene, partial cds.	Lassa virus strain SL21	Vertebrates	1	100	GU979505	Vertebrates	GU979511	385	85.37	371	TRUE
+AY363909	Lassa virus strain SL25 polymerase (L) gene, partial cds.	Lassa virus strain SL25	Vertebrates	1	100	GU979504	Vertebrates	KM406578	329	88.68	402	TRUE
+AY363910	Lassa virus strain SL26 polymerase (L) gene, partial cds.	Lassa virus strain SL26	Vertebrates	1	100	GU979503	Vertebrates	KM406578	330	88.95	410	TRUE
+AY571903	Machupo virus strain 200002427 nucleoprotein gene, partial cds.	Machupo virus strain 200002427	Vertebrates	3	100	AY924204,AY935527,AY960327	Vertebrates	AY571942	618	97.63	1136	TRUE
+AY571904	Machupo virus strain Carvallo segment S, complete sequence.	Machupo virus strain Carvallo	Vertebrates	2	100	AY571927,AY571954	Vertebrates	AY571925	842	100	1669	TRUE
+AY571959	Machupo virus strain 9530537 segment S, complete sequence.	Machupo virus strain 9530537	Vertebrates	4	100	AY571931,AY571958,AY935532,AY960332	Vertebrates	AY571931	842	100	1669	TRUE
+AY619640	Junin virus strain Rumero segment L, complete sequence.	Junin virus strain	Vertebrates	36	100	DQ531486,DQ531487,DQ531488,DQ531489,DQ854730	Vertebrates	KR260731	6934	97.69	1.28E+04	TRUE
+AY619641	Junin virus strain Rumero segment S, complete sequence.	Junin virus strain	Vertebrates	36	100	DQ531486,DQ531487,DQ531488,DQ531489,DQ854730	Vertebrates	DQ854733	3325	97.77	6145	TRUE
+AY619642	Machupo virus strain Carvallo segment L, complete sequence.	Machupo virus strain Carvallo	Vertebrates	2	100	AY571927,AY571954	Vertebrates	AY935529	2176	99.91	4302	TRUE
+AY619643	Machupo virus strain Carvallo segment S, complete sequence.	Machupo virus strain Carvallo	Vertebrates	2	100	AY571927,AY571954	Vertebrates	AY571925	842	100	1669	TRUE
+AY619644	Machupo virus strain Mallele segment L, complete sequence.	Machupo virus strain	Vertebrates	77	100	AY571905,AY571906,AY571907,AY571908,AY571909	Vertebrates	AY960332	289	90.03	384	TRUE
+AY619645	Machupo virus strain Mallele segment S, complete sequence.	Machupo virus strain	Vertebrates	77	100	AY571905,AY571906,AY571907,AY571908,AY571909	Vertebrates	AY571930	841	99.88	1661	TRUE
+AY624354	Machupo virus strain Chicava segment L, complete sequence.	Machupo virus strain Chicava segment	Vertebrates	1	100	AY924202	Vertebrates	AY935525	2178	100	4318	TRUE
+AY624355	Machupo virus strain Chicava segment S, complete sequence.	Machupo virus strain Chicava segment S, complete	Vertebrates	1	100	AY924202	Vertebrates	AY571920	842	100	1669	TRUE
+AY628200	Lassa virus strain Macenta segment L, complete sequence.	Lassa virus strain Macenta	Vertebrates	1	100	KF425246	Vertebrates	GU979507	298	87.65	341	TRUE
+AY628201	Lassa virus strain Macenta segment S, complete sequence.	Lassa virus strain Macenta	Vertebrates	1	100	KF425246	Vertebrates	GU830821	1152	93.2	1784	TRUE
+AY628202	Lassa virus strain Josiah segment L, complete sequence.	Lassa virus strain Josiah segment L,	Vertebrates	1	100	JN650518	Vertebrates	JN650518	7261	99.83	1.43E+04	TRUE
+AY628203	Lassa virus strain Josiah segment S, complete sequence.	Lassa virus strain Josiah segment S,	Vertebrates	1	100	JN650517	Vertebrates	AY772168	3395	99.79	6688	TRUE
+AY628204	Lassa virus strain Z148 segment L, complete sequence.	Lassa virus strain	Vertebrates	512	100	GU481056,GU481057,GU481058,GU481059,GU481060	Vertebrates	GU979507	296	88.1	349	TRUE
+AY628205	Lassa virus strain Z148 segment S, complete sequence.	Lassa virus strain	Vertebrates	512	100	GU481056,GU481057,GU481058,GU481059,GU481060	Vertebrates	GU830821	1166	94.34	1895	TRUE
+AY628206	Lassa virus strain Weller segment S, complete sequence.	Lassa virus strain	Vertebrates	512	100	GU481056,GU481057,GU481058,GU481059,GU481060	Vertebrates	AJ969408	535	96.75	954	TRUE
+AY628207	Lassa virus strain Pinneo segment S, complete sequence.	Lassa virus strain	Vertebrates	512	100	GU481056,GU481057,GU481058,GU481059,GU481060	Vertebrates	AJ969407	723	99.04	1344	TRUE
+AY628208	Lassa virus strain Acar 3080 segment S, complete sequence.	Lassa virus strain	Vertebrates	512	100	GU481056,GU481057,GU481058,GU481059,GU481060	Vertebrates	AJ969407	723	99.04	1344	TRUE
+AY693637	Lassa virus strain Nig04-010 polymerase (L) gene, partial cds.	Lassa virus strain	Vertebrates	512	100	GU481056,GU481057,GU481058,GU481059,GU481060	Vertebrates	KM822052	753	96.41	1330	TRUE
+AY693638	Lassa virus strain las803792 polymerase (L) gene, partial cds.	Lassa virus strain	Vertebrates	512	100	GU481056,GU481057,GU481058,GU481059,GU481060	Vertebrates	GU979507	302	88.82	373	TRUE
+AY693639	Lassa virus strain las806791 polymerase (L) gene, partial cds.	Lassa virus strain	Vertebrates	512	100	GU481056,GU481057,GU481058,GU481059,GU481060	Vertebrates	GU481062	301	88.53	365	TRUE
+AY693640	Lassa virus strain las803213 polymerase (L) gene, partial cds.	Lassa virus strain	Vertebrates	512	100	GU481056,GU481057,GU481058,GU481059,GU481060	Vertebrates	KM821973	705	93.25	1094	TRUE
+AY693641	Mobala virus strain 3099 polymerase (L) gene, partial cds.	Mobala virus strain	Vertebrates	3	100	JQ956481,JQ956482,JQ956483	Vertebrates	JQ956482	234	82.39	171	TRUE
+AY746353	Junin virus strain Candid-1 segment S, complete sequence.	Junin virus strain	Vertebrates	36	100	DQ531486,DQ531487,DQ531488,DQ531489,DQ854730	Vertebrates	JF446289	488	99.8	961	TRUE
+AY772169	Mopeia virus AN20410 segment L, complete sequence.	Mopeia virus	Vertebrates	17	100	KF926391,KF926392,KF926393,KF926394,KF926395	Vertebrates	AY772167	7247	99.89	1.43E+04	TRUE
+AY772170	Mopeia virus AN20410 segment S, complete sequence.	Mopeia virus	Vertebrates	17	100	KF926391,KF926392,KF926393,KF926394,KF926395	Vertebrates	FJ383127	404	79.84	194	TRUE
+AY847350	Lymphocytic choriomeningitis virus Armstrong 53b segment RNA S, complete sequence.	Lymphocytic choriomeningitis virus	Vertebrates	180	100	DQ118959,DQ182704,DQ182705,DQ182706,DQ182707	Vertebrates	KJ603310	3372	99.94	6673	TRUE
+AY847351	Lymphocytic choriomeningitis virus Armstrong 53b segment RNA L, complete sequence.	Lymphocytic choriomeningitis virus	Vertebrates	180	100	DQ118959,DQ182704,DQ182705,DQ182706,DQ182707	Vertebrates	KJ603309	6673	99.93	1.32E+04	TRUE
+AY870334	Lassa virus strain Lib04-2739 polymerase (L) gene, partial cds.	Lassa virus strain Lib04-2739	Vertebrates	1	100	GU830812	Vertebrates	GU979510	503	87.48	569	TRUE
