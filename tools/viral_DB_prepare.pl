@@ -22,14 +22,14 @@ my $debug = 0;
 my %options;
 getopts('a:b:c:d:e:f:g:i:j:k:l:m:n:o:p:q:r:s:t:u:v:w:x:y:z:h', \%options);
 unless (defined $options{'t'} ) { usage($version); }
-if	($options{'t'} eq 'download')	{ vrl_download(\%options, \@ARGV); }    # download dataset
+if		($options{'t'} eq 'download')	{ vrl_download(\%options, \@ARGV); }    # download dataset
 elsif	($options{'t'} eq 'category')	{ vrl_category(\%options, \@ARGV); }    # automatically classification
 elsif	($options{'t'} eq 'manually')	{ vrl_manually(\%options, \@ARGV); }	# manually classification
-elsif	($options{'t'} eq 'patch')	{ vrl_patch(\%options, \@ARGV); }	# combine the result
-elsif	($options{'t'} eq 'unique')	{ vrl_unique(\%options, \@ARGV); }	# unique the classified virus
-elsif	($options{'t'} eq 'refine')	{ vrl_refine(); }			# revine manually changed classification
+elsif	($options{'t'} eq 'patch')		{ vrl_patch(\%options, \@ARGV); }		# combine the result
+elsif	($options{'t'} eq 'unique')		{ vrl_unique(\%options, \@ARGV); }		# unique the classified virus
+elsif	($options{'t'} eq 'refine')		{ vrl_refine(); }						# revine manually changed classification
 elsif	($options{'t'} eq 'extProt')	{ vrl_extract_protein(\%options, \@ARGV); }	# extract protein sequence
-elsif	($options{'t'} eq 'rmDup')	{ vrl_rmDup(\%options, \@ARGV);	}	# remove duplication
+elsif	($options{'t'} eq 'rmDup')		{ vrl_rmDup(\%options, \@ARGV);	}		# remove duplication
 else	{ usage($version); }
 
 sub usage
@@ -92,7 +92,7 @@ PIPELINE (version $version):
 =head2
  vrl_rmDup: remove duplication
 =cut
-sub vrl_rmDup
+sub vrl_rmDupx
 {
         my ($options, $files) = @_;
 
@@ -281,14 +281,94 @@ sub vrl_refine
 }
 
 =head2
- vrl_unique : unique the classified virus 
+ vrl_unique : unique the classified virus with different sequence similarity
 =cut
 sub vrl_unique
 {
 	my ($options, $files) = @_;
+
+	my $usage = qq'
+USAGE: $0 -t unique [option] input_file
+
+	-m	max sequence length (default: 40,000)
+	-n	min sequence length (default: 100)
+	-s	sequence similarity (default: 100)
+		100 for 100%, 97 for 97%, 95 for 95%
+	-p	number of CPU (default: 1)
+
+
+* remove sequence longer than 40kb/shorter than 100bp
+* generate cluster using cd-hit-est with sequence similarity
+* extract representative seq
+'; 
+
+	print $usage and exit unless defined $$files[0];
+	my $input_file = $$files[0];
+	die "[ERR]file not exist $input_file\n" unless -s $input_file;
+
+	my $prefix = $input_file;
+	$prefix =~ s/\.fasta$//ig; $prefix =~ s/\.fa$//ig;
+
+	# parameters
+	my $identity = 100;
+    $identity = $$options{'s'} if (defined $$options{'s'} && $$options{'s'} > 90);
+	my $cls_fasta  = $prefix."_U$identity.fasta";
+	$identity = $identity/100;
+
+	my $cpu = 1;
+	$cpu = $$options{'p'} if (defined $$options{'p'} && $$options{'p'} > 1);
+
+	my $max_len = 40000;
+	my $min_len = 100;
+	$max_len = $$options{'m'} if (defined $$options{'m'} && $$options{'m'} >= 1000);
+	$min_len = $$options{'n'} if (defined $$options{'n'} && $$options{'n'} >= 30 && $$options{'n'} < $max_len);
+
+	# filter reads by length, put sequence to hash
+    my %seq_hash;	# key: id, value: seq
+	my $filter_file = $prefix.".filter.fasta";
+	my $out1 = IO::File->new(">".$filter_file) || die $!;
+	my $in = Bio::SeqIO->new(-format=>'fasta', -file=>$input_file);
+	while(my $inseq = $in->next_seq){   
+		my $id  = $inseq->id;
+		my $seq = $inseq->seq;
+		my $len = $inseq->length;
+		if ($len >= $min_len && $len <= $max_len) {
+			print $out1 ">$id\n$seq\n";
+			$seq_hash{$id} = $seq;
+		}
+	}
+	$out1->close;
+
+	# cd-hit
+	my $cdhit_bin = $FindBin::RealBin."/../bin/cd-hit-est";
+	my $cls_file = $prefix.".cls$identity";
+	run_cmd("$cdhit_bin -i $filter_file -o $cls_file -c $identity -M 0 -T $cpu");
+	
+	########
+	my $cls_result = $prefix.".cls$identity.clstr";
+	my $fho = IO::File->new(">".$cls_fasta) || die $!;
+	my $fhi = IO::File->new($cls_result) || die $!;
+	while(<$fhi>) {
+		chomp;
+		if ($_ =~ m/>(\S+)\.\.\. \*/) {
+			my $id = $1;
+			my $seq = $seq_hash{$id};
+			print $fho ">".$id."\n".$seq."\n";
+		}
+	}
+	$fhi->close;
+	$fho->close;
+}
+
+=head2
+ vrl_unique : unique the classified virus 
+=cut
+sub vrl_rmDup
+{
+	my ($options, $files) = @_;
 	
 	my $usage = qq'
-USAGE: $0 -t unique input_file
+USAGE: $0 -t rmDup input_file
 
 * remove sequence longer than 40kb
 * remove duplication virus (shorter one)	
@@ -419,9 +499,9 @@ USAGE: $0 -t path [options]
 	}	
 
 	my %division  = get_division();
-        my %virus_hostdiv = load_host_div($host_info_file, $update_genus);
-        my %update_hname = load_update_hname($update_hname);
-        my %update_desc  = load_update_desc($update_desc, \%division);
+	my %virus_hostdiv = load_host_div($host_info_file, $update_genus);
+	my %update_hname = load_update_hname($update_hname);
+	my %update_desc  = load_update_desc($update_desc, \%division);
 
 	# set output file
 	$ver_num++;
