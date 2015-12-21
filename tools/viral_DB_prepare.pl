@@ -29,6 +29,7 @@ elsif	($options{'t'} eq 'patch')		{ vrl_patch(\%options, \@ARGV); }		# combine t
 elsif	($options{'t'} eq 'unique')		{ vrl_unique(\%options, \@ARGV); }		# unique the classified virus
 elsif	($options{'t'} eq 'refine')		{ vrl_refine(); }						# revine manually changed classification
 elsif	($options{'t'} eq 'extProt')	{ vrl_extract_protein(\%options, \@ARGV); }	# extract protein sequence
+elsif   ($options{'t'} eq 'genProt')    { vrl_genProt(\%options, \@ARGV); }		# generate protein files
 elsif	($options{'t'} eq 'rmDup')		{ vrl_rmDup(\%options, \@ARGV);	}		# remove duplication
 else	{ usage($version); }
 
@@ -90,84 +91,62 @@ PIPELINE (version $version):
 }
 
 =head2
- vrl_rmDup: remove duplication
+ vrl_genProt: generate protein for database file
 =cut
-sub vrl_rmDupx
+sub vrl_genProt
 {
         my ($options, $files) = @_;
 
         my $usage = qq'
-USAGE $0 input_seq
-        
-        -p      percentage identify (default:97)
-        -m      max length (default:40000)
-        -n      min length (default:100)
+USAGE: $0 -t genProt input_seq vrl_genbank_prot vrl_genbank_tab
+       
+		* the output file is protein sequence of input_seq
+		* input_seq_prot
 
 ';
 
-        print $usage and exit unless defined $$files[0];
-        my $input_file = $$files[0];
-        die "[ERR]file not exist $input_file\n" unless -s $$files[0];
-        my $prefix = $input_file; $prefix =~ s/\.fasta$//; $prefix =~ s/\.fa$//;
+        print $usage and exit if @$files < 3;
+        my $input_seq = $$files[0];
+		my $vrl_prot  = $$files[1];
+		my $vrl_tab   = $$files[2];
 
-        my $identity = 97;
-        $identity = $$options{'p'} if (defined $$options{'p'} && $$options{'p'} > 90);
+		# load protein seq to hash
+		# key: prot id
+		# value: prot seq
+		my %prot_seq;
+		my $inp = Bio::SeqIO->new(-format=>'fasta', -file=>$vrl_prot);
+		while(my $inseq = $inp->next_seq) {
+			my $pid = $inseq->id;
+			my $seq = $inseq->seq;
+			$prot_seq{$pid} = $seq;
+		}
 
-        my $max_len = 40000;
-        my $min_len = 100;
-        $max_len = $$options{'m'} if (defined $$options{'m'} && $$options{'m'} >= 1000);
-        $min_len = $$options{'n'} if (defined $$options{'n'} && $$options{'n'} >= 30 && $$options{'n'} < $max_len);
+		# load protein nt id mapping to hash
+		# key: nt id
+		# value: array of prot id
+		my %nt_prot;
+		my $fhi = IO::File->new($vrl_tab) || die $!;
+		while(<$fhi>) {
+			chomp;
+			next if $_ =~ m/^#/;
+			my @a = split(/\t/, $_);
+			push(@{$nt_prot{$a[1]}}, $a[2]);
+		}
+		$fhi->close;
 
-        # filter reads by length, put sequence to hash
-        my %seq_hash;
-        my $filter_file = $prefix."_filter.fasta";
-        my $out1 = IO::File->new(">".$filter_file) || die $!;
-        my $in = Bio::SeqIO->new(-format=>'fasta', -file=>$input_file);
-        while(my $inseq = $in->next_seq)
-        {
-                my $id  = $inseq->id;
-                my $seq = $inseq->seq;
-                my $len = $inseq->length;
-                if ($len >= $min_len && $len <= $max_len) {
-                        print $out1 ">$id\n$seq\n";
-                        $seq_hash{$id} = $seq;
-                }
-        }
-        $out1->close;
-
-        # sort and cluster      
-        my $sort_file    = $prefix."_sort.fasta";
-        my $cluster_file = $prefix.".uc";
-        my $uclust_bin = $FindBin::RealBin."/../bin/uclust";
-
-        my $cmd1 = "$uclust_bin --mergesort $filter_file --output $sort_file";
-        unless (-s $sort_file) {
-                system($cmd1) && die "[ERR]CMD $cmd1\n";
-        }
-
-        $identity = $identity/100;
-
-        my $cmd2 = "$uclust_bin --input $sort_file --maxlen $max_len --minlen $min_len --uc $cluster_file --id $identity";
-        unless (-s $cluster_file) {
-                system($cmd2) && die "[ERR]CMD $cmd2\n";
-        }
-
-        # remove dup according to cluster info 
-        my $uniq_file = $prefix."_uniq.$identity.fasta";
-        my $out2 = IO::File->new(">".$uniq_file) || die $!;
-        my $fh1 = IO::File->new($cluster_file) || die $!;
-        while(<$fh1>)
-        {
-                chomp;
-                next if $_ =~ m/^#/;
-                next unless $_ =~ m/^C\t/;
-                my @a = split(/\t/, $_);
-                my $id = $a[8];
-                die "[ERR]undef seq $id\n" unless defined $seq_hash{$id};
-                print $out2 ">$id\n$seq_hash{$id}\n";
-        }
-        $fh1->close;
-        $out2->close;
+		# generate protein seq for input nt seq
+		my $fho = IO::File->new(">".$input_seq."_prot") || die $!;
+		my $inn = Bio::SeqIO->new(-format=>'fasta', -file=>$input_seq);
+		while(my $inseq = $inn->next_seq) {
+			my $id = $inseq->id;
+			next unless defined $nt_prot{$id};
+			foreach my $pid (@{$nt_prot{$id}}) {
+				die "[ERR]undef seq for $pid\n" unless defined $prot_seq{$pid};
+				my $pseq = $prot_seq{$pid};
+				print $fho ">$pid\n$pseq\n";
+			}
+		}
+		$fho->close;
 }
 
 =head
@@ -177,26 +156,20 @@ sub vrl_extract_protein
 {
 	my ($options, $files) = @_;
 	my $usage = qq'
-USAGE: $0 -t extProt -i input_seq gbvrl1.seq.gz gbvrl2.seq.gz ... gbvrlN.seq.gz 
+USAGE: $0 -t extProt [options] gbvrl1.seq.gz gbvrl2.seq.gz ... gbvrlN.seq.gz 
+	-o output prefix (default: vrl_genbank)
+
+	* two file will be generate
+	* 1. vrl_genbank_prot: protein sequences used for blastx
+	* 2. vrl_genbank_tab: id_mapping file for virus detection
 
 ';
 	print $usage and exit unless defined $$files[0];
 	foreach my $f (@$files) { 
 		die "[ERR]file not exist: $f\n" unless -s $f;
 	}
-	print $usage and exit unless defined $$options{'i'};
-	my $input_seq = $$options{'i'};
-	die "[ERR]file not exist: $input_seq\n" unless -s $input_seq;
 
-	# get sequence id
-	my %select_id;
-	my $in = Bio::SeqIO->new(-format=>'fasta', -file=>$input_seq);
-	while(my $inseq = $in->next_seq) {
-		$select_id{$inseq->id} = 1;
-	}
-
-	my $output_prefix = $input_seq;
-	$output_prefix =~ s/\.fasta//;
+	my $output_prefix = 'vrl_genbank';
 	my $output_protein = $output_prefix."_prot";
 	my $output_table   = $output_prefix."_tab";
 
@@ -207,16 +180,13 @@ USAGE: $0 -t extProt -i input_seq gbvrl1.seq.gz gbvrl2.seq.gz ... gbvrlN.seq.gz
 	foreach my $f (@$files)
 	{
 		my $seqin = Bio::SeqIO->new(-format => 'GenBank', -file => "gunzip -c $f |" );
-                while(my $inseq = $seqin->next_seq)
-                {
-                        my $sid = $inseq->id;
+		while(my $inseq = $seqin->next_seq)
+		{
+			my $sid = $inseq->id;
 			my $acc = $inseq->accession;
-
 			my $pid;
-			next unless defined $select_id{$acc};
-
-			foreach my $feat_object ($inseq->get_SeqFeatures)
-                        {
+			foreach my $feat_object ($inseq->get_SeqFeatures) 
+			{
 				my $primary_tag = $feat_object->primary_tag;
 				next unless $primary_tag eq "CDS";
 				foreach my $tag ($feat_object->get_all_tags) {
@@ -231,7 +201,6 @@ USAGE: $0 -t extProt -i input_seq gbvrl1.seq.gz gbvrl2.seq.gz ... gbvrlN.seq.gz
 			}
 		}
 	}
-	
 	$out1->close;
 	$out2->close;
 }
