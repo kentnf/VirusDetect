@@ -173,6 +173,13 @@ if ( $host_reference ) {
 	}
 } 
 
+# set path and folder 
+my $WORKING_DIR   = cwd();									# set current folder as working folder
+my $DATABASE_DIR  = ${FindBin::RealBin}."/databases";		# set database folder
+my $BIN_DIR		  = ${FindBin::RealBin}."/bin";				# set script folder
+$reference        = $DATABASE_DIR."/".$reference;			# set reference
+my $seq_info      = $DATABASE_DIR."/vrl_genbank.info.gz";	# set vrl info
+
 # main
 foreach my $sample (@ARGV) 
 {
@@ -182,13 +189,8 @@ foreach my $sample (@ARGV)
 	my $seq_num = Util::detect_seqNum($sample);
 	my $sample_base = basename($sample);
 
-	# set path and folder folder
-	my $WORKING_DIR   = cwd();									# set current folder as working folder
-	my $DATABASE_DIR  = ${FindBin::RealBin}."/databases";		# set database folder
-	my $BIN_DIR       = ${FindBin::RealBin}."/bin";				# set script folder 
+	# set path and folder for sample
 	my $TEMP_DIR      = $WORKING_DIR."/".$sample_base."_temp";	# set temp folder
-	$reference	  	  = $DATABASE_DIR."/".$reference;			# set reference
-	my $seq_info	  = $DATABASE_DIR."/vrl_genbank.info.gz";	# set vrl info
 	print "Working: $WORKING_DIR\nDatabase: $DATABASE_DIR\nBin: $BIN_DIR\nTemp: $TEMP_DIR\n" if $debug;
 
 	# create temp folder and create link for sample
