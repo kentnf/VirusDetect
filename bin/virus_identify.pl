@@ -253,7 +253,7 @@ main: {
 		} elsif ($known_num == 1) {
 			Util::print_user_submessage("$known_num virus was identified by nucleotide similarity (BLASTN) ");
 		} else {
-			Util::print_user_submessage("No known virus was identified by nucleotide similarity (BLASTN)");
+			Util::print_user_submessage("No virus was identified by nucleotide similarity (BLASTN)");
 		}
 
 		# assign known type to contigs 
@@ -285,7 +285,8 @@ main: {
 	else
 	{ 
 		# create file 'no_known_virus_detected' if there is no contig meet cutoff of known virus
-		system("touch $sample_dir/no_known_virus_detected");
+		Util::process_cmd("touch $sample_dir/no_virus_detected_by_blastn", $debug);
+		Util::print_user_submessage("No virus was identified by nucleotide similarity (BLASTN)");	
 	}
 	############################################
 	# ===== end of known virus detection ===== #
