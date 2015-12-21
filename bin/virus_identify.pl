@@ -183,7 +183,7 @@ main: {
 
 	Util::save_file($blast_table, "$sample.blastn.table");	# checking files
 
-	my ($known_contig, $known_blast_table) = Util::find_known_contig($blast_table, 60, 50);
+	my ($known_contig, $known_blast_table) = Util::find_known_contig($blast_table, 70, 50);
 
 	unlink($blast_output) unless $debug;
 
