@@ -15,31 +15,29 @@ my $usage = <<_EOUSAGE_;
 ########################################################################
 # virus_detect.pl [option] --reference reference input1 input2 ...
 #  
-# Basic Options:
+# Basic options:
 #  --reference		Name of the reference virus sequences database 
 #                        [vrl_plant]
-#  --host_reference	Name of Name of the host reference database used 
-#                        to subtract sRNA sequences of host origin [Null]
-#  --thread_num		Number of CPUs used for alignments [8] 
+#  --host_reference	Name of the host reference database used 
+#                        for host sRNA subtraction [Null]
+#  --thread_num		Number of CPUs used for alignments [8]
 # 
 # BWA-related options (align sRNA to reference virus database or host 
 #  sequences):
 #  --max_dist		Maximum edit distance [1]  
 #  --max_open		Maximum number of gap opens [1]  
 #  --max_extension	Maximum number of gap extensions [1]  
-#  --len_seed		Take the first INT subsequence as seed [15] 
+#  --len_seed		Minimum seed length [15] 
 #  --dist_seed		Maximum edit distance in the seed [1]  
 #
 # HISAT-related options (align mRNA to host reference)
-#  --hisat_dist		Maximum edit distance for HISAT [2]
+#  --hisat_dist		Maximum edit distance for HISAT [5]
 #
 # Megablast-related options (remove redundancy within virus contigs):
-#  --strand_specific	Only for sequences assembled from strand-
-#                        specific RNA-seq [false]
-#  --min_overlap	The minimum overlap length between two 
+#  --min_overlap	Minimum overlap length between two 
 #                        contigs to be combined [30]
-#  --max_end_clip	The maximum length of end clips [6]
-#  --min_identity	The minimum identity between two contigs to be 
+#  --max_end_clip	Maximum length of end clips [6]
+#  --min_identity	Minimum identity between two contigs to be 
 #  			 combined [97]
 #  --mis_penalty	Penalty score for a nucleotide mismatch [-1]
 #  --gap_cost		Cost to open a gap [2] 
@@ -48,22 +46,18 @@ my $usage = <<_EOUSAGE_;
 # Megablast-related options (align virus contigs to reference virus 
 #  database for virus identification):
 #  --word_size	     	Minimum word size - length of best perfect match [11] 
-#  --exp_value	     	Maximum Expectation value [1e-5]
-#  --percent_identity 	Minimum identity percentage for the alignment [25] 
+#  --exp_value	     	Maximum e-value [1e-5]
+#  --percent_identity 	Minimum percent identity for the alignment [25] 
 #  --mis_penalty_b   	Penalty score for a nucleotide mismatch [-1]
 #  --gap_cost_b      	Cost to open a gap [2] 
 #  --gap_extension_b 	Cost to extend a gap [1]
 #
-# Result filter options:
+# Result filtering options:
 #  --hsp_cover		Coverage cutoff of a reported virus contig by
 #                        reference virus sequences [0.75]
 #  --coverage_cutoff	Coverage cutoff of a reported virus reference 
 #                        sequences by assembled virus contigs [0.1] 
 #  --depth_cutoff	Depth cutoff of a reported virus reference [5]
-#  --novel_len_cutoff	Length cutoff of a contig categorized as novel
-#  			 when it is not reported as known, but it may 
-#  			 shows similarity with the reference virus 
-#  			 sequences. The default is 100bp [100]
 ########################################################################
 _EOUSAGE_
 ;

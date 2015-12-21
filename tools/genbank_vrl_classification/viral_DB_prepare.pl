@@ -309,7 +309,7 @@ USAGE: $0 -t unique [option] input_file
 	$out1->close;
 
 	# cd-hit
-	my $cdhit_bin = $FindBin::RealBin."/../bin/cd-hit-est";
+	my $cdhit_bin = $FindBin::RealBin."/../../bin/cd-hit-est";
 	my $cls_file = $prefix.".cls$identity";
 	run_cmd("$cdhit_bin -i $filter_file -o $cls_file -c $identity -M 0 -T $cpu");
 	
@@ -446,7 +446,7 @@ USAGE: $0 -t path [options]
 ';
 
 	# load default version
-	my $version_file = $FindBin::RealBin."/default_version";
+	my $version_file = $FindBin::RealBin."/current_genbank_version";
 	my $version = `head -n 1 $version_file`; chomp($version);
 	die "[ERR]version $version\n" if $version < 0;
 	my $ver_num = $version;
@@ -563,7 +563,7 @@ No. of manual classifiction: $desc_patch_num
 
 !!! Notice !!!
 Please copy patched file into $FindBin::RealBin
-Please change version number of default_version
+Please change version number of current_genbank_version
 ';
 	
 }
@@ -707,7 +707,7 @@ USAGE: $0 -t category [options] input_file1 ... input_fileN
 	}
 
 	# load default version
-	my $version_file = $FindBin::RealBin."/default_version";
+	my $version_file = $FindBin::RealBin."/current_genbank_version";
 	my $version = `head -n 1 $version_file`; chomp($version);
 	die "[ERR]version $version\n" if $version < 0;
 	$version = "v$version";
