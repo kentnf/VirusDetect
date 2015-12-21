@@ -230,14 +230,14 @@ foreach my $sample (@ARGV)
 			align::remove_redundancy("$sample.aligned", $sample, $rr_blast_parameters, $max_end_clip, $min_overlap, $min_identity, 'ALIGNED', $BIN_DIR, $TEMP_DIR, $debug);
 			my $align_num = align::count_seq("$sample.aligned");
 			if ($align_num == 0) {
-				Util::print_user_submessage("None of uniq contig was generated");
+				Util::print_user_submessage("No unique contig was generated");
 			}
 		} else {
 			system("touch $sample.aligned");
-			Util::print_user_submessage("None of uniq contig was generated");
+			Util::print_user_submessage("No unique contig was generated");
 		}
 	} else {
-		Util::print_user_submessage("None of uniq contig was generated");
+		Util::print_user_submessage("No unique contig was generated");
 	}
 	
 	# part B: 1. remove host related reads  2. de novo assembly 3. remove redundancy contigs
@@ -301,12 +301,12 @@ foreach my $sample (@ARGV)
 			} elsif ($sub_num == 1) {
 				Util::print_user_submessage("$sub_num host-derived contig was removed");
 			} else {
-				Util::print_user_submessage("None host-derived contig was removed");
+				Util::print_user_submessage("No host-derived contig was removed");
 			}
 		}
 		align::remove_redundancy("$sample.assembled", $sample, $rr_blast_parameters, $max_end_clip, $min_overlap, $min_identity, 'ASSEMBLED',$BIN_DIR, $TEMP_DIR, $debug) if -s "$sample.assembled";
 	} else {
-		Util::print_user_submessage("None of uniq contig was generated");
+		Util::print_user_submessage("No unique contig was generated");
 	}
 
 	# combine the known and unknown virus, remove redundancy of combined results, it must be using strand_specific parameter
@@ -323,7 +323,7 @@ foreach my $sample (@ARGV)
 	if (-s "$sample.combined") {
 		align::remove_redundancy("$sample.combined", $sample, $rr_blast_parameters, $max_end_clip, $min_overlap, $min_identity, 'CONTIG', $BIN_DIR, $TEMP_DIR, $debug);
 	} else {
-		Util::print_user_submessage("None of uniq contig was generated");
+		Util::print_user_submessage("No unique contig was generated");
 	}
 
 	# identify the virus
@@ -340,7 +340,7 @@ foreach my $sample (@ARGV)
 	if (-s "$sample.combined") {
 		Util::process_cmd($cmd_identify, $debug);
 	} else {
-		Util::print_user_submessage("None of virus has been identified");
+		Util::print_user_submessage("No virus was identified");
 	}
 
 	# delete temp files and log files 
