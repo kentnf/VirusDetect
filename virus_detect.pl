@@ -12,53 +12,53 @@ use Util;
 use align;
 
 my $usage = <<_EOUSAGE_;
-########################################################################
-# virus_detect.pl [option] --reference reference input1 input2 ...
-#  
-# Basic options:
-#  --reference		Name of the reference virus sequences database 
-#                        [vrl_plant]
-#  --host_reference	Name of the host reference database used 
-#                        for host sRNA subtraction [Null]
-#  --thread_num		Number of CPUs used for alignments [8]
-# 
-# BWA-related options (align sRNA to reference virus database or host 
-#  sequences):
-#  --max_dist		Maximum edit distance [1]  
-#  --max_open		Maximum number of gap opens [1]  
-#  --max_extension	Maximum number of gap extensions [1]  
-#  --len_seed		Minimum seed length [15] 
-#  --dist_seed		Maximum edit distance in the seed [1]  
-#
-# HISAT-related options (align mRNA to host reference)
-#  --hisat_dist		Maximum edit distance for HISAT [5]
-#
-# Megablast-related options (remove redundancy within virus contigs):
-#  --min_overlap	Minimum overlap length between two 
-#                        contigs to be combined [30]
-#  --max_end_clip	Maximum length of end clips [6]
-#  --min_identity	Minimum identity between two contigs to be 
-#  			 combined [97]
-#  --mis_penalty	Penalty score for a nucleotide mismatch [-1]
-#  --gap_cost		Cost to open a gap [2] 
-#  --gap_extension	Cost to extend a gap [1] 
-#
-# Megablast-related options (align virus contigs to reference virus 
-#  database for virus identification):
-#  --word_size	     	Minimum word size - length of best perfect match [11] 
-#  --exp_value	     	Maximum e-value [1e-5]
-#  --percent_identity 	Minimum percent identity for the alignment [25] 
-#  --mis_penalty_b   	Penalty score for a nucleotide mismatch [-1]
-#  --gap_cost_b      	Cost to open a gap [2] 
-#  --gap_extension_b 	Cost to extend a gap [1]
-#
-# Result filtering options:
-#  --hsp_cover		Coverage cutoff of a reported virus contig by
-#                        reference virus sequences [0.75]
-#  --coverage_cutoff	Coverage cutoff of a reported virus reference 
-#                        sequences by assembled virus contigs [0.1] 
-#  --depth_cutoff	Depth cutoff of a reported virus reference [5]
-########################################################################
+
+Usage: virus_detect.pl [option] --reference reference input1 input2 ...
+  
+ Basic options:
+  --reference		Name of the reference virus sequences database 
+                        [vrl_plant]
+  --host_reference	Name of the host reference database used 
+                        for host sRNA subtraction [Null]
+  --thread_num		Number of threads used for alignments [8]
+ 
+ BWA-related options (align sRNA to reference virus database or host 
+  reference):
+  --max_dist		Maximum edit distance [1]  
+  --max_open		Maximum number of gap opens [1]  
+  --max_extension	Maximum number of gap extensions [1]  
+  --len_seed		Seed length [15] 
+  --dist_seed		Maximum edit distance in the seed [1]  
+
+ HISAT-related options (align mRNA to host reference)
+  --hisat_dist		Maximum edit distance for HISAT [5]
+
+ Megablast-related options (remove redundancy within virus contigs):
+  --min_overlap		Minimum overlap length between two 
+                        contigs to be combined [30]
+  --max_end_clip	Maximum length of end clips [6]
+  --min_identity	Minimum identity between two contigs to be 
+  			 combined [97]
+  --mis_penalty		Penalty score for a nucleotide mismatch [-1]
+  --gap_cost		Cost to open a gap [2] 
+  --gap_extension	Cost to extend a gap [1] 
+
+ Megablast-related options (align virus contigs to reference virus 
+  database for virus identification):
+  --word_size	     	Minimum word size - length of best perfect match [11] 
+  --exp_value	     	Maximum e-value [1e-5]
+  --percent_identity 	Minimum percent identity for the alignment [25] 
+  --mis_penalty_b   	Penalty score for a nucleotide mismatch [-1]
+  --gap_cost_b      	Cost to open a gap [2] 
+  --gap_extension_b 	Cost to extend a gap [1]
+
+ Result filtering options:
+  --hsp_cover		Coverage cutoff of a reported virus contig by
+                        reference virus sequences [0.75]
+  --coverage_cutoff	Coverage cutoff of a reported virus reference 
+                        sequences by assembled virus contigs [0.1] 
+  --depth_cutoff	Depth cutoff of a reported virus reference [5]
+
 _EOUSAGE_
 ;
 
@@ -77,7 +77,7 @@ my $len_seed = 15; 				# bwa seed length
 my $dist_seed = 1; 				# bwa seed max edit distance
 
 # paras for HISAT:
-my $hisat_ed = 2;				# max edit disantce
+my $hisat_ed = 5;				# max edit disantce
 
 # paras for megablast detection (remove redundancy )
 my $strand_specific;  			# switch for strand specific transcriptome data? 
@@ -156,7 +156,15 @@ GetOptions(
 	'novel_len_cutoff=i'=> \$novel_len_cutoff
 );
 
-# check host 
+# set path and folder
+my $WORKING_DIR   = cwd();									# set current folder as working folder
+my $DATABASE_DIR  = ${FindBin::RealBin}."/databases";		# set database folder
+my $BIN_DIR       = ${FindBin::RealBin}."/bin";				# set script folder
+$reference		  = $DATABASE_DIR."/".$reference;			# set reference
+my $seq_info	  = $DATABASE_DIR."/vrl_genbank.info.gz";	# set vrl info
+
+
+# check host reference & format 
 if ( $host_reference ) {
 	if (-s $host_reference ) {
 		# nothing to do with the reference	
@@ -165,14 +173,17 @@ if ( $host_reference ) {
 	} else {
 		die "[ERR]reference not exist: $host_reference\n";
 	}
-} 
 
-# set path and folder 
-my $WORKING_DIR   = cwd();									# set current folder as working folder
-my $DATABASE_DIR  = ${FindBin::RealBin}."/databases";		# set database folder
-my $BIN_DIR		  = ${FindBin::RealBin}."/bin";				# set script folder
-$reference        = $DATABASE_DIR."/".$reference;			# set reference
-my $seq_info      = $DATABASE_DIR."/vrl_genbank.info.gz";	# set vrl info
+	my @host_db = ("$host_reference.nhr", "$host_reference.nin", "$host_reference.nsq");
+	foreach my $h (@host_db) {
+		unless(-s $h) {
+			my $formatdb_bin = $BIN_DIR."/formatdb";
+			my $cmd_format_host = "$formatdb_bin -i $host_reference -p F";
+			Util::process_cmd($cmd_format_host, $debug);
+			last;
+		}
+	}
+} 
 
 # main
 foreach my $sample (@ARGV) 

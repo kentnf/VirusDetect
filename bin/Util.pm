@@ -748,6 +748,7 @@ sub find_known_contig
 	# %known -> key: virus ref ID, value: 1
 	my %blk;
 	my %query_len;
+	my %hit_len;
 	my %known;	
 
 	chomp($input_blast_table);
@@ -762,6 +763,7 @@ sub find_known_contig
 		{
 			push(@{$blk{$ta[0]}}, [@ta[9,10]]); 				# create blk hash for query ID and [query_start,query_end], query is contig
 			defined $query_len{$ta[0]} or $query_len{$ta[0]} = $ta[1];
+			defined $hit_len{$ta[2]} or $hit_len{$ta[2]} = $ta[3];
 		}
 	}
 
@@ -793,10 +795,10 @@ sub find_known_contig
 			$total_cov += ($ar->[1]-$ar->[0]+1);
 		}
 
-		my $ratio=int($total_cov/$query_len{$tk}*10000+0.5)/100;
+		my $ratio_q=int($total_cov/$query_len{$tk}*10000+0.5)/100;
+		#my $ratio_s=int($total_cov/$hit_len{$tk}*10000+0.5)/100;
 
-		if($ratio >= $min_ratio)
-		{
+		if($ratio_q >= $min_ratio) {
 			defined $known{$tk} or $known{$tk} = 1;
 		}
 	}
