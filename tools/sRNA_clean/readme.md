@@ -7,6 +7,17 @@ The usage of sRNA_clean.pl is quite simple, just provide adapter sequences and f
 perl sRNA_clean.pl -s CAGATCGGAAGAGCACA input.fastq
 ```
 
+We collect 6 sRNA adapters from various sRNA read files (below), and only the first 17nt was taken for adapter removing.
+
+```
+CTGTAGGCACCATCAAT
+CAGATCGGAAGAGCACA
+TCGTATGCCGTCTTCTG
+TGGAATTCTCGGGTGCC
+ATCTCGTATGCCGTCTT
+GTACCTCGTATGCCGTC
+```
+
 The output files include cleaned reads after remove adapter, and report file including statistics information about adapter removing. Below is the format of report file:
 
 sample | total | unmatch | null | match | baseN | short | clean
