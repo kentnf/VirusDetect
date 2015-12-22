@@ -3,21 +3,21 @@ Virus Classification Pipeline (version 0.1)
 --------------------------------------------
 
 >***Note***
->This document describes how **Virus Classification Pipline** works.
+>This document describes how **Virus Classification Pipeline** works.
 
 
 ###1. Download viral sequences and taxonomy database from GenBank (ftp://ftp.ncbi.nih.gov/genbank/)
 
 ```
 $ perl viral_DB_prepare.pl -t download > download.sh  
-$ bash ./download.sh
+$ bash download.sh
 ```
 These two commands will: 1) generate the download script (download.sh), and 2) download all virus sequences (GB_virus.gz) and the taxonomy database (names.dmp.gz and nodes.dmp.gz) from GenBank.
 
 ###2. Run viral_DB_prepare.pl script to automatically classify virus sequences into different kingdoms
 
 ``` 
-$ perl viral_DB_prepare.pl -t category -c 1 gbvrl*.gz 1>report.txt 2>&1
+$ perl viral_DB_prepare.pl -t category -c 1 GB_virus.gz 1>report.txt 2>&1
 ```
 
 This will generate three files:
@@ -44,10 +44,10 @@ The standard host name for these entries should be 'Vitis vinifera' or 'wine gra
 
 We need to manually add the standard host name after each of the non-standard names (separated by a tab key)
 
---- | ---
-grape cultivar 6-23	Vitis | vinifera
-grape cultivar 8612	Vitis | vinifera
-grape cultivar 87-1	Vitis | vinifera
+| --- | --- |
+| grape cultivar 6-23	Vitis | vinifera |
+| grape cultivar 8612	Vitis | vinifera |
+| grape cultivar 87-1	Vitis | vinifera |
 
 
 ####3.2 Manually check the virus genus and classification (manual_genus_table.txt)
