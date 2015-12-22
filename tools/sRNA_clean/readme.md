@@ -43,6 +43,7 @@ The script will generate three files for each input file:
   * **baseN**: number of “match” reads containing undetermined base (N)
   * **short**: number of “match” reads that are short
   * **clean**: number of final cleaned sRNAs
+
 3. A file (sRNA_length.txt) containing the sRNA length distribution.
 
 
