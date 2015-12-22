@@ -3,10 +3,10 @@ sRNA data cleaning
 ==================
 
 The script “sRNA_clean.pl” is used to process raw sRNA file in fastq format by
-- 1. trimming the adaptor sequences;  
-- 2. removing reads that do not contain adaptor sequences;
-- 3. removing reads that are in low quality (containing “N”);
-- 4. removing reads that are short (e.g., <15 nt) after trimming.
+1. trimming the adaptor sequences;  
+2. removing reads that do not contain adaptor sequences;
+3. removing reads that are in low quality (containing “N”);
+4. removing reads that are short (e.g., <15 nt) after trimming.
 
 ```
 $ perl sRNA_clean.pl -s adaptor_seq -l 15 input1.fastq input2.fastq
@@ -28,12 +28,12 @@ GTACCTCGTATGCCGTC
 
 The script will generate three files for each input file:
 
-- 1. A fastq file containing the cleaned reads.
-- 2. A report file including the statistics on the sequence processing.
+1. A fastq file containing the cleaned reads.
+2. A report file including the statistics on the sequence processing.
 
-| sample | total | unmatch | null | match | baseN | short | clean |
-|---|---|---|---|---|---|---|---|
-| test.fq | 1000 | 132 | 0 | 868 | 0 | 6 | 862 |
+  * | sample | total | unmatch | null | match | baseN | short | clean |
+  * |---|---|---|---|---|---|---|---|
+  * | test.fq | 1000 | 132 | 0 | 868 | 0 | 6 | 862 |
 
     * **sample**: input file name
     * **total**: total number of raw reads
@@ -44,6 +44,6 @@ The script will generate three files for each input file:
     * **short**: number of “match” reads that are short
     * **clean**: number of final cleaned sRNAs
 
-- 3. A file (sRNA_length.txt) containing the sRNA length distribution.
+3. A file (sRNA_length.txt) containing the sRNA length distribution.
 
 
