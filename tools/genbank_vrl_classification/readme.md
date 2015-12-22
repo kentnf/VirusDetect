@@ -2,8 +2,8 @@
 Virus Classification Pipeline (version 0.1)
 --------------------------------------------
 
->__Note__ 
-This document just describes how __Virus Classification Pipline__ works.
+>***Note***
+>This document describes how **Virus Classification Pipline** works.
 
 
 ###1. Download viral sequences and taxonomy database from GenBank (ftp://ftp.ncbi.nih.gov/genbank/)
