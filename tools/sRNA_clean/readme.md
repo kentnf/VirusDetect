@@ -32,6 +32,8 @@ The script will generate three files for each input file:
 1. A fastq file containing the cleaned reads.
 2. A report file including the statistics on the sequence processing.
 
+  * <table border=1><tr><td>Row 1, Column 1</td><td>Row 1, Column 2</td></tr><tr><td>Row 2, Column 1</td><td>Row 2, Column 2</td></tr></table>
+
   * >| sample | total | unmatch | null | match | baseN | short | clean |
   * >|---|---|---|---|---|---|---|---|
   * >| test.fq | 1000 | 132 | 0 | 868 | 0 | 6 | 862 |
