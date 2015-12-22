@@ -23,9 +23,9 @@ Usage: virus_itentify.pl [options] --reference reference input_read contig
   --exp_value		Maximum e-value [1e-5]
   --percent_identity	Minimum identity percentage for the alignment [25] 
   --cpu_num		Number of threads to use [8] 
-  --mis_penalty		Penalty for a nucleotide mismatch [-1]
-  --gap_cost		Cost to open a gap [2] 
-  --gap_extension	Cost to extend a gap [1]
+  --mis_penalty		Penalty for a nucleotide mismatch [-3]
+  --gap_cost		Cost to open a gap [-1] 
+  --gap_extension	Cost to extend a gap [-1]
 
  New options(5):
   --hsp_cover           Coverage of hsp should be more than this cutoff for query or hit [0.75]
@@ -78,9 +78,9 @@ my $novel_check = 1;			# enable novel check (this parameter is fixed)
 
 my $word_size = 11;
 my $cpu_num = 8;				# megablast: thread number
-my $mis_penalty = -1;			# megablast: penalty for mismatch
-my $gap_cost = 2;				# megablast: penalty for gap open
-my $gap_extension = 1;			# megablast: penalty for gap extension
+my $mis_penalty = -3;			# megablast: penalty for mismatch
+my $gap_cost = -1;				# megablast: penalty for gap open
+my $gap_extension = -1;			# megablast: penalty for gap extension
 my $exp_value = 1e-5;			#
 my $identity_percen = 25;		# tblastx: hsp_identity cutoff for protein blast
 

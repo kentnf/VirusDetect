@@ -39,18 +39,18 @@ Usage: virus_detect.pl [option] --reference reference input1 input2 ...
   --max_end_clip	Maximum length of end clips [6]
   --min_identity	Minimum identity between two contigs to be 
   			 combined [97]
-  --mis_penalty		Penalty score for a nucleotide mismatch [-1]
-  --gap_cost		Cost to open a gap [2] 
-  --gap_extension	Cost to extend a gap [1] 
+  --mis_penalty		Penalty score for a nucleotide mismatch [-3]
+  --gap_cost		Cost to open a gap [-1] 
+  --gap_extension	Cost to extend a gap [-1] 
 
  Megablast-related options (align virus contigs to reference virus 
   database for virus identification):
   --word_size	     	Minimum word size - length of best perfect match [11] 
   --exp_value	     	Maximum e-value [1e-5]
   --percent_identity 	Minimum percent identity for the alignment [25] 
-  --mis_penalty_b   	Penalty score for a nucleotide mismatch [-1]
-  --gap_cost_b      	Cost to open a gap [2] 
-  --gap_extension_b 	Cost to extend a gap [1]
+  --mis_penalty_b   	Penalty score for a nucleotide mismatch [-3]
+  --gap_cost_b      	Cost to open a gap [-1] 
+  --gap_extension_b 	Cost to extend a gap [-1]
 
  Result filtering options:
   --hsp_cover		Coverage cutoff of a reported virus contig by
@@ -69,8 +69,6 @@ _EOUSAGE_
             shows similarity with the reference virus 
             sequences. The default is 100bp [100]
 =cut
-
-if (scalar(@ARGV) < 1 ) { print $usage; exit; }
 
 # basic options
 my $reference= "vrl_plant";		# virus sequence
@@ -92,18 +90,18 @@ my $strand_specific;  			# switch for strand specific transcriptome data?
 my $min_overlap = 30; 			# minimum overlap for hsp combine
 my $max_end_clip = 6; 			# max end clip for hsp combine
 my $min_identity = 97;			# mininum identity for remove redundancy contigs
-my $mis_penalty = -1;     		# megablast mismatch penlty, minus integer
-my $gap_cost = 2;         		# megablast gap open cost, plus integer
-my $gap_extension = 1;    		# megablast gap extension cost, plus integer
+my $mis_penalty = -3;     		# megablast mismatch penlty, minus integer
+my $gap_cost = -1;         		# megablast gap open cost, plus integer
+my $gap_extension = -1;    		# megablast gap extension cost, plus integer
 my $cpu_num = 8;
 
 # paras for blast && identification 
 my $word_size = 11;
 my $exp_value = 1e-5;			#
 my $percent_identity = 25;		# percent identity for tblastx
-my $mis_penalty_b = -1;			# megablast mismatch penlty, minus integer
-my $gap_cost_b = 2;				# megablast gap open cost, plus integer
-my $gap_extension_b = 1;		# megablast gap extension cost, plus integer
+my $mis_penalty_b = -3;			# megablast mismatch penlty, minus integer
+my $gap_cost_b = -1;				# megablast gap open cost, plus integer
+my $gap_extension_b = -1;		# megablast gap extension cost, plus integer
 
 my $filter_query = "F";			# megablast switch for remove simple sequence
 my $hits_return = 500;			# megablast number of hit returns
@@ -165,8 +163,8 @@ GetOptions(
 );
 
 # check input parameters
-if (@ARGV == 0 ) { print $usage; exit;}
-foreach my $sample (@ARGV) { print $usage and exit unless -s $sample; }
+if (@ARGV == 0 ) { print "[ERR]cat not find input file.\n$usage"; }
+foreach my $sample (@ARGV) { print "[ERR]cat not find input file: $sample\n$usage" and exit unless -s $sample; }
 
 # set path and folder
 my $WORKING_DIR   = cwd();									# set current folder as working folder
@@ -183,7 +181,7 @@ if ( $host_reference ) {
 	} elsif ( -s ${FindBin::RealBin}."/databases/$host_reference" ) {
 		$host_reference = ${FindBin::RealBin}."/databases/$host_reference"; # change the reference address
 	} else {
-		die "[ERR]reference not exist: $host_reference\n";
+		die "[ERR]can not find host reference: $host_reference\n";
 	}
 
 	my @host_db = ("$host_reference.nhr", "$host_reference.nin", "$host_reference.nsq");

@@ -28,12 +28,7 @@ sub rmadp
 	my ($options, $files) = @_;
 	
 	my $subUsage = qq'
-USAGE: $0 -t rmadp [options] -s adapter_sequence -l 11 -d 1 sRNA1 sRNA2 ... sRNAn
-	-s	3p adapter sequence [option if -p] [9bp at least]
-	-l	3p adapter length (5-11) (default: 9)
-	-d	distance between 3p adater and sRNA (default: 1)
-
-* support gz file for input
+USAGE: $0 -s adapter_sequence sRNA1 sRNA2 ... sRNAn
 
 ';
 
@@ -42,7 +37,7 @@ USAGE: $0 -t rmadp [options] -s adapter_sequence -l 11 -d 1 sRNA1 sRNA2 ... sRNA
 	foreach my $f ( @$files ) { print "[ERR]no file $f\n" and exit unless -s $$files[0]; }
 
 	my ($adp_3p, $adp_3p_len, $adp_3p_sub, $adp_5p, $adp_5p_len, $adp_5p_sub, $adp_5p_len_long, $adp_5p_sub_long,);
-	$adp_3p_len = 9;	# default 3p adp length for trimming
+	$adp_3p_len = 11;	# default 3p adp length for trimming
 	$adp_5p_len = 5;	# default 5p adp length for trimming, match and 5'end match and trim
 	$adp_5p_len_long = 9;	# default 5p adp length for trimming, match and trim
 	if (defined $$options{'s'} || defined $$options{'p'}) { } else { print $subUsage and exit; } 
@@ -66,24 +61,20 @@ USAGE: $0 -t rmadp [options] -s adapter_sequence -l 11 -d 1 sRNA1 sRNA2 ... sRNA
 	my $report_file = 'report_sRNA_trim.txt';
 	print "[ERR]report file exist\n" if -s $report_file;
 
-	my $report_info = qq'
-# 
-# adp: cleaned reads by both 3p and 5p adapters
-# adp5/3: cleaned reads by 3p or 5p adapter
-';
-	$report_info.= "#sRNA\ttotal\t5Punmatch\t5Pnull\t5Pmatch\t3Punmatch\t3Pnull\t3Pmatch\tbaseN\tshort\tcleaned\tadp\tadp5\tadp3\n";
+	my $report_info = '';
+	$report_info.= "#sRNA\ttotal\t3Punmatch\t3Pnull\t3Pmatch\tbaseN\tshort\tcleaned\n";
 
 	foreach my $inFile ( @$files ) 
 	{
 		my $prefix = $inFile;
 		$prefix =~ s/\.gz$//; $prefix =~ s/\.fastq$//; $prefix =~ s/\.fq$//; $prefix =~ s/\.fasta$//; $prefix =~ s/\.fa$//;
 
-		my $outFile1 = $prefix.".trimmed".$distance;
-		my $outFile2 = $prefix.".trimmed".$distance.".report.txt";
+		my $outFile1 = $prefix.".clean.fq";
+		#my $outFile2 = $prefix.".clean.report.txt";
 		#print "[ERR]out file exist\n" and exit if -s $outFile1;
 		my $out1 = IO::File->new(">".$outFile1) || die $!;
-		my $out2 = IO::File->new(">".$outFile2) || die $!;
-		print $out2 "#ReadID\tlength\tstart\tend\t3p_edit_distacne\tlabel\n";
+		#my $out2 = IO::File->new(">".$outFile2) || die $!;
+		#print $out2 "#ReadID\tlength\tstart\tend\t3p_edit_distacne\tlabel\n";
 
 		my $fh;
 		if ($inFile =~ m/\.gz$/) { 
@@ -269,19 +260,18 @@ USAGE: $0 -t rmadp [options] -s adapter_sequence -l 11 -d 1 sRNA1 sRNA2 ... sRNA
 			$label =~ s/^,//;
 			$total_num++;
 			$match_ed = 'NA' unless defined $match_ed;
-			print $out2 "$id1\t$read_len\t$pos_5p\t$pos_3p\t$match_ed\t$label\n";
+			#print $out2 "$id1\t$read_len\t$pos_5p\t$pos_3p\t$match_ed\t$label\n";
  
 		}
 		$fh->close;
 		$out1->close;
-		$out2->close;
+		#$out2->close;
 		$report_info.="$inFile\t$total_num\t".
-			"$unmatch_5p_num\t$null_5p_num\t$match_5p_num\t".
 			"$unmatch_3p_num\t$null_3p_num\t$match_3p_num\t".
-			"$baseN_num\t$short_num\t$clean_num\t$adp_clean\t$adp5p_clean\t$adp3p_clean\n";
+			"$baseN_num\t$short_num\t$clean_num\n";
 
 		# debug 5p info
-		print "$inFile\t$mode_5p_a\t$mode_5p_a_match\t$mode_5p_b\n";
+		#print "$inFile\t$mode_5p_a\t$mode_5p_a_match\t$mode_5p_b\n";
 	}
 
 	# report sRNA trim information
