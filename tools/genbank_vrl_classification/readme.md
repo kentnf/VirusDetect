@@ -5,181 +5,128 @@ Virus Classification Pipeline (version 0.1)
 >__Note__ 
 This document just describes how __Virus Classification Pipline__ works.
 
-[TOC]
 
-####1. download viral sequneces and taxnomy database from GenBank ftp (ftp://ftp.ncbi.nih.gov/genbank/)
-
-The 1st command only generate download commands, and the 2nd command will execute the download
-commands to download all viral sequences and taxonomy database.
+###1. Download viral sequences and taxonomy database from GenBank (ftp://ftp.ncbi.nih.gov/genbank/)
 
 ```
 $ perl viral_DB_prepare.pl -t download > download.sh  
 $ bash ./download.sh
 ```
+These two commands will: 1) generate the download script (download.sh), and 2) download all virus sequences (GB_virus.gz) and the taxonomy database (names.dmp.gz and nodes.dmp.gz) from GenBank.
 
-####2. run viral_DB_prepare.pl script to initial classification
+###2. Run viral_DB_prepare.pl script to automatically classify virus sequences into different kingdoms
 
 ``` 
-$ perl viral_DB_prepare.pl -t category gbvrl*.gz 1>report.txt 2>&1
-```
-The initial classification may contains some errors or unclassified viruses, please correct them according below description
-
-
-####3. manually correction
-
-#####3.1 manually corret host name
-
-The pipeline will classify some virus by its host name when it is not classified by means of genus. But the host name
-in GenBank may present with abnormal description that could not accepted by taxonomy database. So the file **manual_hname_table.txt** contains all abnormal host name that did not accpet by GenBank. It lists one abnormal name per line. Please correct the abnormal name to make them consistent with GenBank.
-
-
-Example 
-
-######3.1.1 open file manual_hname_table.txt, the hosts were named as below:
-
->grape cultivar 6-23     
->grape cultivar 8612     
->grape cultivar 87-1     
->grape cultivar Atebage  
->grape cultivar Augusta  
->grape cultivar Benifuji 
-
-
-######3.1.2 the abnormal host name should be 'Vitis vinifera' or 'wine grape' by searching GenBank taxonomy database.
-
-![img04](http://kentnf.github.io/tools/img/vcp_p4.png)
-
-
-######3.1.3 add the correct host name behind the abnormal name
-
->grape cultivar 6-23 [tab] Vitis vinifera
->grape cultivar 8612 [tab] Vitis vinifera
->grape cultivar 87-1 [tab] Vitis vinifera
->grape cultivar Atebage [tab] Vitis vinifera
->grape cultivar Augusta [tab] Vitis vinifera
->grape cultivar Benifuji [tab] Vitis vinifera
-
-
-#####3.2 manually check the virus genus and classification 
-
-After the classification in step2, the pipeline will create some new genus classification information that not presented in web (www.mcb.uct.ac.za/tutorial/ICTV%20Species%20Lists%20by%20host.htm). For example, the becurtovirus GI:169303562 was found in GenBank nt database, and it was categorized into plant virus according to its host is Suger Beet. Then the pipeline will automatically create a rule that becurtovius should be categorized into plant virus (below).
-
-![img05](http://kentnf.github.io/tools/img/vcp_p5.png)
-
-
-The new genus classification information was stored in file **manual_genus_table.txt**. 
-The file format is one genus & classification per line. If the genus has one division, that is pretty good result. If genus
-has more than one division, make it to keep one or more according frequency of each division, or searching
-background of this genus to make correct decision.
-
-If you are not familiar with virus genus classification system, please skip this step. That means you trust
-the genus & classification information from GenBank.
-
-#####3.3 manually classification using virus description
-
-After correting host name and genus, some viruses still can not be classified for missing host feature and have a unrecognized genus name. But they have almost same description, or show sequence similarity with other classified viruses. These unclassified viruses could be classified by comparing their descriptions and sequences with classified. The below command will do it automatically. The command will compare the description of unclassified virus with classified virus, then borrow the info of classification to the unclassified.
-
-For example, the sequence M18869 does not have host feature, and the genus name is “Small linear single stranded RNA satellites”. But it described as “Cucumber mosaic virus satellite RNA”. Another sequence X86421 with same description was classified into plant virus. Through blast, The M18869 is 100% covered by X86421 with 96% identity. So, it should be classified as plant virus.
-
-![img06](http://kentnf.github.io/tools/img/vcp_p6.png)
-
-```	
 $ perl viral_DB_prepare.pl -t category -c 1 gbvrl*.gz 1>report.txt 2>&1
 ```
 
-The classified result **manual_desc_table.txt** need to be checked manually in case making incorrect classification.
-
->The format of manual_desc_table.txt:  
->1 - ID: GFLRNA3  
->2 - Desc: Grapevine fanleaf virus satellite RNA (RNA3), complete cds.  
->3 - Same Desc: Grapevine fanleaf virus  
->4 - Plants  
->5 - No. of same: 1  
->6 - Freq of same: 100.00  
->7 - ID of same: GFLRNA1  
->8 - Div name by blast  
->9 - best hit of blast  
->10- match length of blast  
->11- percentage identity  
->12- match score  
+This will generate three files:
+- manual_hname_table.txt
+- manual_genus_table.txt
+- manual_desc_table.txt
 
 
-> **Suggestion method:**
-> - A. sort to find different in word search and blast search (col 4 and 8), only foucus difference in division.
-> - B. check the blast match length, identify. Lower than 100 match base, 90% identity should be manually checked.
-> - C. check the word search column 3, 5, 6, and 7.
-> - D. fill correct division in column 4
+###3. Manual check of classification
+
+The automatic classification in step 2 may contain errors or unclassified viruses, which need to be manually processed.
+
+####3.1 Manually correct host names associated with the virus sequences (manual_hname_table.txt)
+
+The pipeline will classify some viruses according to their host names, if they cannot be classified using the genus information in ICTV (http://www.ictvonline.org/). However some host names in GenBank may not follow the standard descriptions thus they cannot match entries in the taxonomy database. The file manual_hname_table.txt contains all the non-standard host names identified by the pipeline.
+
+Example:
+
+grape cultivar 6-23
+grape cultivar 8612
+grape cultivar 87-1
+
+The standard host name for these entries should be 'Vitis vinifera' or 'wine grape' according to the GenBank taxonomy database.
+
+We need to manually add the standard host name after each of the non-standard names (separated by a tab key)
+
+--- | ---
+grape cultivar 6-23	Vitis | vinifera
+grape cultivar 8612	Vitis | vinifera
+grape cultivar 87-1	Vitis | vinifera
 
 
-#####3.4 update the manually correct file to classification
+####3.2 Manually check the virus genus and classification (manual_genus_table.txt)
 
-Next, the manually correct files should be append to previous correction. The parameter **v** indicate the version of GenBank.
+The automatic classification pipeline will generate some new genus classification information that is not presented in the ICTV website. For example, the becurtovirus (GI:169303562) is not present in ICTV and will be categorized as a plant virus according to its host (sugar beet). The pipeline will automatically generate a rule that becurtovius should be classified into the plant kingdom. The new genus classification information is stored in the file **manual_genus_table.txt**. This file needs to be manually checked to ensure the accuracy.
+
+
+#####3.3 Manual classification based on virus description and sequence similarity (manual_desc_table.txt)
+
+After correcting host name and genus, some viruses still cannot be classified due to the missing of host features or having unrecognized genus names. However, most of them have nearly identical description, or show high sequence similarity to other classified viruses. Therefor these unclassified viruses can be classified by comparing their descriptions and sequences with classified viruses. For example, the sequence M18869 does not have host feature, and its genus name is “Small linear single stranded RNA satellites”; but it is described as “Cucumber mosaic virus satellite RNA”. Another sequence X86421 with same description has been classified into plant virus. In addition, the sequence of M18869 is 100% covered by X86421 with 96% identity. Therefore, M18869 should be classified as a plant virus. 
+
+The file **manual_desc_table.txt** needs to be checked manually to identify any potential wrong classifications by the pipeline.
+
+>The format of the file **manual_desc_table.txt**:
+>1 - ID: GFLRNA3
+>2 - Description: Grapevine fanleaf virus satellite RNA (RNA3), complete cds.
+>3 - Same Description: Grapevine fanleaf virus
+>4 - Kingdom name by description
+>5 - No. of sequences with same description: 1
+>6 - Frequency of same description: 100.00
+>7 - ID of sequence with same description: GFLRNA1
+>8 - Kingdom name by blast
+>9 - best hit of blast
+>10- match length of blast
+>11- percentage identity
+>12- match score 
+
+> **Suggested method to manually check the file:**
+> - A. Compare values in columns 4 and 8. Only need to check this with different values in these two columns.
+> - B. Check the blast result. Those with matching bases (column 10) less than 100 bp or with less than 90% identity (column 11) should be manually checked.
+
+
+####3.4 Add the manually corrected file to the classification
+
+Next, the manually corrected files should be append to previous files provide by the system. The parameter -v indicate the version of GenBank (current version no. can be obtained at ftp://ftp.ncbi.nih.gov/genbank/GB_Release_Number).
+
 ```
 $ perl viral_DB_prepare.pl -t patch -v 211
 ```
 
-Three new update files will be generated in current folder.
-       
-``` 
-update_genus_table_v211.txt
-update_hname_table_v211.txt
-update_desc_table_v211.txt
-```
+Three new update files will be generated
+- update_genus_table_v211.txt
+- update_hname_table_v211.txt
+- update_desc_table_v211.txt
 
-It is better to check these update files again. The updated information is append behind the label line 
+
+###4. Run viral_DB_prepare.pl script to classify viruses again
 
 ```
-# patch v211
----- update information will be here ----
+$ perl viral_DB_prepare.pl -t category -c 1 GB_virus.gz
 ```
 
-Copy the three updated files into **tools/genbank_vrl_classification** folder of VirusDetect. 
-Check the **current_genbank_verion** locate in **tools/genbank_vrl_classification** folder, make sure it same as the update file.
-If the current version is **211**, the three update file name should be:
+###5. Extract protein sequences from the viruses
 
 ```
-update_desc_table_v211.txt  
-update_genus_table_v211.txt  
-update_hname_table_v211.txt
-```
-
-####4. run viral_DB_prepare.pl script to category virus again
-
-```
-$ perl viral_DB_prepare.pl -t category -c 1 gbvr*.gz
-```
-
-####5. extract protein sequences
-
-```
-$ viral_DB_prepare.pl -t extProt gbvrl1.seq.gz gbvrl2.seq.gz ... gbvrlN.seq.gz
+$ perl viral_DB_prepare.pl -t extProt GB_virus.gz
 ```
 
 Two file will be generate. 
+- vrl_genbank_prot: virus protein sequences
+- vrl_genbank_tab: virus nucleotide accession and protein accession
 
->vrl_genbank_prot: virus protein sequences
->vrl_genbank_tab: virus nucleotide accession and protein accession
 
-####6. remove redundancy (using plant as example)
+####6. Remove redundancy in virus sequences (using plant viruses as an example)
 
-remove redundancy sequences with 100% sequence similarity
 ```
-$ perl viral_DB_prepare.pl -t unique vrl_Plants_all.fasta -s 100
+perl viral_DB_prepare.pl -t unique -p 20 vrl_Plants_all.fasta -s 95
 ```
+This will collapse redundant sequences with 95% sequence similarity
 
-then generate u99 u97 and u95 base on the U100
-```
-$ perl viral_DB_prepare.pl -t unique -p 64 -s 99 vrl_Plants_u100 
-$ perl viral_DB_prepare.pl -t unique -p 64 -s 97 vrl_Plants_u100
-$ perl viral_DB_prepare.pl -t unique -p 64 -s 95 vrl_Plants_u100
-```
 
-####7. retrieve proteins for each division (using plant u95 as example)
+####7. Retrieve proteins for each division (using vrl_Plants_u95 as an example)
 
 ```
 $ perl viral_DB_prepare.pl -t genProt vrl_Plants_u95 vrl_genbank_prot vrl_genbank_tab
 ```
+
 The output protein sequences will be named as: **vrl_Plants_u95_prot**
+
 
 
 
