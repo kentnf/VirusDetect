@@ -56,7 +56,7 @@ Usage: virus_detect.pl [option] --reference reference input1 input2 ...
   --hsp_cover		Coverage cutoff of a reported virus contig by
                          reference virus sequences [0.75]
   --coverage_cutoff	Coverage cutoff of a reported virus reference 
-                         sequences by assembled virus contigs [0.1] 
+                         sequence by assembled virus contigs [0.1] 
   --depth_cutoff	Depth cutoff of a reported virus reference [5]
 
 _EOUSAGE_
