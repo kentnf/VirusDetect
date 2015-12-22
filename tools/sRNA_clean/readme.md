@@ -45,13 +45,19 @@ test.fq | 1000 | 132 | 0 | 868 | 0 | 6 | 862
 
 - 3. A file (sRNA_length.txt) containing the sRNA length distribution.
 
-1. Item 1
-  1. A corollary to the above item.
-  2. Yet another point to consider.
-2. Item 2
-  * A corollary that does not need to be ordered.
-    * This is indented four spaces, because its two spaces further than the item above.
-    * You might want to consider making a new list.
-3. Item 3
+1. A fastq file containing the cleaned reads.
+2. A report file including the statistics on the sequence processing.
+sample | total | unmatch | null | match | baseN | short | clean
+--- | --- | --- | --- | --- | --- | --- | ---
+test.fq | 1000 | 132 | 0 | 868 | 0 | 6 | 862
+  * **sample**: input file name
+  * **total**: total number of raw reads
+  * **unmatch**: number of reads that do not contain the adaptor sequence
+  * **null**: number of reads containing empty adaptors
+  * **match**: number of reads contain both sRNA and adapter sequence
+  * **baseN**: number of “match” reads containing undetermined base (N)
+  * **short**: number of “match” reads that are short
+  * **clean**: number of final cleaned sRNAs
+3. A file (sRNA_length.txt) containing the sRNA length distribution.
 
 
