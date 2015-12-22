@@ -22,7 +22,7 @@ $ bash ./download.sh
 ``` 
 $ perl viral_DB_prepare.pl -t category gbvrl*.gz 1>report.txt 2>&1
 ```
-the initial may contains some errors or unclassified viruses, please correct them according below description
+The initial classification may contains some errors or unclassified viruses, please correct them according below description
 
 
 ####3. manually correction
@@ -30,23 +30,19 @@ the initial may contains some errors or unclassified viruses, please correct the
 #####3.1 manually corret host name
 
 The pipeline will classify some virus by its host name when it is not classified by means of genus. But the host name
-in GenBank may exist in abnormal that could not accepted by taxonomy database. So the file __manual_hname_table.txt_
-records abnormal host name. It lists one abnormal name per line. Please search the abnormal name using google, 
-genbank taxon database, and iciba to infer the correct name, this correct name must be included in genbank taxon 
-database (in name.dmp.gz). Then add the correct name behind the abnormal name in below format: 
+in GenBank may present with abnormal description that could not accepted by taxonomy database. So the file **manual_hname_table.txt** contains all abnormal host name that did not accpet by GenBank. It lists one abnormal name per line. Please correct the abnormal name to make them consistent with GenBank.
 
->abnormal name [tab] correct name [return]
 
 Example 
 
 ######3.1.1 open file manual_hname_table.txt, the hosts were named as below:
 
-	grape cultivar 6-23     
-	grape cultivar 8612     
-	grape cultivar 87-1     
-	grape cultivar Atebage  
-	grape cultivar Augusta  
-	grape cultivar Benifuji 
+>grape cultivar 6-23     
+>grape cultivar 8612     
+>grape cultivar 87-1     
+>grape cultivar Atebage  
+>grape cultivar Augusta  
+>grape cultivar Benifuji 
 
 
 ######3.1.2 the abnormal host name should be 'Vitis vinifera' or 'wine grape' by searching GenBank taxonomy database.
@@ -56,12 +52,13 @@ Example
 
 ######3.1.3 add the correct host name behind the abnormal name
 
-	grape cultivar 6-23	Vitis vinifera
-	grape cultivar 8612	Vitis vinifera
-	grape cultivar 87-1	Vitis vinifera
-	grape cultivar Atebage	Vitis vinifera
-	grape cultivar Augusta	Vitis vinifera
-	grape cultivar Benifuji	Vitis vinifera
+>grape cultivar 6-23 [tab] Vitis vinifera
+>grape cultivar 8612 [tab] Vitis vinifera
+>grape cultivar 87-1 [tab] Vitis vinifera
+>grape cultivar Atebage [tab] Vitis vinifera
+>grape cultivar Augusta [tab] Vitis vinifera
+>grape cultivar Benifuji [tab] Vitis vinifera
+
 
 #####3.2 manually check the virus genus and classification 
 
@@ -78,13 +75,11 @@ background of this genus to make correct decision.
 If you are not familiar with virus genus classification system, please skip this step. That means you trust
 the genus & classification information from GenBank.
 
-**Directly perfrom step 3.4 will take very long time due to lot of virus have not been classified after step 3.3. It is better to perform step 3.5 to update two manually correct files after step 3.4. About 8,000 unclassified virus need to be analyzed in step 3.4, and it will save lot of time.**
-
 #####3.3 manually classification using virus description
 
-After correting host name and genus, some viral sequences still can not be classified for missing host feature and have a unrecognized genus name. But they have almost same description with other classified virus. These virus could be classified by comparing their descriptions with classified virus. The below command will do it automatically. The command will compare the description of unclassified virus with classified virus, then borrow the info of classification to the unclassified.
+After correting host name and genus, some viruses still can not be classified for missing host feature and have a unrecognized genus name. But they have almost same description, or show sequence similarity with other classified viruses. These unclassified viruses could be classified by comparing their descriptions and sequences with classified. The below command will do it automatically. The command will compare the description of unclassified virus with classified virus, then borrow the info of classification to the unclassified.
 
-For example, the sequence GI:331725 does not have host feature, and the genus name is “Small linear single stranded RNA satellites”. It described as “Cucumber mosaic virus satellite RNA”. And another sequence GI:1103556 with same description was classified into plant virus. It should be plant virus according to the description.
+For example, the sequence M18869 does not have host feature, and the genus name is “Small linear single stranded RNA satellites”. But it described as “Cucumber mosaic virus satellite RNA”. Another sequence X86421 with same description was classified into plant virus. Through blast, The M18869 is 100% covered by X86421 with 96% identity. So, it should be classified as plant virus.
 
 ![img06](http://kentnf.github.io/tools/img/vcp_p6.png)
 
@@ -108,32 +103,17 @@ The classified result **manual_desc_table.txt** need to be checked manually in c
 >11- percentage identity  
 >12- match score  
 
-Just check the 2nd, 3rd, and 4th column. If it does not make sense,
-correct them manually. Please also concern the 5th and 6th column, the error usually happens to the record
-without 100% freq.
-
-Beside correction with word search method, we also blast the unclassified virus against the classified virus
-(col 8-12). Most of word search result and blast search result are same, less the 100 of them are diff. So
-manually corret the different part will saving a lot of time
 
 > **Suggestion method:**
-
-- Add col A behind col 'match score', compare col 4 and 8 in col A using function 'exac', 
-then sort col A and mv rows with 'true' value to another table. We think the classification 
-result is correct if the word search method and blast method generate same result.
-- then sort col 'Div name by blast', remove col with value 'NA-BLAST'. sort the remaing table
-with col 'match length of blast' and 'percentage identity'. 
-
-
-> - A. sort to find different in word search and blast search (col 4 and 8).
-> - B. check the blast match length, identify. Lower than 100 match base, 90% identity show low blast clue for classification
+> - A. sort to find different in word search and blast search (col 4 and 8), only foucus difference in division.
+> - B. check the blast match length, identify. Lower than 100 match base, 90% identity should be manually checked.
 > - C. check the word search column 3, 5, 6, and 7.
-> - D. assign a correct div to column 4 for the virus
+> - D. fill correct division in column 4
 
 
 #####3.4 update the manually correct file to classification
 
-Next, the manually correct files need to be append to previous correction. The parameter **v** indicate the version of GenBank.
+Next, the manually correct files should be append to previous correction. The parameter **v** indicate the version of GenBank.
 ```
 $ perl viral_DB_prepare.pl -t patch -v 211
 ```
