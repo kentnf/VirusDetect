@@ -44,6 +44,7 @@ The standard host name for these entries should be 'Vitis vinifera' or 'wine gra
 
 We need to manually add the standard host name after each of the non-standard names (separated by a tab key)
 
+|     |     |
 | --- | --- |
 | grape cultivar 6-23 | Vitis vinifera |
 | grape cultivar 8612 | Vitis vinifera |
