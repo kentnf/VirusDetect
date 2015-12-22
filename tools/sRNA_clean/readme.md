@@ -32,7 +32,7 @@ The script will generate three files for each input file:
 1. A fastq file containing the cleaned reads.
 2. A report file including the statistics on the sequence processing.
 
-  * <table border=1><tr><td>sample</td><td>total</td><td>unmatch</td><td>null</td><td>match</td><td>baseN</td><td>short</td><td>clean</td></tr><tr><td>test.fq</td><td>1000</td><td>132</td><td>0</td><td>868</td><td>0</td><td>6</td><td>862</td></tr></table>
+<table border=1><tr><td>sample</td><td>total</td><td>unmatch</td><td>null</td><td>match</td><td>baseN</td><td>short</td><td>clean</td></tr><tr><td>test.fq</td><td>1000</td><td>132</td><td>0</td><td>868</td><td>0</td><td>6</td><td>862</td></tr></table>
 
     * **sample**: input file name
     * **total**: total number of raw reads
