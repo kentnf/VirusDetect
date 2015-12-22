@@ -65,18 +65,18 @@ After correcting host name and genus, some viruses still cannot be classified du
 The file **manual_desc_table.txt** needs to be checked manually to identify any potential wrong classifications by the pipeline.
 
 >The format of the file **manual_desc_table.txt**:
->1 - ID: GFLRNA3
->2 - Description: Grapevine fanleaf virus satellite RNA (RNA3), complete cds.
->3 - Same Description: Grapevine fanleaf virus
->4 - Kingdom name by description
->5 - No. of sequences with same description: 1
->6 - Frequency of same description: 100.00
->7 - ID of sequence with same description: GFLRNA1
->8 - Kingdom name by blast
->9 - best hit of blast
->10- match length of blast
->11- percentage identity
->12- match score 
+> - 1. ID: GFLRNA3
+> - 2. Description: Grapevine fanleaf virus satellite RNA (RNA3), complete cds.
+> - 3. Same Description: Grapevine fanleaf virus
+> - 4. Kingdom name by description
+> - 5. No. of sequences with same description: 1
+> - 6. Frequency of same description: 100.00
+> - 7. ID of sequence with same description: GFLRNA1
+> - 8. Kingdom name by blast
+> - 9. best hit of blast
+> - 10. match length of blast
+> - 11. percentage identity
+> - 12. match score 
 
 > **Suggested method to manually check the file:**
 > - A. Compare values in columns 4 and 8. Only need to check this with different values in these two columns.
