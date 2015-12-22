@@ -105,7 +105,7 @@ USAGE: $0 -t genProt input_seq vrl_genbank_prot vrl_genbank_tab
 
 ';
 
-        print $usage and exit if @$files < 3;
+        print $usage and exit if @$files < 2;
         my $input_seq = $$files[0];
 		my $vrl_prot  = $$files[1];
 		my $vrl_tab   = $$files[2];
@@ -130,7 +130,7 @@ USAGE: $0 -t genProt input_seq vrl_genbank_prot vrl_genbank_tab
 			chomp;
 			next if $_ =~ m/^#/;
 			my @a = split(/\t/, $_);
-			push(@{$nt_prot{$a[1]}}, $a[2]);
+			push(@{$nt_prot{$a[0]}}, $a[1]);
 		}
 		$fhi->close;
 
@@ -194,7 +194,7 @@ USAGE: $0 -t extProt [options] gbvrl1.seq.gz gbvrl2.seq.gz ... gbvrlN.seq.gz
 						$pid = $value if ($tag eq 'protein_id');
 						if ($tag eq 'translation' && length($value) > 0) {
 							print $out1 ">".$pid."\n".$value."\n";
-							print $out2 "$sid\t$acc\t$pid\n";
+							print $out2 "$acc\t$pid\n";
 						}
 					}
 				}

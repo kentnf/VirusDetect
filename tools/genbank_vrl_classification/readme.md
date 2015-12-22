@@ -17,63 +17,15 @@ $ perl viral_DB_prepare.pl -t download > download.sh
 $ bash ./download.sh
 ```
 
-####2. run viral_DB_prepare.pl script to classify virus
-
->__Note__
->please add -c 1 if the classification is from previous result, or please remove `-c 1` if a denovo
-classification will be performed 
+####2. run viral_DB_prepare.pl script to initial classification
 
 ``` 
-$ perl viral_DB_prepare.pl -t category -c 1 gbvrl*.gz 1>report.txt 2>&1
+$ perl viral_DB_prepare.pl -t category gbvrl*.gz 1>report.txt 2>&1
 ```
+the initial may contains some errors or unclassified viruses, please correct them according below description
+
 
 ####3. manually correction
-
->__Update__
->the correction of virus taxon id will be automatically execute. An new file `add_taxid.txt` will
->record the incorrect taxon id and corresponding correct one. 
-
-
-
-#####3.1 manually correct the virus taxon id
-
-There will be several virus do not have correct taxon id in download files, but they may have correct taxon id on 
-GenBank website. So I guess the website update more frequently than ftp. To generate accurate classification, we need manually update 
-these virus taxon id in the script viral_DB_prepare.pl, sorry for that I did not make it as a automatically process.
-
-######3.1.1 the file "report.txt" records these virus without taxon id like this:
-
-	$ grep "WARN" report.txt
-	[WARN]organism is not virus: KC244112
-	[WARN]organism is not virus: KC244113
-	[WARN]organism is not virus: AF050065
-	[WARN]organism is not virus: AF101979
-	... 
-
-The warnings message means virus sequence, take KC244112 as a example, does not have correct taxon id.
-
-######3.1.2 search the locus ID in genbank to find correct taxon id
-
-In GenBank website, the KC244112 has correct taxon id 1600283.
-
-![img01](http://kentnf.github.io/tools/img/vcp_p1.png)
-
-
-Obviously, the taxon id 1600283 belong to Influenza B virus
-
-![img02](http://kentnf.github.io/tools/img/vcp_p2.png)
-
-
-######3.1.3 open file viral_DB_prepare.pl, add the correct taxon id to subroutine correct_org_taxon_division
-
-Add the correct virus locus id and taxon id to subroutine correct_org_taxon_division as below:
-       
-![img03](http://kentnf.github.io/tools/img/vcp_p3.png)
- 
-######3.1.4 re-run the viral_DB_prepare.pl until there is no WARN message.
-
-	$ perl viral_DB_prepare.pl -t category gbvrl*.gz 1>report.txt 2>&1
-
 
 #####3.1 manually corret host name
 
@@ -111,7 +63,7 @@ Example
 	grape cultivar Augusta	Vitis vinifera
 	grape cultivar Benifuji	Vitis vinifera
 
-#####3.3 manually check the virus genus and classification 
+#####3.2 manually check the virus genus and classification 
 
 After the classification in step2, the pipeline will create some new genus classification information that not presented in web (www.mcb.uct.ac.za/tutorial/ICTV%20Species%20Lists%20by%20host.htm). For example, the becurtovirus GI:169303562 was found in GenBank nt database, and it was categorized into plant virus according to its host is Suger Beet. Then the pipeline will automatically create a rule that becurtovius should be categorized into plant virus (below).
 
@@ -128,25 +80,17 @@ the genus & classification information from GenBank.
 
 **Directly perfrom step 3.4 will take very long time due to lot of virus have not been classified after step 3.3. It is better to perform step 3.5 to update two manually correct files after step 3.4. About 8,000 unclassified virus need to be analyzed in step 3.4, and it will save lot of time.**
 
-#####3.4 manually classification using virus description
+#####3.3 manually classification using virus description
 
-**Run the classification again, notice to add -c parameter.**
-	
-	$ perl viral_DB_prepare.pl -t category -c 1 gbvrl*.gz 1>report.txt 2>&1
+After correting host name and genus, some viral sequences still can not be classified for missing host feature and have a unrecognized genus name. But they have almost same description with other classified virus. These virus could be classified by comparing their descriptions with classified virus. The below command will do it automatically. The command will compare the description of unclassified virus with classified virus, then borrow the info of classification to the unclassified.
 
-Afer manually correct in step 3.1 to 3.3. Some viral sequences still can not be classified for 
-missing host feature and have a unrecognized genus name. But they have almost same description 
-with other classified virus. These virus could be classified by comparing their descriptions with 
-classified virus. The below command will do it automatically. The command will compare the 
-description of unclassified virus with classified virus, then borrow the info
-of classification to the unclassified.
-
-For example, the sequence GI:331725 does not have host feature, and the genus name is 
-“Small linear single stranded RNA satellites”. It described as “Cucumber mosaic virus satellite RNA”. 
-And another sequence GI:1103556 with same description was classified into plant virus. 
-It should be plant virus according to the description.
+For example, the sequence GI:331725 does not have host feature, and the genus name is “Small linear single stranded RNA satellites”. It described as “Cucumber mosaic virus satellite RNA”. And another sequence GI:1103556 with same description was classified into plant virus. It should be plant virus according to the description.
 
 ![img06](http://kentnf.github.io/tools/img/vcp_p6.png)
+
+```	
+$ perl viral_DB_prepare.pl -t category -c 1 gbvrl*.gz 1>report.txt 2>&1
+```
 
 The classified result **manual_desc_table.txt** need to be checked manually in case making incorrect classification.
 
@@ -187,54 +131,78 @@ with col 'match length of blast' and 'percentage identity'.
 > - D. assign a correct div to column 4 for the virus
 
 
-#####3.5 update the manually correct file to classification
+#####3.4 update the manually correct file to classification
 
-After steps 3.1 to 3.4, we need to update the manually correct files. 
-First, backup all the txt files in **tools** folder of VirusDetect. 
-Then run below command:
- 
-	$ perl viral_DB_prepare.pl -t patch
+Next, the manually correct files need to be append to previous correction. The parameter **v** indicate the version of GenBank.
+```
+$ perl viral_DB_prepare.pl -t patch -v 211
+```
 
 Three new update files will be generated in current folder.
-We need to check these updated files: 
-        
-	update_genus_table_v205.txt
-	update_hname_table_v205.txt
-	update_desc_table_v205.txt
+       
+``` 
+update_genus_table_v211.txt
+update_hname_table_v211.txt
+update_desc_table_v211.txt
+```
 
 It is better to check these update files again. The updated information is append behind the label line 
 
-	# patch v205**
-	*update information will be here
+```
+# patch v211
+---- update information will be here ----
+```
 
-After check, use the three updated files to replace files in **tools** folder of VirusDetect. 
-Last, check the  **default_verion** locate in **tools** folder, make sure it same as the update file.
-If the default version is **205**, the three update file name should be:
+Copy the three updated files into **tools/genbank_vrl_classification** folder of VirusDetect. 
+Check the **current_genbank_verion** locate in **tools/genbank_vrl_classification** folder, make sure it same as the update file.
+If the current version is **211**, the three update file name should be:
 
-	update_desc_table_v205.txt  
-	update_genus_table_v205.txt  
-	update_hname_table_v205.txt
+```
+update_desc_table_v211.txt  
+update_genus_table_v211.txt  
+update_hname_table_v211.txt
+```
 
-After manually correct all errors in classication, please move three patch files into tools folder of VirusDetect (the step remind me again Virus Classification Pipeline is just a tool of VirusDetect). Then do the same thing as before, but I promise it is the last time for you to run it.
+####4. run viral_DB_prepare.pl script to category virus again
 
-####4. run viral_DB_prepare.pl script to category virus again using manually changed file
+```
+$ perl viral_DB_prepare.pl -t category -c 1 gbvr*.gz
+```
 
-	$ perl viral_DB_prepare.pl -t category -c 1 gbvr*.gz
+####5. extract protein sequences
+
+```
+$ viral_DB_prepare.pl -t extProt gbvrl1.seq.gz gbvrl2.seq.gz ... gbvrlN.seq.gz
+```
+
+Two file will be generate. 
+
+>vrl_genbank_prot: virus protein sequences
+>vrl_genbank_tab: virus nucleotide accession and protein accession
+
+####6. remove redundancy (using plant as example)
+
+remove redundancy sequences with 100% sequence similarity
+```
+$ perl viral_DB_prepare.pl -t unique vrl_Plants_all.fasta -s 100
+```
+
+then generate u99 u97 and u95 base on the U100
+```
+$ perl viral_DB_prepare.pl -t unique -p 64 -s 99 vrl_Plants_u100 
+$ perl viral_DB_prepare.pl -t unique -p 64 -s 97 vrl_Plants_u100
+$ perl viral_DB_prepare.pl -t unique -p 64 -s 95 vrl_Plants_u100
+```
+
+####7. retrieve proteins for each division (using plant u95 as example)
+
+```
+$ perl viral_DB_prepare.pl -t genProt vrl_Plants_u95 vrl_genbank_prot vrl_genbank_tab
+```
+The output protein sequences will be named as: **vrl_Plants_u95_prot**
 
 
-####5. unique the classified virus
 
-	$ perl viral_DB_prepare.pl -t unique input_virus.fasta
 
-This is the last step of classication of virus, the unique virus sequences could be used as reference
-of VirusDetect program after create index for bwa and blast
 
-####6. manually update the classification
-
-The classification result of this pipline may contain very limited errors. For any specific reason or specific project, user may need to correct or update the classication for only several virus. 
-First, just correct the classification information in vrl_genbank.txt. Then run this command:
-
-	$ perl viral_DB_prepare.pl -t refine
-
-The sequence file will be updated according to vrl_genbank.txt, and the updated sequences will be named like 'vrl_Bacteria_all.fasta.new'.
 
