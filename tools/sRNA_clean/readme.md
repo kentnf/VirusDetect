@@ -3,6 +3,7 @@ sRNA data cleaning
 ==================
 
 The script “sRNA_clean.pl” is used to process raw sRNA file in fastq format by
+
 1. trimming the adaptor sequences;  
 2. removing reads that do not contain adaptor sequences;
 3. removing reads that are in low quality (containing “N”);
@@ -31,9 +32,9 @@ The script will generate three files for each input file:
 1. A fastq file containing the cleaned reads.
 2. A report file including the statistics on the sequence processing.
 
-  * | sample | total | unmatch | null | match | baseN | short | clean |
-  * |---|---|---|---|---|---|---|---|
-  * | test.fq | 1000 | 132 | 0 | 868 | 0 | 6 | 862 |
+  * >| sample | total | unmatch | null | match | baseN | short | clean |
+  * >|---|---|---|---|---|---|---|---|
+  * >| test.fq | 1000 | 132 | 0 | 868 | 0 | 6 | 862 |
 
     * **sample**: input file name
     * **total**: total number of raw reads
