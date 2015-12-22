@@ -294,6 +294,14 @@ foreach my $sample (@ARGV)
 	if (-s "$sample.assembled") {
 		# subtraction host-derived contigs 	
 		if ($host_reference) {
+			my %denovo_ctg = Util::load_seq("$sample.assembled");		
+			my $denovo_ctg = scalar(keys(%denovo_ctg));
+			if ($denovo_ctg > 1) {
+				Util::print_user_submessage("$denovo_ctg contigs were assembled");
+			} else {
+				Util::print_user_submessage("$denovo_ctg contigs was assembled");
+			}
+
 		    my $blast_program = $BIN_DIR."/megablast";
  			my $blast_output  = "$sample.assembled.blast";
 			my $blast_param   = "-p 90 -F $filter_query -a $cpu_num -W $word_size -q $mis_penalty -G $gap_cost -E $gap_extension -b $hits_return -e $exp_value";
