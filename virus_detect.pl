@@ -17,9 +17,9 @@ Usage: virus_detect.pl [option] --reference reference input1 input2 ...
   
  Basic options:
   --reference		Name of the reference virus sequences database 
-                        [vrl_plant]
+                         [vrl_plant]
   --host_reference	Name of the host reference database used 
-                        for host sRNA subtraction [Null]
+                         for host sRNA subtraction [Null]
   --thread_num		Number of threads used for alignments [8]
  
  BWA-related options (align sRNA to reference virus database or host 
@@ -35,7 +35,7 @@ Usage: virus_detect.pl [option] --reference reference input1 input2 ...
 
  Megablast-related options (remove redundancy within virus contigs):
   --min_overlap		Minimum overlap length between two 
-                        contigs to be combined [30]
+                         contigs to be combined [30]
   --max_end_clip	Maximum length of end clips [6]
   --min_identity	Minimum identity between two contigs to be 
   			 combined [97]
@@ -54,13 +54,21 @@ Usage: virus_detect.pl [option] --reference reference input1 input2 ...
 
  Result filtering options:
   --hsp_cover		Coverage cutoff of a reported virus contig by
-                        reference virus sequences [0.75]
+                         reference virus sequences [0.75]
   --coverage_cutoff	Coverage cutoff of a reported virus reference 
-                        sequences by assembled virus contigs [0.1] 
+                         sequences by assembled virus contigs [0.1] 
   --depth_cutoff	Depth cutoff of a reported virus reference [5]
 
 _EOUSAGE_
 ;
+
+=head1 discard parameters
+ --strand_specific	Only for sequences assembled from strand-specific RNA-seq [false]
+ --novel_len_cutoff   Length cutoff of a contig categorized as novel
+            when it is not reported as known, but it may 
+            shows similarity with the reference virus 
+            sequences. The default is 100bp [100]
+=cut
 
 if (scalar(@ARGV) < 1 ) { print $usage; exit; }
 
@@ -156,6 +164,10 @@ GetOptions(
 	'novel_len_cutoff=i'=> \$novel_len_cutoff
 );
 
+# check input parameters
+if (@ARGV == 0 ) { print $usage; exit;}
+foreach my $sample (@ARGV) { print $usage and exit unless -s $sample; }
+
 # set path and folder
 my $WORKING_DIR   = cwd();									# set current folder as working folder
 my $DATABASE_DIR  = ${FindBin::RealBin}."/databases";		# set database folder
@@ -188,7 +200,6 @@ if ( $host_reference ) {
 # main
 foreach my $sample (@ARGV) 
 {
-	die $usage unless -s $sample;
 	my $file_type = Util::detect_FileType($sample);
 	my $data_type = Util::detect_DataType($sample);
 	my $seq_num = Util::detect_seqNum($sample);
@@ -299,7 +310,7 @@ foreach my $sample (@ARGV)
 			if ($denovo_ctg > 1) {
 				Util::print_user_submessage("$denovo_ctg contigs were assembled");
 			} else {
-				Util::print_user_submessage("$denovo_ctg contigs was assembled");
+				Util::print_user_submessage("$denovo_ctg contig was assembled");
 			}
 
 		    my $blast_program = $BIN_DIR."/megablast";
@@ -342,7 +353,7 @@ foreach my $sample (@ARGV)
 	# identify the virus
 	Util::print_user_message("Virus identification");
 	my $cmd_identify = "$BIN_DIR/virus_identify.pl --reference $reference ";
-	$cmd_identify .= "--word_size $word_size --exp_value $exp_value --identity_percen $percent_identity ";
+	$cmd_identify .= "--word_size $word_size --exp_value $exp_value --percent_identity $percent_identity ";
 	$cmd_identify .= "--cpu_num $thread_num --mis_penalty $mis_penalty_b --gap_cost $gap_cost_b --gap_extension $gap_extension_b ";
 	$cmd_identify .= "--hsp_cover $hsp_cover --diff_ratio $diff_ratio --diff_contig_cover $diff_contig_cover --diff_contig_length $diff_contig_length ";
 	$cmd_identify .= "--coverage_cutoff $coverage_cutoff --depth_cutoff $depth_cutoff ";

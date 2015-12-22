@@ -12,40 +12,34 @@ use Util;
 
 my $usage = <<_EOUSAGE_;
 
-#########################################################################################
-# virus_itentify.pl [options] --reference reference input_read contig
-#  		
-#  		the contig was assembled from input_read
-#
-#                   --diff_ratio --word_size [INT] --exp_value <Float> --identity_percen <Float>
-#                   --cpu_num  [INT] --mis_penalty [INT] --gap_cost[INT] --gap_extension [INT]
-#
-# Options(3):
-#  --reference The name of a fasta file containing all of the virus reference sequences  [vrl_genbank.fasta] 
-#  --diff_ratio The hits with distance less than 0.25 will be combined into one  [0.25] 
-# 
-# blast-related options(7):
-#  --word_size [11] 
-#  --exp_value [1e-5]
-#  --identity_percen [25] 
-#  --cpu_num         Number of processors to use [8] 
-#  --mis_penalty     Penalty for a nucleotide mismatch [-1]
-#  --gap_cost        Cost to open a gap [2] 
-#  --gap_extension   Cost to extend a gap [1]
-#
-# New options(5):
-#  --hsp_cover		The coverage of hsp should be more than this cutoff for query or hit [0.75]
-#  --diff_contig_cover	The coverage for different contigs [0.5]
-#  --diff_contig_length	The length of different contigs [100 (bp)]
-#  --identity_drop_off	The percentage identity drop off compared with the highest identity [5 (%)]
-#
-#  --coverage_cutoff	The coverage cutoff for final ouput [0.1] 
-#  --depth_cutoff	The depth cutoff for final ouput    [5]
-#  --novel_len_cutoff   Length cutoff of a contig categorized as novel
-#            when it is not reported as known, but it may 
-#            shows similarity with the reference virus 
-#            sequences. The default is 100bp [100]
-###########################################################################################
+Usage: virus_itentify.pl [options] --reference reference input_read contig
+
+ Options(3):
+  --reference	Name of the reference virus sequences database [vrl_plant]
+  --diff_ratio	The hits with distance less than 0.25 will be combined into one  [0.25] 
+ 
+ blast-related options(7):
+  --word_size		Minimum word size - length of best perfect match [11]
+  --exp_value		Maximum e-value [1e-5]
+  --percent_identity	Minimum identity percentage for the alignment [25] 
+  --cpu_num		Number of threads to use [8] 
+  --mis_penalty		Penalty for a nucleotide mismatch [-1]
+  --gap_cost		Cost to open a gap [2] 
+  --gap_extension	Cost to extend a gap [1]
+
+ New options(5):
+  --hsp_cover           Coverage of hsp should be more than this cutoff for query or hit [0.75]
+  --diff_contig_cover	Coverage for different contigs [0.5]
+  --diff_contig_length	Length of different contigs [100 (bp)]
+  --identity_drop_off	Percent identity drop off compared with the highest identity [5 (%)]
+
+  --coverage_cutoff	Coverage cutoff of a reported virus reference
+			 sequences by assembled virus contigs [0.1] 
+  --depth_cutoff	Depth cutoff of a reported virus reference [5]
+  --novel_len_cutoff	Length cutoff of a contig categorized as novel
+			 when it is not reported as known, but it may 
+			 shows similarity with the reference virus 
+			 sequences. The default is 100bp [100]
 
 _EOUSAGE_
 
@@ -107,7 +101,7 @@ GetOptions(
 	'diff_contig_length=i'	=> \$diff_contig_length,
 	'word_size=i' 			=> \$word_size,
 	'exp_value=f' 			=> \$exp_value,
-	'identity_percen=f' 	=> \$identity_percen,
+	'percent_identity=f' 	=> \$identity_percen,
 	'cpu_num=i' 			=> \$cpu_num,
 	'mis_penalty=i' 		=> \$mis_penalty,
 	'gap_cost=i' 			=> \$gap_cost,
