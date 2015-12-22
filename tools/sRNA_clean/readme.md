@@ -30,9 +30,11 @@ The script will generate three files for each input file:
 
 1. A fastq file containing the cleaned reads.
 2. A report file including the statistics on the sequence processing.
-  | sample | total | unmatch | null | match | baseN | short | clean |
-  | --- | --- | --- | --- | --- | --- | --- | --- |
-  | test.fq | 1000 | 132 | 0 | 868 | 0 | 6 | 862 |
+
+| sample | total | unmatch | null | match | baseN | short | clean |
+|---|---|---|---|---|---|---|---|
+| test.fq | 1000 | 132 | 0 | 868 | 0 | 6 | 862 |
+
   * **sample**: input file name
   * **total**: total number of raw reads
   * **unmatch**: number of reads that do not contain the adaptor sequence
