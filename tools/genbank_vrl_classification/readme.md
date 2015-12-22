@@ -36,9 +36,11 @@ The pipeline will classify some viruses according to their host names, if they c
 
 Example:
 
-grape cultivar 6-23
-grape cultivar 8612
-grape cultivar 87-1
+|     |
+| --- |
+|grape cultivar 6-23 |
+|grape cultivar 8612 |
+|grape cultivar 87-1 |
 
 The standard host name for these entries should be 'Vitis vinifera' or 'wine grape' according to the GenBank taxonomy database.
 
