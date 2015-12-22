@@ -1,13 +1,21 @@
 
-clean sRNA adapter 
+sRNA data cleaning 
 ==================
 
-The usage of sRNA_clean.pl is quite simple, just provide adapter sequences and fastq file
+The script “sRNA_clean.pl” is used to process raw sRNA file in fastq format by
+- 1. trimming the adaptor sequences;  
+- 2. removing reads that do not contain adaptor sequences;
+- 3. removing reads that are in low quality (containing “N”);
+- 4. removing reads that are short (e.g., <15 nt) after trimming.
+
 ```
-perl sRNA_clean.pl -s CAGATCGGAAGAGCACA input.fastq
+$ perl sRNA_clean.pl -s adaptor_seq -l 15 input1.fastq input2.fastq
+
+-s sequences of the adaptor
+-l minimum length of sRNAs after trimming
 ```
 
-We collect 6 sRNA adapters from various sRNA read files (below), and only the first 17nt was taken for adapter removing.
+Multiple sRNA files can be used as input for the script. The script will process the files one by one (sequentially). We have collected six most commonly used sRNA adaptors from the files we have processed. Only the first 11 nt are used for removing adaptors (so providing the 11 nt of the adaptors will be good enough).
 
 ```
 CTGTAGGCACCATCAAT
@@ -18,18 +26,25 @@ ATCTCGTATGCCGTCTT
 GTACCTCGTATGCCGTC
 ```
 
-The output files include cleaned reads after remove adapter, and report file including statistics information about adapter removing. Below is the format of report file:
+The script will generate three files for each input file:
+- 1. A fastq file containing the cleaned reads. 
+- 2. A report file including the statistics on the sequence processing.
 
 sample | total | unmatch | null | match | baseN | short | clean
---- | --- | --- | --- | --- | --- | --- | ---
+--- | --- | --- | --- | --- | --- | --- | --- 
 test.fq | 1000 | 132 | 0 | 868 | 0 | 6 | 862
 
-- **sample**: sample name
-- **total**: total number of reads before adapter removing
-- **unmatch**: number of reads do not contain provide adapter
-- **null**: number of reads do not contain sRNA 
-- **match**: number of reads contain both sRNA and adapter sequence
-- **baseN**: number of match reads contain undetermined base in sRNA
-- **short**: number of match reads contain short sRNA after adapter removing
-- **clean**: number of match reads contain properly sRNA
+-- **sample**: input file name
+-- **total**: total number of raw reads
+-- **unmatch**: number of reads that do not contain the adaptor sequence
+-- **null**: number of reads containing empty adaptors
+-- **match**: number of reads contain both sRNA and adapter sequence
+-- **baseN**: number of “match” reads containing undetermined base (N)
+-- **short**: number of “match” reads that are short
+-- **clean**: number of final cleaned sRNAs
+
+- 3. A file (sRNA_length.txt) containing the sRNA length distribution.
+
+
+
 
