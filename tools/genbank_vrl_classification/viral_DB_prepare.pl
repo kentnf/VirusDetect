@@ -37,53 +37,17 @@ sub usage
 {
 	my $version = shift;
 	my $usage = qq'
-PIPELINE (version $version):
+Virus Classification Pipeline (VCP; version $version)
 
-1. download viral sequnece from genbank ftp (ftp://ftp.ncbi.nih.gov/genbank/)
-   \$ $0 -t download > command.sh
-   * run the downloand command
+USAGE: $0 -t [tool] [options]
 
-2. run viral_DB_prepare.pl script to category virus 
-   \$ $0 -t category gbvrl*.gz
-   * check warning message: if there is any virus do not have taxon id. 
-                            manually chagne it in [sub correct_org_taxon_division]
-
-	>> Steps
-	\$ grep WARN nohup.out
-	search the ID in WARN in genbank to find correct taxon id
-	open file $0
-	add the correct taxon id to correct_org_taxon_division subroutine
-	* then run the category again until there is no WARN message
-
-3. generate manually classification file
-   \$ $0 -t manually
-   \$ $0 -t patch
-   * there is no process in this step, a guide about how to manually change the 
-     classification is print on screen
-   * after manually change, please patch the changed files to previous file
-
-4. run viral_DB_prepare.pl script to category virus again using manually changed file
-   \$ $0 -t category -c 1 gbvr*.gz
-   \$ $0 -t manually
-   \$ $0 -t patch
-   * manually change the desc file, then patch it
-
-   === notice === 
-   step 3, and 4 could be combined into one. Before generate and apply patched genes table,
-   the step to generate desc table using word search method will take very long time. After 
-   apply patched genus table, only ~8000 unclassified virus need to be search using word search
-   and blast search method (about half day) 
-
-5. move the patched file into bin folder, then run classification again
-   \$ $0 -t category -c 1 gbvr*.g
-
-6. unique the classified virus
-   \$ $0 -t unique input_virus.fasta
-
-*7.if the output vrl_genbank.txt has been manually changed
-   \$ $0 -t refine [no parameters] 
-   * output is like vrl_Bacteria_all.fasta.new
-
+	[tool]		[description]
+	download	Generate the download script
+	category	Classify virus sequences into different kingdoms
+	path		Append manually corrected files to the classification
+	extProt		Extract virus protein sequences
+	unique		Remove redundancy in virus sequences
+	genProt		Retrieve proteins for each division
 
 ';
 	print $usage;
