@@ -722,7 +722,11 @@ sub contigStats
 =cut
 sub remove_redundancy
 {
-	my ($contig_file, $read_file, $parameters, $max_end_clip, $min_overlap, $min_identity, $perfix, $bin_dir, $temp_dir, $debug) = @_;
+	my ($contig_file, $read_file, $parameters, $max_end_clip, $min_overlap, $min_identity, $perfix, $bin_dir, $temp_dir, $data_type, $debug) = @_;
+
+	# guess thread number used for blast, or using default 20
+	my $cpu_num = 8;
+    if ($parameters =~ m/-a\s+(\d+)/) { $cpu_num = $1; }
 
 	# step 1. remove low complexity sequence using dust, 2 remov XN reads
 	trim_XNseq($contig_file, 0.8, 40, $bin_dir, $debug);
@@ -736,7 +740,29 @@ sub remove_redundancy
 		Util::print_user_submessage("No unique contig was generated");
 		return 1;
 	}
-	
+
+	# ==== remove redundancy using cd-hit for mRNA ====
+	if ($data_type eq 'mRNA') {
+		my $cdhit_bin = $bin_dir."/cd-hit-est";
+		my $cluster = $contig_file.".cls";
+    	Util::process_cmd("$cdhit_bin -i $contig_file -o $cluster -c $min_identity -M 0 -T $cpu_num", $debug);
+		Util::process_cmd("mv $cluster $contig_file", $debug);
+		my %uniq_ctg_hash = Util::load_seq($contig_file);
+		my $uniq_ctg_num = scalar(keys(%uniq_ctg_hash));
+		
+		if ($uniq_ctg_num > 1) {
+			Util::print_user_submessage("$uniq_ctg_num unique contigs were generated");
+		} elsif ($after_contig_num == 1) {
+			Util::print_user_submessage("$uniq_ctg_num unique contig was generated");
+		} else {
+			Util::print_user_submessage("No unique contig was generated");
+		}
+
+		base_correction($read_file, $contig_file, $cpu_num, $perfix, $bin_dir, $temp_dir, $debug);	
+		return 1;
+	}
+
+	# ==== remove redundancy for sRNA ====
 	# if the new contig number != old contig number, continue remove redundancy
 	my $rmDup_cycle_num = 0;
 	while( $after_contig_num != $before_contig_num )
@@ -768,9 +794,6 @@ sub remove_redundancy
 	}
 
 	# finish remove redundancy, next for base correction
-	my $cpu_num = 20;
-	if ($parameters =~ m/-a (\d+)/) { $cpu_num = $1; }
-
 	base_correction($read_file, $contig_file, $cpu_num, $perfix, $bin_dir, $temp_dir, $debug);
 }
 

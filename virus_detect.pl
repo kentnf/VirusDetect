@@ -241,7 +241,7 @@ foreach my $sample (@ARGV)
 
 		# system("cp $sample.aligned $sample.aligned.raw.ctg");	# for debug
 		if (-s "$sample.aligned") {
-			align::remove_redundancy("$sample.aligned", $sample, $rr_blast_parameters, $max_end_clip, $min_overlap, $min_identity, 'ALIGNED', $BIN_DIR, $TEMP_DIR, $debug);
+			align::remove_redundancy("$sample.aligned", $sample, $rr_blast_parameters, $max_end_clip, $min_overlap, $min_identity, 'ALIGNED', $BIN_DIR, $TEMP_DIR, $data_type, $debug);
 			my $align_num = align::count_seq("$sample.aligned");
 			if ($align_num == 0) {
 				Util::print_user_submessage("No unique contig was generated");
@@ -326,7 +326,7 @@ foreach my $sample (@ARGV)
 				Util::print_user_submessage("No host-derived contig was removed");
 			}
 		}
-		align::remove_redundancy("$sample.assembled", $sample, $rr_blast_parameters, $max_end_clip, $min_overlap, $min_identity, 'ASSEMBLED',$BIN_DIR, $TEMP_DIR, $debug) if -s "$sample.assembled";
+		align::remove_redundancy("$sample.assembled", $sample, $rr_blast_parameters, $max_end_clip, $min_overlap, $min_identity, 'ASSEMBLED',$BIN_DIR, $TEMP_DIR, $data_type, $debug) if -s "$sample.assembled";
 	} else {
 		Util::print_user_submessage("No unique contig was generated");
 	}
@@ -343,7 +343,7 @@ foreach my $sample (@ARGV)
 	}
 
 	if (-s "$sample.combined") {
-		align::remove_redundancy("$sample.combined", $sample, $rr_blast_parameters, $max_end_clip, $min_overlap, $min_identity, 'CONTIG', $BIN_DIR, $TEMP_DIR, $debug);
+		align::remove_redundancy("$sample.combined", $sample, $rr_blast_parameters, $max_end_clip, $min_overlap, $min_identity, 'CONTIG', $BIN_DIR, $TEMP_DIR, $data_type, $debug);
 	} else {
 		Util::print_user_submessage("No unique contig was generated");
 	}
