@@ -635,6 +635,7 @@ sub vrl_download
 
 	#print "# cmd for download vrl database\n$download_cmd\n\n";
 	print "# cmd for download all vrl database files\n$download_cmd_all\n\n";
+	print "cat gbvrl*.seq.gz > GB_virus.gz\nrm gbvrl*.seq.gz\n";
 	print "# cmd for dwonload taxonomy database\nwget ftp://ftp.ncbi.nih.gov/pub/taxonomy/taxdump.tar.gz\n";
 	my @del_f = qw/citations.dmp delnodes.dmp division.dmp gc.prt gencode.dmp merged.dmp readme.txt taxdump.tar.gz/;
 	my @zip_f = qw/names.dmp nodes.dmp/;
