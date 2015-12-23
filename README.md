@@ -1,7 +1,5 @@
-virus-detect
-============
+virusDetect
+===========
 
+Please check document VirusDetect_manual.pdf 
 
-virus-detect program
-
-./virus_detect.pl --thread_num 24 --coverage_cutoff 0.3 --depth_cutoff 10 test_data

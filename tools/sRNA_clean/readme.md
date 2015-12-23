@@ -27,10 +27,10 @@ ATCTCGTATGCCGTCTT
 GTACCTCGTATGCCGTC
 ```
 
-The script will generate three files for each input file:
+The script will generate the following files:
 
-1. A fastq file containing the cleaned reads.
-2. A report file including the statistics on the sequence processing.
+1. A fastq file containing the cleaned reads for each of the input file.
+2. A report file (***report_sRNA_trim.txt***) including the statistics on the sequence processing.
 
   * <table border=1><tr><td>sample</td><td>total</td><td>unmatch</td><td>null</td><td>match</td><td>baseN</td><td>short</td><td>clean</td></tr><tr><td>test.fq</td><td>1000</td><td>132</td><td>0</td><td>868</td><td>0</td><td>6</td><td>862</td></tr></table>
 
@@ -43,6 +43,5 @@ The script will generate three files for each input file:
     * **short**: number of “match” reads that are short
     * **clean**: number of final cleaned sRNAs
 
-3. A file (sRNA_length.txt) containing the sRNA length distribution.
-
+3. A file (***sRNA_length.txt***) containing the sRNA length distribution.
 
