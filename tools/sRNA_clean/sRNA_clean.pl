@@ -28,7 +28,7 @@ sub rmadp
 	my ($options, $files) = @_;
 	
 	my $subUsage = qq'
-USAGE: $0 -s adapter_sequence sRNA1 sRNA2 ... sRNAn
+USAGE: $0 -s adapter_sequence -l minimum_length sRNA1 sRNA2 ... sRNAn
 
 ';
 
@@ -44,7 +44,7 @@ USAGE: $0 -s adapter_sequence sRNA1 sRNA2 ... sRNAn
 	if (defined $$options{'s'}) {
 		$adp_3p = $$options{'s'};
 		print "[ERR]short adapter 3p\n" and exit if length($adp_3p) < 9;
-		$adp_3p_len = $$options{'l'} if (defined $$options{'l'} && $$options{'l'} > 5);
+		#$adp_3p_len = $$options{'l'} if (defined $$options{'l'} && $$options{'l'} > 5);
 		$adp_3p_sub = substr($adp_3p, 0, $adp_3p_len);
 	} 
 	if (defined $$options{'p'} ) {
@@ -57,6 +57,14 @@ USAGE: $0 -s adapter_sequence sRNA1 sRNA2 ... sRNAn
 	
 	my $distance = 1;
 	$distance = int($$options{'d'}) if defined $$options{'d'} && $$options{'d'} >= 0;
+
+	my $cutoff_min_len = 15;
+	$cutoff_min_len =  $$options{'l'} if (defined $$options{'l'} );
+
+	# set hash for sRNA size distribution
+	my %sRNA_len_dist;	# key1: sample; key2: size; value: count
+	my %sRNA_size;		# key: size; value: 1
+
 
 	my $report_file = 'report_sRNA_trim.txt';
 	print "[ERR]report file exist\n" if -s $report_file;
@@ -236,7 +244,7 @@ USAGE: $0 -s adapter_sequence sRNA1 sRNA2 ... sRNAn
 				if ($baseN > 0) {
 					$label.=",baseN";
 					$baseN_num++;
-				} elsif (length($trimmed_seq) < 15 ) {
+				} elsif (length($trimmed_seq) < $cutoff_min_len ) {
 					$label.=",short";
 					$short_num++;
 				} else {
@@ -254,6 +262,10 @@ USAGE: $0 -s adapter_sequence sRNA1 sRNA2 ... sRNAn
 					} else {
 						print $out1 ">".$id1."\n".$trimmed_seq."\n";
 					}
+
+					# save hash for size distribution
+					$sRNA_size{$trimmed_len} = 1 unless defined $sRNA_size{$trimmed_len};
+					defined $sRNA_len_dist{$prefix}{$trimmed_len} and $sRNA_len_dist{$prefix}{$trimmed_len}++ or $sRNA_len_dist{$prefix}{$trimmed_len} = 1;
 				}
 			} 
 
@@ -278,6 +290,25 @@ USAGE: $0 -s adapter_sequence sRNA1 sRNA2 ... sRNAn
 	my $outr = IO::File->new(">$report_file") || die $!;
 	print $outr $report_info;
 	$outr->close;
+
+	# report sRNA length distribution
+	my $out_len = IO::File->new(">sRNA_length.txt") || die $!;
+	print $out_len "#sample";
+	foreach my $len (sort {$a<=>$b} keys %sRNA_size ) {
+		print $out_len "\t".$len;
+	}
+	print $out_len "\n";
+	foreach my $sample (sort keys %sRNA_len_dist) {
+		print $out_len $sample;
+		foreach my $len (sort {$a<=>$b} keys %sRNA_size ) {
+			my $num = 0;
+			$num = $sRNA_len_dist{$sample}{$len} if defined $sRNA_len_dist{$sample}{$len};
+			print $out_len "\t".$num;
+		}	
+		print $out_len "\n";	
+	}
+	$out_len->close;
+
 }
 
 sub hamming($$) { length( $_[ 0 ] ) - ( ( $_[ 0 ] ^ $_[ 1 ] ) =~ tr[\0][\0] )  }
