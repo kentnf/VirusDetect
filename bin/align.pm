@@ -745,14 +745,15 @@ sub remove_redundancy
 	if ($data_type eq 'mRNA') {
 		my $cdhit_bin = $bin_dir."/cd-hit-est";
 		my $cluster = $contig_file.".cls";
-    	Util::process_cmd("$cdhit_bin -i $contig_file -o $cluster -c $min_identity -M 0 -T $cpu_num", $debug);
+		my $identity = $min_identity / 100;
+    	Util::process_cmd("$cdhit_bin -i $contig_file -o $cluster -c $identity -M 0 -T $cpu_num 1>$contig_file.cd-hit.rpt 2>&1", $debug);
 		Util::process_cmd("mv $cluster $contig_file", $debug);
 		my %uniq_ctg_hash = Util::load_seq($contig_file);
 		my $uniq_ctg_num = scalar(keys(%uniq_ctg_hash));
 		
 		if ($uniq_ctg_num > 1) {
 			Util::print_user_submessage("$uniq_ctg_num unique contigs were generated");
-		} elsif ($after_contig_num == 1) {
+		} elsif ($uniq_ctg_num == 1) {
 			Util::print_user_submessage("$uniq_ctg_num unique contig was generated");
 		} else {
 			Util::print_user_submessage("No unique contig was generated");
