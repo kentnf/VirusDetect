@@ -64,7 +64,7 @@ USAGE: $0 -s adapter_sequence -l minimum_length sRNA1 sRNA2 ... sRNAn
 	# set hash for sRNA size distribution
 	my %sRNA_len_dist;	# key1: sample; key2: size; value: count
 	my %sRNA_size;		# key: size; value: 1
-
+	my %sRNA_sample;	# key: sample; value: 1
 
 	my $report_file = 'report_sRNA_trim.txt';
 	print "[ERR]report file exist\n" if -s $report_file;
@@ -76,6 +76,7 @@ USAGE: $0 -s adapter_sequence -l minimum_length sRNA1 sRNA2 ... sRNAn
 	{
 		my $prefix = $inFile;
 		$prefix =~ s/\.gz$//; $prefix =~ s/\.fastq$//; $prefix =~ s/\.fq$//; $prefix =~ s/\.fasta$//; $prefix =~ s/\.fa$//;
+		$sRNA_sample{$prefix} = 1;
 
 		my $outFile1 = $prefix.".clean.fq";
 		#my $outFile2 = $prefix.".clean.report.txt";
@@ -293,19 +294,20 @@ USAGE: $0 -s adapter_sequence -l minimum_length sRNA1 sRNA2 ... sRNAn
 
 	# report sRNA length distribution
 	my $out_len = IO::File->new(">sRNA_length.txt") || die $!;
-	print $out_len "#sample";
-	foreach my $len (sort {$a<=>$b} keys %sRNA_size ) {
-		print $out_len "\t".$len;
+	print $out_len "#Size";
+	foreach my $s (sort keys %sRNA_sample) {
+		print $out_len "\t$s (No. of reads)";
 	}
 	print $out_len "\n";
-	foreach my $sample (sort keys %sRNA_len_dist) {
-		print $out_len $sample;
-		foreach my $len (sort {$a<=>$b} keys %sRNA_size ) {
+
+	foreach my $len (sort {$a<=>$b} keys %sRNA_size ) {
+		print $out_len $len;
+		foreach my $s (sort keys %sRNA_sample) {
 			my $num = 0;
-			$num = $sRNA_len_dist{$sample}{$len} if defined $sRNA_len_dist{$sample}{$len};
+			$num = $sRNA_len_dist{$s}{$len} if defined $sRNA_len_dist{$s}{$len};
 			print $out_len "\t".$num;
-		}	
-		print $out_len "\n";	
+		}
+		print $out_len "\n";
 	}
 	$out_len->close;
 
