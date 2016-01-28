@@ -1151,6 +1151,8 @@ sub pileup_depth
 		next if $_ =~ m/^#/;
 		# SL2.40ch00      23059   T       1       ^S.     I
 		my @a = split(/\t/, $_);
+		die "[ERR]pileup line\n" if scalar @a < 4;
+		next if scalar @a < 6;
 		my ($ref, $pos, $base, $depth, $align, $qual) = @a;
 
 		if ($ref ne $prev_ref) 

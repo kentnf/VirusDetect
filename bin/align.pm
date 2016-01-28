@@ -233,7 +233,8 @@ sub pileup_filter
 		# ref pos base depth match Qual?
 		# AB000282 216 T 1 ^!, ~
 		my @a = split(/\t/, $_);
-		die "[EROR]Pileup File, Line $_\n" if scalar @a < 5;
+		die "[ERR]Pileup File, Line $_\n" if scalar @a < 4;
+		next if scalar @a < 6;
 		my ($id, $pos, $base, $depth) = ($a[0], $a[1], $a[2], $a[3]);
 
 		if ( defined $pre_id && $id ne $pre_id)
@@ -285,10 +286,17 @@ sub pileup_to_contig
 	my $fh = IO::File->new($input_pileup) || die $!;
 	my $out = IO::File->new(">".$output_seq) || die $!;
 
-	my $line = <$fh>; chomp($line); die "[ERR]Pileup File, 1st Line $line\n" if $line =~ m/^#/;
-	my @t = split(/\t/, $line); die "[ERR]Pileup File, Line $line\n" if scalar @t < 5;
-	my ($pre_id, $pre_pos, $base, $dep, $align) = ($t[0], $t[1], $t[2], $t[3], $t[4]);
-	$base = get_best_base($base, $dep, $align, $line);
+	# parse the 1st line 
+	my ($pre_id, $pre_pos, $base, $dep, $align);
+	while(my $line = <$fh>) {
+		chomp($line);
+		my @t = split(/\t/, $line);
+		die "[ERR]Pileup File, Line $line\n" if scalar @t < 4;
+		next if scalar @t < 6;
+		($pre_id, $pre_pos, $base, $dep, $align) = ($t[0], $t[1], $t[2], $t[3], $t[4]);
+		$base = get_best_base($base, $dep, $align, $line);
+		last;
+	}
 	my $seq = $base;
 	my $len = 1;
 	my ($id, $pos, $depth, $qual);
@@ -299,7 +307,8 @@ sub pileup_to_contig
 		# ref pos base depth match Qual?
 		# AB000282 216 T 1 ^!, ~
 		my @a = split(/\t/, $_);
-		die "[ERR]Pileup File, Line $_\n" if scalar @a < 5;
+		die "[ERR]Pileup File, Line $_\n" if scalar @a < 4;
+		next if scalar @a < 6;
 		($id, $pos, $base, $depth, $align, $qual) = ($a[0], $a[1], $a[2], $a[3], $a[4], $a[5]);
 		die "[ERR]undef seq len $id\n" unless defined $seq_hash{$id}{'length'};
 		my $seq_len = $seq_hash{$id}{'length'};
@@ -513,12 +522,12 @@ sub get_best_base
 	#	die;
 	#}
 
-        return $best_base;
+	return $best_base;
 }
 
 sub parse_indel_str
 {
-        my ($map_str, $i) = @_;
+	my ($map_str, $i) = @_;
 
 	$i++; # skip the + / -
 	
@@ -534,11 +543,10 @@ sub parse_indel_str
 	my $ins_str = substr($map_str, $begin, $ins_num);
 
 	#print "INS:$ins_num\t$ins_str\n"; # for debug
-        return ($end, $ins_str);
+	return ($end, $ins_str);
 }
 
-
-=head
+=head2
 # input reads;
 my $sample = $ARGV[0];
 my $output_contig = $ARGV[1];
@@ -570,11 +578,11 @@ sub velvet_optimiser_combine
 
 	my $current_folder;
    	my $statfile;
-    	my $objective;						# the objective for each run
-    	my $max_objective = 0;					# the maximum objective
-    	my $opt_kmer = $kmer_start; 				# the optimization kmer_length when objective is max
-    	my $opt_coverage = $coverage_start;			# the optimization coverage when objective is max
-    	my $opt_avgLen = 0;                			# the avg Length when objective is max
+	my $objective;							# the objective for each run
+	my $max_objective = 0;					# the maximum objective
+	my $opt_kmer = $kmer_start; 			# the optimization kmer_length when objective is max
+	my $opt_coverage = $coverage_start;		# the optimization coverage when objective is max
+	my $opt_avgLen = 0;						# the avg Length when objective is max
 		
 	# optimize k-mer length using fixed coverage
 	for(my $i=$kmer_start; $i<= $kmer_end; $i=$i+2) 
@@ -649,12 +657,10 @@ sub runVelvet
 =cut
 sub contigStats 
 {
-	
 	my $file = shift;
 	#my $minsize = shift;
 	
 	#print "In contigStats with $file, $minsize\n" if $interested;
-	
 	my $numseq=0;
 	my $avglen=0;
 	my $minlen=1E9;
