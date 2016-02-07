@@ -311,7 +311,8 @@ main: {
 		# compare noval contigs against virus database using tblastx
 		$blast_output = "$sample.novel.paired";
 		$blast_program = $BIN_DIR."/blastall -p blastx";
-		$blast_param = "-F $filter_query -a $cpu_num -e $exp_value";				
+		#$blast_param = "-F $filter_query -a $cpu_num -e $exp_value";
+		$blast_param = "-F $filter_query -a $cpu_num -e 1e-2"; # change as Fei suggestion Feb 05				
 		my $reference_prot = $reference."_prot"; 
 		Util::process_cmd("$blast_program -i $novel_contig -d $reference_prot -o $blast_output $blast_param", $debug) unless -s $blast_output;
 		my $blast_novel_table = Util::parse_blast_to_table($blast_output, $blast_program);
@@ -329,7 +330,7 @@ main: {
 			Util::process_cmd("cp $novel_contig $sample_dir/undetermined.contigs.fa", $debug);
 			exit;
 		}
-	
+
 		# 4. get coverage remove redundancy 
 		my ($novel_coverage, $novel_block) = Util::get_hit_coverage($blast_novel_table, $identity_percen, 0, 1);
 		my $novel_identified = Util::remove_redundancy_hit($novel_coverage, $blast_novel_table, $diff_ratio, $diff_contig_cover, $diff_contig_length);		

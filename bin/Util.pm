@@ -878,6 +878,14 @@ sub get_hit_coverage
 		#if ( $identity >= $cutoff_identity && $query_covered >= $query_cov)
 		#{
 			# put hit and (hit_start,hit_end) to hash
+
+			# change for blastX result
+			if ($hit_start > $hit_end) {
+				my $hit_start_temp = $hit_start;
+				$hit_start = $hit_end;
+				$hit_end = $hit_start_temp;
+			}
+
 			push(@{$blk{$hit_name}}, [$hit_start, $hit_end]);
 			$blk{$ta[2]}[-1][2]{$ta[0]}=1;
 			defined $hit_len{$hit_name} or $hit_len{$hit_name} = $hit_length;
@@ -991,12 +999,12 @@ sub remove_redundancy_hit
 		chomp($line);
 		next if $line =~ m/^#/;
 		my @ta = split(/\t/, $line);
-        	my @contigs= split(/,/, $ta[4]);	# column 5 has all contig name for each hit
+		my @contigs= split(/,/, $ta[4]);	# column 5 has all contig name for each hit
 
 		# shan use bowtie align read to virus ref to get covered bp
 		# for simply, I use the contig covered length to instead of covered bp
 		# the covered is used for sort the coverage result in next
-		#my $covered_bp = $ta[7];		# 
+		# my $covered_bp = $ta[7];		# 
 		my $covered_bp = $ta[2];
 
 		if ( $ta[2] eq "") { $covered_bp = 0; }

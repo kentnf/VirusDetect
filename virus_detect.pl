@@ -367,8 +367,9 @@ foreach my $sample (@ARGV)
 
 	# delete temp files and log files 
 	unlink("error.log", "formatdb.log");
-	system("rm -r $TEMP_DIR") if -s $TEMP_DIR;
-
+	unless ($debug) {
+		system("rm -r $TEMP_DIR") if -s $TEMP_DIR;
+	}
 	Util::print_user_message("Finished");
 	print ("####################################################################\n\n");
 
