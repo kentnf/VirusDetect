@@ -190,6 +190,7 @@ sub host_subtraction
 		}
         
 		my $ratio=int($total_cov/$query_len{$tk}*10000+0.5)/100;
+		#print "XXX:$tk\t$ratio\n";
         if($ratio >= $min_cov) {   
 			defined $host{$tk} or $host{$tk} = 1;
 		}
@@ -200,8 +201,9 @@ sub host_subtraction
 	my $in = Bio::SeqIO->new(-format=>'fasta', -file=>$contigs);
 	while(my $inseq = $in->next_seq) {
 		my $id = $inseq->id;
-		next if defined $host{$id};
 		my $sq = $inseq->seq;
+		#print ">$id\n$sq\n";
+		next if defined $host{$id};
 		$host_rm_seq .= ">$id\n$sq\n";
 	}
 
