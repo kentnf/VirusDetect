@@ -209,7 +209,11 @@ foreach my $sample (@ARGV)
 
 	# create temp folder and create link for sample
 	Util::process_cmd("mkdir $TEMP_DIR", $debug) unless -e $TEMP_DIR;
-	Util::process_cmd("ln -s $WORKING_DIR/$sample $TEMP_DIR/$sample_base", $debug) unless -e "$TEMP_DIR/$sample_base";
+	my $sample_abs_source;
+	if ($sample =~ m/^\//) { $sample_abs_source = $sample; }
+	else { $sample_abs_source = "$WORKING_DIR/$sample"; }
+
+	Util::process_cmd("ln -s $sample_abs_source $TEMP_DIR/$sample_base", $debug) unless -e "$TEMP_DIR/$sample_base";
 	$sample = "$TEMP_DIR/$sample_base";				# change the sample name to the linke from this step
 
 	# set parameters for remove reduncancy (rr)
