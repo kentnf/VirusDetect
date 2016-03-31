@@ -258,13 +258,16 @@ sub xa2multi
 }
 
 =head2
-
  load_virus_info -- load virus information from vrl_genebank file 
+ discard for high memory usage
+
+ fetch_virus_info -- fetch virus information from vrl_genebank file according to virus id list
+ this will only use less memory for fetch identified virus info
 
 =cut
-sub load_virus_info
+sub fetch_virus_info
 {
-	my ($file, $prot_tab) = @_;
+	my ($file, $prot_tab, $iden_vid) = @_;
 
 	# load protein tab info to hash
 	my %vid_pid; # key: virus ID, value: pid1 # pid2 # ... # pidN
@@ -279,10 +282,14 @@ sub load_virus_info
 			chomp;
 			next if $_ =~ m/^#/;
 			my @a = split(/\t/, $_);
-			if ( defined $vid_pid{$a[0]} ) {
-				$vid_pid{$a[0]}.= "#".$a[1];
-			} else {
-				$vid_pid{$a[0]} = $a[1];
+			my $nid = $a[0];
+			my $pid = $a[1];
+			if (defined $$iden_vid{$pid}) {
+				if ( defined $vid_pid{$nid} ) {
+					$vid_pid{$nid}.= "#".$pid;
+				} else {
+					$vid_pid{$nid} = $pid;
+				}
 			}
 		}
 		$fh1->close;
@@ -302,12 +309,14 @@ sub load_virus_info
 		chomp;
 		next if $_ =~ m/^#/;
 		my @a = split(/\t/, $_);
-		# AB000048	2007	Parvovirus	Feline panleukopenia virus gene for nonstructural protein 1, complete cds, isolate: 483.	1	Vertebrata	
-		$virus_info{$a[0]}{'length'}	= $a[1];
-		$virus_info{$a[0]}{'genus'} 	= $a[2];
-		$virus_info{$a[0]}{'desc'} 	= $a[3];
-		$virus_info{$a[0]}{'verison'} 	= $a[4];
-		$virus_info{$a[0]}{'host_type'} = $a[5];
+		# AB000048	2007	Parvovirus	Feline panleukopenia virus gene for nonstructural protein 1, complete cds, isolate: 483.	1	Vertebrata
+		if (defined $$iden_vid{$a[0]}) {
+			$virus_info{$a[0]}{'length'}	= $a[1];
+			$virus_info{$a[0]}{'genus'} 	= $a[2];
+			$virus_info{$a[0]}{'desc'} 		= $a[3];
+			$virus_info{$a[0]}{'verison'} 	= $a[4];
+			$virus_info{$a[0]}{'host_type'} = $a[5];
+		}
 
 		if (defined $vid_pid{$a[0]}) {
 			my @b = split(/#/, $vid_pid{$a[0]});

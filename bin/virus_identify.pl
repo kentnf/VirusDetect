@@ -137,12 +137,15 @@ main: {
 	# value: seq, length, (known, unused, novel, undetermined)
 	my %contig_info = Util::load_seq($contig);
 	foreach my $cid (sort keys %contig_info) { $contig_info{$cid}{'type'} = 'undetermined'; }
-	my %reference_info = Util::load_seq($reference);
-	my %reference_prot_info = Util::load_seq($reference."_prot");
+
+	# discard for high memory usage
+	# my %reference_info = Util::load_seq($reference);
+	# my %reference_prot_info = Util::load_seq($reference."_prot");
 
 	# load virus seqinfo to hash
 	# key: seqID, Length, type, desc, version, host_type
-	my %virus_info = Util::load_virus_info($seq_info, $prot_tab);
+	# discard for high memory usage
+	# my %virus_info = Util::load_virus_info($seq_info, $prot_tab);
 
 	# Part A
 	# 1. blast contigs against reference, parse and filter blast results to table format (NOT USE SEARCH::IO)
@@ -228,13 +231,13 @@ main: {
 		($known_identified, $final_known_ctgs, $removed_ctgs) = filter_by_coverage_depth($known_identified, \%known_depth, $coverage_cutoff, $depth_cutoff);
 		Util::save_file($known_identified, "$sample.known.identified_with_depth");
 
-		my ($known_contig_table, $known_contig_blast_table, $known_reference) =  combine_table1($known_identified, $known_blast_table, \%contig_info, \%virus_info, \%reference_info);
+		my ($known_contig_table, $known_contig_blast_table, $known_reference) =  combine_table1($known_identified, $known_blast_table, \%contig_info, $reference);
 		my $known_contig_blast_sam = Util::blast_table_to_sam($known_contig_blast_table);
 		Util::save_file($known_contig_table, "$sample_dir/$sample_base.blastn.xls");
 		Util::save_file($known_reference, "$sample_dir/blastn.reference.fa");
 		Util::save_file($known_contig_blast_sam, "$sample_dir/$sample_base.blastn.sam");
 	
-		my $known_num = 0; ($known_num, $known_identified) = arrange_col2($known_identified, \%virus_info);
+		my $known_num = 0; ($known_num, $known_identified) = arrange_col2($known_identified);
 
 		if ( length($known_identified) > 1 ) { 
 			Util::plot_result($known_identified, $known_contig_blast_table, $sample_dir, 'blastn'); 
@@ -340,13 +343,13 @@ main: {
 		($novel_identified, $final_novel_ctgs, $removed_novel_ctgs) = filter_by_coverage_depth($novel_identified, \%novel_depth, $coverage_cutoff, $depth_cutoff);
 		
 		# combine
-		my ($novel_contig_table, $novel_contig_blast_table, $novel_reference) =  combine_table1($novel_identified, $blast_novel_table, \%contig_info, \%virus_info, \%reference_prot_info);
+		my ($novel_contig_table, $novel_contig_blast_table, $novel_reference) =  combine_table1($novel_identified, $blast_novel_table, \%contig_info, $reference."_prot");
 		my $novel_contig_blast_sam = Util::blast_table_to_sam($novel_contig_blast_table);
 		Util::save_file($novel_contig_table, "$sample_dir/$sample_base.blastx.xls");
 		Util::save_file($novel_reference, "$sample_dir/blastx.reference.fa");
        	Util::save_file($novel_contig_blast_sam, "$sample_dir/$sample_base.blastx.sam");
 
-		my $novel_num = 0; ($novel_num, $novel_identified) = arrange_col2($novel_identified, \%virus_info);
+		my $novel_num = 0; ($novel_num, $novel_identified) = arrange_col2($novel_identified);
 
 		if ( length($novel_identified) > 1 ) { 
 			Util::plot_result($novel_identified, $novel_contig_blast_table, $sample_dir, 'blastx'); 
@@ -467,12 +470,24 @@ sub arrange_col1
 =cut
 sub arrange_col2
 {
-	my ($known_identified, $virus_info, $sample, $coverage_norm) = @_;
+	my ($known_identified, $sample, $coverage_norm) = @_;
 
 	my @all_data;
 
 	chomp($known_identified);
 	my @a = split(/\n/, $known_identified);
+
+	# get all virus_seq_id to hash
+	my %virus_id;
+	foreach my $line (@a) {
+		my @ta = split(/\t/, $line);
+		$virus_id{$ta[0]} = 1;
+	}
+
+	# fetch virus information
+	# key: seqID, Length, type, desc, version, host_type
+	# my %virus_info = Util::fetch_virus_info($seq_info, $prot_tab);
+	my %virus_info = Util::fetch_virus_info($seq_info, $prot_tab, \%virus_id);
 
 	foreach my $line (@a)
 	{
@@ -490,8 +505,8 @@ sub arrange_col2
 		my $coverage = $ta[2] / $ta[1];						# changed by kentnf
 		my $depth = $ta[6];
 		my $norm_depth = $ta[7];
-		my $genus = $$virus_info{$ta[0]}{'genus'};				# col 9
-		my $desc  = $$virus_info{$ta[0]}{'desc'};				# col 10
+		my $genus = $virus_info{$ta[0]}{'genus'};				# col 9
+		my $desc  = $virus_info{$ta[0]}{'desc'};				# col 10
 		push(@all_data, [@ta[0,1,2],$coverage,@ta[4,5,6,7],$genus,$desc]); 	# re-order the data, then put them to array 
 	}
 	
@@ -687,32 +702,57 @@ my ($known_contig_table, $knwon_contig_blast_table, $known_reference) =  combine
 
 sub combine_table1
 {
-	my ($known_identified, $known_blast_table, $contig_info, $virus_info, $reference_info) = @_;
+	my ($known_identified, $known_blast_table, $contig_info, $reference_fa) = @_;
 	
 	# put the refID to hash
 	# key: refID (The reference is virus reference sequence)
 	# value: 1
-	my $reference_seq = '';
 	my %hit_index;
 	chomp($known_identified);
 	my @a = split(/\n/, $known_identified);
-
 	foreach my $line (@a) {
 		next if $line =~ m/^#/;
 		# HQ593108        7458    96      0.0113971574148565      CONTIG282       1
 		my @ta = split(/\t/, $line);
-		die "[ERR]Undef Ref Seq: $ta[0]\n" unless defined $$reference_info{$ta[0]}{'seq'};
-		$reference_seq.= ">$ta[0]\n$$reference_info{$ta[0]}{'seq'}\n";
+		#die "[ERR]Undef Ref Seq: $ta[0]\n" unless defined $$reference_info{$ta[0]}{'seq'};
+		#$reference_seq.= ">$ta[0]\n$$reference_info{$ta[0]}{'seq'}\n";
 		$hit_index{$ta[0]} = 1;
 	}
-
-        # main
-        my $output_table = "#Contig_ID\tContig_Seq\tContig_Len\tHit_ID\tHit_Len\tGenus\tDescription\tContig_start\tContig_end\tHit_start\tHit_end\tHsp_identity\tE_value\tHsp_strand\n";
+    
+	# fetch seq
+	my $reference_seq = '';
+	my $in = Bio::SeqIO->new(-file=>$reference_fa, -format=>'fasta');
+	while(my $inseq = $in->next_seq) {
+		my $id = $inseq->id;
+		my $sq = $inseq->seq;
+		if (defined $hit_index{$id}) {
+			$reference_seq.=">$id\n$sq\n";
+		}
+	}
+    
+	# main
+	
+	my $output_table = "#Contig_ID\tContig_Seq\tContig_Len\tHit_ID\tHit_Len\tGenus\tDescription\tContig_start\tContig_end\tHit_start\tHit_end\tHsp_identity\tE_value\tHsp_strand\n";
 	my $output_blast_table = '';
-        chomp($known_blast_table);
-        my @b = split(/\n/, $known_blast_table);
-        foreach my $line (@b)
-        {
+	chomp($known_blast_table);
+	my @b = split(/\n/, $known_blast_table);
+
+	# 1. get virus id
+	my %virus_id;
+	foreach my $line (@b) {
+		next if $line =~ m/^#/;
+		my @ta = split(/\t/, $line);
+		if ( defined $hit_index{$ta[2]} ) {
+			$virus_id{$ta[2]} = 1;
+		}
+	}
+
+	# 2. fetch virus_info
+	my %virus_info = Util::fetch_virus_info($seq_info, $prot_tab, \%virus_id);
+
+	# 3. parse data
+	foreach my $line (@b)
+	{
 		next if $line =~ m/^#/;
 		# query_name \t query_length \t hit_name \t hit_length \t hsp_length \t identity \t evalue \t score \t strand \t
 		# query_start \t query_end \t hit_start \t hit_end \t identity2 \t aligned_query \t aligned_hit \t aligned_string\n
@@ -721,10 +761,9 @@ sub combine_table1
 		if ( defined $hit_index{$ta[2]} ) 
 		{
 			die "[ERR]Undef seq for $ta[0]\n"   unless defined $$contig_info{$ta[0]}{'seq'};
-			die "[ERR]Undef Genus for $ta[2]\n" unless defined $$virus_info{$ta[2]}{'genus'};
-			die "[ERR]Undef Desc for $ta[2]\n"  unless defined $$virus_info{$ta[2]}{'desc'};
-		
-			$output_table.="$ta[0]\t$$contig_info{$ta[0]}{'seq'}\t$ta[1]\t$ta[2]\t$ta[3]\t$$virus_info{$ta[2]}{'genus'}\t$$virus_info{$ta[2]}{'desc'}\t";
+			die "[ERR]Undef Genus for $ta[2]\n" unless defined $virus_info{$ta[2]}{'genus'};
+			die "[ERR]Undef Desc for $ta[2]\n"  unless defined $virus_info{$ta[2]}{'desc'};
+			$output_table.="$ta[0]\t$$contig_info{$ta[0]}{'seq'}\t$ta[1]\t$ta[2]\t$ta[3]\t$virus_info{$ta[2]}{'genus'}\t$virus_info{$ta[2]}{'desc'}\t";
 			$output_table.="$ta[9]\t$ta[10]\t$ta[11]\t$ta[12]\t$ta[13]\t$ta[6]\t$ta[8]\n";
 			$output_blast_table.=$line."\n";
 		}
