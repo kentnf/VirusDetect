@@ -15,31 +15,32 @@ my $usage = <<_EOUSAGE_;
 Usage: virus_itentify.pl [options] --reference reference input_read contig
 
  Options(3):
-  --reference	Name of the reference virus sequences database [vrl_plant]
-  --diff_ratio	The hits with distance less than 0.25 will be combined into one  [0.25] 
+  --reference           Name of the reference virus sequences database [vrl_plant]
+  --diff-ratio          The hits with distance less than 0.25 will be combined into one  [0.25] 
  
  blast-related options(7):
-  --word_size		Minimum word size - length of best perfect match [11]
-  --exp_value		Maximum e-value [1e-5]
-  --percent_identity	Minimum identity percentage for the alignment [25] 
-  --cpu_num		Number of threads to use [8] 
-  --mis_penalty		Penalty for a nucleotide mismatch [-3]
-  --gap_cost		Cost to open a gap [-1] 
-  --gap_extension	Cost to extend a gap [-1]
+  --word-size           Minimum word size - length of best perfect match [11]
+  --exp-value           Maximum e-value [1e-5]
+  --percent-identity    Minimum identity percentage for the alignment [25] 
+  --cpu-num             Number of threads to use [8] 
+  --mis-penalty         Penalty for a nucleotide mismatch [-3]
+  --gap-cost            Cost to open a gap [-1] 
+  --gap-extension       Cost to extend a gap [-1]
 
  New options(5):
-  --hsp_cover           Coverage of hsp should be more than this cutoff for query or hit [0.75]
-  --diff_contig_cover	Coverage for different contigs [0.5]
-  --diff_contig_length	Length of different contigs [100 (bp)]
-  --identity_drop_off	Percent identity drop off compared with the highest identity [5 (%)]
+  --hsp-cover           Coverage of hsp should be more than this cutoff for query or hit [0.75]
+  --diff-contig_cover   Coverage for different contigs [0.5]
+  --diff-contig_length  Length of different contigs [100 (bp)]
+  --identity-drop-off   Percent identity drop off compared with the highest identity [5 (%)]
 
-  --coverage_cutoff	Coverage cutoff of a reported virus reference
-			 sequences by assembled virus contigs [0.1] 
-  --depth_cutoff	Depth cutoff of a reported virus reference [5]
-  --novel_len_cutoff	Length cutoff of a contig categorized as novel
-			 when it is not reported as known, but it may 
-			 shows similarity with the reference virus 
-			 sequences. The default is 100bp [100]
+  --coverage-cutoff     Coverage cutoff of a reported virus reference
+                         sequences by assembled virus contigs [0.1] 
+  --depth-cutoff        Depth cutoff of a reported virus reference [5]
+  --norm-depth-cutoff   Normalized depth cutoff of a reported virus reference [5]
+  --novel-len-cutoff    Length cutoff of a contig categorized as novel
+                         when it is not reported as known, but it may 
+                         shows similarity with the reference virus 
+                         sequences. The default is 100bp [100]
 
 _EOUSAGE_
 
@@ -72,8 +73,10 @@ my $diff_contig_cover = 0.5;	# for hit filter
 my $diff_contig_length = 100;	# for hit filter
 my $coverage_cutoff = 0.1;		# coverage cutoff for final result
 my $depth_cutoff = 5;			# depth cutoff for final result
+my $norm_depth_cutoff = 5;		# normalized depth cutoff
 my $novel_len_cutoff = 100;		# the unused known contigs were used for novel contig identification (this parameter is fixed)
 my $depth_norm = 1;				# normalization depth by library size (this parameter is fixed)
+
 my $novel_check = 1;			# enable novel check (this parameter is fixed)
 
 my $word_size = 11;
@@ -95,21 +98,22 @@ my ($debug, $debug_force);
 ########################
 GetOptions( 
 	'reference=s' 			=> \$reference,
-	'diff_ratio=f' 			=> \$diff_ratio,
-	'hsp_cover=f'			=> \$hsp_cover,
-	'diff_contig_cover=f'	=> \$diff_contig_cover,
-	'diff_contig_length=i'	=> \$diff_contig_length,
-	'word_size=i' 			=> \$word_size,
-	'exp_value=f' 			=> \$exp_value,
-	'percent_identity=f' 	=> \$identity_percen,
-	'cpu_num=i' 			=> \$cpu_num,
-	'mis_penalty=i' 		=> \$mis_penalty,
-	'gap_cost=i' 			=> \$gap_cost,
-	'gap_extension=i' 		=> \$gap_extension,
-	'coverage_cutoff=f'		=> \$coverage_cutoff,
-	'depth_cutoff=f'		=> \$depth_cutoff,
+	'diff-ratio=f' 			=> \$diff_ratio,
+	'hsp-cover=f'			=> \$hsp_cover,
+	'diff-contig-cover=f'	=> \$diff_contig_cover,
+	'diff-contig-length=i'	=> \$diff_contig_length,
+	'word-size=i' 			=> \$word_size,
+	'exp-value=f' 			=> \$exp_value,
+	'percent-identity=f' 	=> \$identity_percen,
+	'cpu-num=i' 			=> \$cpu_num,
+	'mis-penalty=i' 		=> \$mis_penalty,
+	'gap-cost=i' 			=> \$gap_cost,
+	'gap-extension=i' 		=> \$gap_extension,
+	'coverage-cutoff=f'		=> \$coverage_cutoff,
+	'depth-cutoff=f'		=> \$depth_cutoff,
+	'norm-depth-cutoff=f'	=> \$norm_depth_cutoff,
 	'd|debug'				=> \$debug,
-	'novel_len_cutoff=i'	=> \$novel_len_cutoff,
+	'novel-len-cutoff=i'	=> \$novel_len_cutoff,
 	'f|force'				=> \$debug_force,
 );
 
@@ -228,7 +232,7 @@ main: {
 		#   define depth:
 		#   if the coverage meet cutoff, and raw & normalized depth meet the cutoff, identified virus will reported (final table)
 		# my ($final_known_ctgs, $removed_ctgs);
-		($known_identified, $final_known_ctgs, $removed_ctgs) = filter_by_coverage_depth($known_identified, \%known_depth, $coverage_cutoff, $depth_cutoff);
+		($known_identified, $final_known_ctgs, $removed_ctgs) = filter_by_coverage_depth($known_identified, \%known_depth, $coverage_cutoff, $depth_cutoff, $norm_depth_cutoff);
 		Util::save_file($known_identified, "$sample.known.identified_with_depth");
 
 		my ($known_contig_table, $known_contig_blast_table, $known_reference) =  combine_table1($known_identified, $known_blast_table, \%contig_info, $reference);
@@ -340,7 +344,7 @@ main: {
 
 		# 5. get depth
 		my %novel_depth  = correct_depth($novel_identified, \%contig_depth, \%contig_info, $sample, $depth_norm);
-		($novel_identified, $final_novel_ctgs, $removed_novel_ctgs) = filter_by_coverage_depth($novel_identified, \%novel_depth, $coverage_cutoff, $depth_cutoff);
+		($novel_identified, $final_novel_ctgs, $removed_novel_ctgs) = filter_by_coverage_depth($novel_identified, \%novel_depth, $coverage_cutoff, $depth_cutoff, $norm_depth_cutoff);
 		
 		# combine
 		my ($novel_contig_table, $novel_contig_blast_table, $novel_reference) =  combine_table1($novel_identified, $blast_novel_table, \%contig_info, $reference."_prot");
@@ -633,7 +637,7 @@ sub correct_depth
 =cut
 sub filter_by_coverage_depth
 {
-	my ($known_identified, $known_depth, $coverage_cutoff, $depth_cutoff) = @_;
+	my ($known_identified, $known_depth, $coverage_cutoff, $depth_cutoff, $norm_depth_cutoff) = @_;
 
 	my $output_identified = '';	# output identified content
 	my %known_contigs;		# known contigs after filter
@@ -649,7 +653,7 @@ sub filter_by_coverage_depth
 		if ($ta[3] > $coverage_cutoff) {
 			#debug
 			die "[ERR]Undef depth for $ta[0]\n" unless defined $$known_depth{$ta[0]}{'norm'};
-			if ( $$known_depth{$ta[0]}{'norm'} > $depth_cutoff || $$known_depth{$ta[0]}{'depth'} > $depth_cutoff ) 
+			if ( $$known_depth{$ta[0]}{'norm'} > $norm_depth_cutoff || $$known_depth{$ta[0]}{'depth'} > $depth_cutoff ) 
 			{
 				$output_identified.=$line."\t".$$known_depth{$ta[0]}{'depth'}."\t".$$known_depth{$ta[0]}{'norm'}."\n";
 				foreach my $ctg (@tb) { $known_contigs{$ctg} = 1; }

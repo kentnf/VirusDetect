@@ -18,53 +18,54 @@ Usage: virus_detect.pl [option] --reference reference input1 input2 ...
  Basic options:
   --reference		Name of the reference virus sequences database 
                          [vrl_plant]
-  --host_reference	Name of the host reference database used 
+  --host-reference	Name of the host reference database used 
                          for host sRNA subtraction [Null]
-  --thread_num		Number of threads used for alignments [8]
+  --thread-num		Number of threads used for alignments [8]
  
  BWA-related options (align sRNA to reference virus database or host 
   reference):
-  --max_dist		Maximum edit distance [1]  
-  --max_open		Maximum number of gap opens [1]  
-  --max_extension	Maximum number of gap extensions [1]  
-  --len_seed		Seed length [15] 
-  --dist_seed		Maximum edit distance in the seed [1]  
+  --max-dist		Maximum edit distance [1]  
+  --max-open		Maximum number of gap opens [1]  
+  --max-extension	Maximum number of gap extensions [1]  
+  --len-seed		Seed length [15] 
+  --dist-seed		Maximum edit distance in the seed [1]  
 
  HISAT-related options (align mRNA to host reference)
-  --hisat_dist		Maximum edit distance for HISAT [5]
+  --hisat-dist		Maximum edit distance for HISAT [5]
 
  Megablast-related options (remove redundancy within virus contigs):
-  --min_overlap		Minimum overlap length between two 
+  --min-overlap		Minimum overlap length between two 
                          contigs to be combined [30]
-  --max_end_clip	Maximum length of end clips [6]
-  --min_identity	Minimum identity between two contigs to be 
+  --max-end-clip	Maximum length of end clips [6]
+  --min-identity	Minimum identity between two contigs to be 
   			 combined [97]
-  --mis_penalty		Penalty score for a nucleotide mismatch [-3]
-  --gap_cost		Cost to open a gap [-1] 
-  --gap_extension	Cost to extend a gap [-1] 
+  --mis-penalty		Penalty score for a nucleotide mismatch [-3]
+  --gap-cost		Cost to open a gap [-1] 
+  --gap-extension	Cost to extend a gap [-1] 
 
  Megablast-related options (align virus contigs to reference virus 
   database for virus identification):
-  --word_size	     	Minimum word size - length of best perfect match [11] 
-  --exp_value	     	Maximum e-value [1e-5]
-  --percent_identity 	Minimum percent identity for the alignment [25] 
-  --mis_penalty_b   	Penalty score for a nucleotide mismatch [-3]
-  --gap_cost_b      	Cost to open a gap [-1] 
-  --gap_extension_b 	Cost to extend a gap [-1]
+  --word-size	       Minimum word size - length of best perfect match [11] 
+  --exp-value	       Maximum e-value [1e-5]
+  --percent-identity   Minimum percent identity for the alignment [25] 
+  --mis-penalty-b      Penalty score for a nucleotide mismatch [-3]
+  --gap-cost-b         Cost to open a gap [-1] 
+  --gap-extension-b    Cost to extend a gap [-1]
 
  Result filtering options:
-  --hsp_cover		Coverage cutoff of a reported virus contig by
+  --hsp-cover          Coverage cutoff of a reported virus contig by
                          reference virus sequences [0.75]
-  --coverage_cutoff	Coverage cutoff of a reported virus reference 
+  --coverage-cutoff    Coverage cutoff of a reported virus reference 
                          sequence by assembled virus contigs [0.1] 
-  --depth_cutoff	Depth cutoff of a reported virus reference [5]
-
+  --depth-cutoff       Depth cutoff of a reported virus reference [5]
+  --norm-depth-cutoff  Normalized depth cutoff of a reported virus 
+                         reference [5]
 _EOUSAGE_
 ;
 
 =head1 discard parameters
- --strand_specific	Only for sequences assembled from strand-specific RNA-seq [false]
- --novel_len_cutoff   Length cutoff of a contig categorized as novel
+ --strand-specific	Only for sequences assembled from strand-specific RNA-seq [false]
+ --novel-len-cutoff   Length cutoff of a contig categorized as novel
             when it is not reported as known, but it may 
             shows similarity with the reference virus 
             sequences. The default is 100bp [100]
@@ -110,6 +111,7 @@ my $hits_return = 500;			# megablast number of hit returns
 my $hsp_cover = 0.75;
 my $coverage_cutoff = 0.1;		# coverage cutoff for final result
 my $depth_cutoff = 5;			# depth cutoff for final result
+my $norm_depth_cutoff = 5;		# normalized depth cutoff for final result
 my $novel_len_cutoff = 100;
 
 # disabled parameters or used as fixed value
@@ -123,43 +125,44 @@ my $debug;
 # get input paras #
 GetOptions(
 	'r|reference=s'		=> \$reference,
-	'h|host_reference=s'=> \$host_reference,
-	't|thread_num=i'	=> \$thread_num,
+	'h|host-reference=s'=> \$host_reference,
+	't|thread-num=i'	=> \$thread_num,
 	'd|debug'			=> \$debug,
 
-	'max_dist=i' 		=> \$max_dist,
-	'max_open=i' 		=> \$max_open,
-	'max_extension=i' 	=> \$max_extension,
-	'len_seed=i' 		=> \$len_seed,
-	'dist_seed=i' 		=> \$dist_seed,			 
+	'max-dist=i' 		=> \$max_dist,
+	'max-open=i' 		=> \$max_open,
+	'max-extension=i' 	=> \$max_extension,
+	'len-seed=i' 		=> \$len_seed,
+	'dist-seed=i' 		=> \$dist_seed,			 
 	
-	'hisat_dist=i'		=> \$hisat_ed,
+	'hisat-dist=i'		=> \$hisat_ed,
 	
-	'strand_specific!' 	=> \$strand_specific,
-	'min_overlap=i' 	=> \$min_overlap,
-	'max_end_clip=i' 	=> \$max_end_clip,
-	'min_identity=s'	=> \$min_identity,
+	'strand-specific!' 	=> \$strand_specific,
+	'min-overlap=i' 	=> \$min_overlap,
+	'max-end-clip=i' 	=> \$max_end_clip,
+	'min-identity=s'	=> \$min_identity,
 
-	'cpu_num=i' 		=> \$cpu_num,
-	'mis_penalty=i' 	=> \$mis_penalty,
-	'gap_cost=i' 		=> \$gap_cost,
-	'gap_extension=i' 	=> \$gap_extension,
+	'cpu-num=i' 		=> \$cpu_num,
+	'mis-penalty=i' 	=> \$mis_penalty,
+	'gap-cost=i' 		=> \$gap_cost,
+	'gap-extension=i' 	=> \$gap_extension,
 	
-	'word_size=i' 		=> \$word_size,
-	'exp_value-s' 		=> \$exp_value,
-	'percent_identity=s'=> \$percent_identity,
-	'mis_penalty_b=i' 	=> \$mis_penalty_b,
-	'gap_cost_b=i' 		=> \$gap_cost_b,
-	'gap_extension_b=i' => \$gap_extension_b,
+	'word-size=i' 		=> \$word_size,
+	'exp-value-s' 		=> \$exp_value,
+	'percent-identity=s'=> \$percent_identity,
+	'mis-penalty-b=i' 	=> \$mis_penalty_b,
+	'gap-cost-b=i' 		=> \$gap_cost_b,
+	'gap-extension-b=i' => \$gap_extension_b,
 
-	'hsp_cover=s' 		=> \$hsp_cover,
-	'diff_ratio=s' 		=> \$diff_ratio,
-	'diff_contig_cover=s' 	=> \$diff_contig_cover,
-	'diff_contig_length=s'	=> \$diff_contig_length,
+	'hsp-cover=s' 		=> \$hsp_cover,
+	'diff-ratio=s' 		=> \$diff_ratio,
+	'diff-contig-cover=s' 	=> \$diff_contig_cover,
+	'diff-contig-length=s'	=> \$diff_contig_length,
 
-	'coverage_cutoff=f' => \$coverage_cutoff,
-	'depth_cutoff=f' 	=> \$depth_cutoff,
-	'novel_len_cutoff=i'=> \$novel_len_cutoff
+	'coverage-cutoff=f' => \$coverage_cutoff,
+	'depth-cutoff=f' 	=> \$depth_cutoff,
+	'norm-depth-cutoff=f'	=> \$norm_depth_cutoff,
+	'novel-len-cutoff=i'=> \$novel_len_cutoff
 );
 
 # check input parameters
@@ -381,11 +384,11 @@ foreach my $sample (@ARGV)
 	# identify the virus
 	Util::print_user_message("Virus identification");
 	my $cmd_identify = "$BIN_DIR/virus_identify.pl --reference $reference ";
-	$cmd_identify .= "--word_size $word_size --exp_value $exp_value --percent_identity $percent_identity ";
-	$cmd_identify .= "--cpu_num $thread_num --mis_penalty $mis_penalty_b --gap_cost $gap_cost_b --gap_extension $gap_extension_b ";
-	$cmd_identify .= "--hsp_cover $hsp_cover --diff_ratio $diff_ratio --diff_contig_cover $diff_contig_cover --diff_contig_length $diff_contig_length ";
-	$cmd_identify .= "--coverage_cutoff $coverage_cutoff --depth_cutoff $depth_cutoff ";
-	$cmd_identify .= "--novel_len_cutoff $novel_len_cutoff ";
+	$cmd_identify .= "--word-size $word_size --exp-value $exp_value --percent-identity $percent_identity ";
+	$cmd_identify .= "--cpu-num $thread_num --mis-penalty $mis_penalty_b --gap-cost $gap_cost_b --gap-extension $gap_extension_b ";
+	$cmd_identify .= "--hsp-cover $hsp_cover --diff-ratio $diff_ratio --diff-contig-cover $diff_contig_cover --diff-contig-length $diff_contig_length ";
+	$cmd_identify .= "--coverage-cutoff $coverage_cutoff --depth_cutoff $depth_cutoff ";
+	$cmd_identify .= "--novel-len-cutoff $novel_len_cutoff ";
 	$cmd_identify .= "-d " if $debug;
 	$cmd_identify .= "$sample $sample.combined ";
 
