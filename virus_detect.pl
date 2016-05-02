@@ -16,12 +16,13 @@ my $usage = <<_EOUSAGE_;
 Usage: virus_detect.pl [option] --reference reference input1 input2 ...
   
  Basic options:
-  --reference		Name of the reference virus sequences database 
-                         [vrl_plant]
-  --host-reference	Name of the host reference database used 
-                         for host sRNA subtraction [Null]
-  --thread-num		Number of threads used for alignments [8]
-  --rm-dup			Remove duplicated reads [disable]
+  --reference       Name of the reference virus sequences database 
+                      [vrl_plant]
+  --host-reference  Name of the host reference database used 
+                      for host sRNA subtraction [Null]
+  --thread-num      Number of threads used for alignments [8]
+  --rm-dup          Remove duplicated reads [disable]
+  --kmer-range      Set kmer range for denove assembly [default:9-23]
  
  BWA-related options (align sRNA to reference virus database or host 
   reference):
@@ -36,7 +37,7 @@ Usage: virus_detect.pl [option] --reference reference input1 input2 ...
 
  Megablast-related options (remove redundancy within virus contigs):
   --min-overlap		Minimum overlap length between two 
-                         contigs to be combined [30]
+                      contigs to be combined [30]
   --max-end-clip	Maximum length of end clips [6]
   --min-identity	Minimum identity between two contigs to be 
   			 combined [97]
@@ -77,6 +78,7 @@ my $reference= "vrl_plant";		# virus sequence
 my $host_reference;       		# host reference
 my $thread_num = 8; 			# thread number
 my $rm_dup;						# remove duplicate
+my $kmer_range = "9-23";		# kmer range
 
 # paras for BWA
 my $max_dist = 1;  				# max edit distance
@@ -131,6 +133,7 @@ GetOptions(
 	't|thread-num=i'	=> \$thread_num,
 	'd|debug'			=> \$debug,
 	'rm-dup'			=> \$rm_dup,
+	'kmer-range=s'		=> \$kmer_range,
 
 	'max-dist=i' 		=> \$max_dist,
 	'max-open=i' 		=> \$max_open,
@@ -179,7 +182,6 @@ my $BIN_DIR       = ${FindBin::RealBin}."/bin";				# set script folder
 $reference		  = $DATABASE_DIR."/".$reference;			# set reference
 my $seq_info	  = $DATABASE_DIR."/vrl_genbank.info.gz";	# set vrl info
 
-
 # check host reference & format 
 if ( $host_reference ) {
 	if (-s $host_reference ) {
@@ -200,6 +202,12 @@ if ( $host_reference ) {
 		}
 	}
 } 
+
+# set kmer range
+my @kmer = split(/-/, $kmer_range);
+die "[ERR]kmer range: $kmer_range\n" unless @kmer == 2;
+my ($kmer_min, $kmer_max) = @kmer;
+die "[ERR]kmer range: $kmer_range\n" if $kmer_min > $kmer_max;
 
 # main
 foreach my $sample (@ARGV) 
@@ -294,7 +302,7 @@ foreach my $sample (@ARGV)
 			align::velvet_optimiser_combine("$sample.unmapped", "$sample.assembled", 31, 31, 10, 10, $objective_type, $BIN_DIR, $TEMP_DIR, $rm_dup, $debug) if -s "$sample.unmapped";
 		}
 		else {
-			align::velvet_optimiser_combine("$sample.unmapped", "$sample.assembled", 9, 19, 5, 25, $objective_type, $BIN_DIR, $TEMP_DIR, $rm_dup, $debug) if -s "$sample.unmapped";
+			align::velvet_optimiser_combine("$sample.unmapped", "$sample.assembled", $kmer_min, $kmer_max, 5, 25, $objective_type, $BIN_DIR, $TEMP_DIR, $rm_dup, $debug) if -s "$sample.unmapped";
 		}
 	}	
 	else
@@ -305,7 +313,7 @@ foreach my $sample (@ARGV)
 			align::velvet_optimiser_combine("$sample.unmapped", "$sample.assembled", 31, 31, 10, 10, $objective_type, $BIN_DIR, $TEMP_DIR, $rm_dup, $debug) if -s "$sample.unmapped";
 		} 
 		else {
-			align::velvet_optimiser_combine($sample, "$sample.assembled", 9, 19, 5, 25, $objective_type, $BIN_DIR, $TEMP_DIR, $rm_dup, $debug);
+			align::velvet_optimiser_combine($sample, "$sample.assembled", $kmer_min, $kmer_max, 5, 25, $objective_type, $BIN_DIR, $TEMP_DIR, $rm_dup, $debug);
 		}
 	}
 

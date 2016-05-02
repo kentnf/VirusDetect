@@ -12,6 +12,7 @@ sub line_num {
 	return $num;
 }
 
+# check if the program avaiable 
 sub check_program {
 	my ($bin, $program) = @_;
 }
