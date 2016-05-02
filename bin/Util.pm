@@ -12,6 +12,11 @@ sub line_num {
 	return $num;
 }
 
+sub check_program {
+	my ($bin, $program) = @_;
+}
+
+# load fasta sequence to hash
 sub load_seq {
 	my $input_seq = shift;
 	my %seq_info;
@@ -23,6 +28,37 @@ sub load_seq {
 		$seq_info{$inseq->id}{'length'} = $inseq->length;
 	}
 	return %seq_info;
+}
+
+# remove duplicated reads
+sub remove_dup {
+	my $input_seq = shift;
+	my $uniq_file = $input_seq.'.uniq';
+
+	# hash for store unique seq
+	my %uniq_seq;
+
+	open(OUT, ">".$uniq_file) || die $!;
+	open(IN, $input_seq) || die $!;
+	while(<IN>) {
+		my $file_type;
+		my $sid = $_; chomp($sid);
+		if		($sid =~ m/^>/) { $file_type = 'fasta'; }
+		elsif	($sid =~ m/^@/) { $file_type = 'fastq'; }
+		else	{ die "[ERR], can not detect the file type for file: $input_seq\n"; }
+		my $seq = <IN>; chomp($seq);
+
+		my $out_seq = "$sid\n$seq\n";
+		if ($file_type eq 'fastq') { $out_seq.=<IN>; $out_seq.=<IN>; }
+
+		unless (defined $uniq_seq{$seq}) {
+			print OUT $out_seq;	
+			$uniq_seq{$seq} = 1;
+		}
+	}
+	close(IN);
+	close(OUT);
+	#process_cmd("mv $uniq_file $input_seq");
 }
 
 sub process_cmd {

@@ -21,6 +21,7 @@ Usage: virus_detect.pl [option] --reference reference input1 input2 ...
   --host-reference	Name of the host reference database used 
                          for host sRNA subtraction [Null]
   --thread-num		Number of threads used for alignments [8]
+  --rm-dup			Remove duplicated reads [disable]
  
  BWA-related options (align sRNA to reference virus database or host 
   reference):
@@ -75,6 +76,7 @@ _EOUSAGE_
 my $reference= "vrl_plant";		# virus sequence
 my $host_reference;       		# host reference
 my $thread_num = 8; 			# thread number
+my $rm_dup;						# remove duplicate
 
 # paras for BWA
 my $max_dist = 1;  				# max edit distance
@@ -128,6 +130,7 @@ GetOptions(
 	'h|host-reference=s'=> \$host_reference,
 	't|thread-num=i'	=> \$thread_num,
 	'd|debug'			=> \$debug,
+	'rm-dup'			=> \$rm_dup,
 
 	'max-dist=i' 		=> \$max_dist,
 	'max-open=i' 		=> \$max_open,
@@ -262,7 +265,7 @@ foreach my $sample (@ARGV)
 	}
 	
 	# part B: 1. remove host related reads  2. de novo assembly 3. remove redundancy contigs
-	# parameter for velvet: $sample, $output_contig, $kmer_start, $kmer_end, $coverage_start, $coverage_end, $objective_type, $bin_dir, $temp_dir, $debug
+	# parameter for velvet: $sample, $output_contig, $kmer_start, $kmer_end, $coverage_start, $coverage_end, $objective_type, $bin_dir, $temp_dir, $rm_dup, $debug
 	if( $host_reference ){
 		my $host_reference_base = $host_reference; $host_reference_base =~ s/.*\///;
 		Util::print_user_message("Align reads to host ($host_reference_base) reference sequences");
@@ -288,10 +291,10 @@ foreach my $sample (@ARGV)
 
 
 		if ($data_type eq 'mRNA') {
-			align::velvet_optimiser_combine("$sample.unmapped", "$sample.assembled", 31, 31, 10, 10, $objective_type, $BIN_DIR, $TEMP_DIR, $debug) if -s "$sample.unmapped";
+			align::velvet_optimiser_combine("$sample.unmapped", "$sample.assembled", 31, 31, 10, 10, $objective_type, $BIN_DIR, $TEMP_DIR, $rm_dup, $debug) if -s "$sample.unmapped";
 		}
 		else {
-			align::velvet_optimiser_combine("$sample.unmapped", "$sample.assembled", 9, 19, 5, 25, $objective_type, $BIN_DIR, $TEMP_DIR, $debug) if -s "$sample.unmapped";
+			align::velvet_optimiser_combine("$sample.unmapped", "$sample.assembled", 9, 19, 5, 25, $objective_type, $BIN_DIR, $TEMP_DIR, $rm_dup, $debug) if -s "$sample.unmapped";
 		}
 	}	
 	else
@@ -299,10 +302,10 @@ foreach my $sample (@ARGV)
 		Util::print_user_message("De novo assembly");
 
 		if ($data_type eq 'mRNA') {
-			align::velvet_optimiser_combine("$sample.unmapped", "$sample.assembled", 31, 31, 10, 10, $objective_type, $BIN_DIR, $TEMP_DIR, $debug) if -s "$sample.unmapped";
+			align::velvet_optimiser_combine("$sample.unmapped", "$sample.assembled", 31, 31, 10, 10, $objective_type, $BIN_DIR, $TEMP_DIR, $rm_dup, $debug) if -s "$sample.unmapped";
 		} 
 		else {
-			align::velvet_optimiser_combine($sample, "$sample.assembled", 9, 19, 5, 25, $objective_type, $BIN_DIR, $TEMP_DIR, $debug);
+			align::velvet_optimiser_combine($sample, "$sample.assembled", 9, 19, 5, 25, $objective_type, $BIN_DIR, $TEMP_DIR, $rm_dup, $debug);
 		}
 	}
 
@@ -387,7 +390,7 @@ foreach my $sample (@ARGV)
 	$cmd_identify .= "--word-size $word_size --exp-value $exp_value --percent-identity $percent_identity ";
 	$cmd_identify .= "--cpu-num $thread_num --mis-penalty $mis_penalty_b --gap-cost $gap_cost_b --gap-extension $gap_extension_b ";
 	$cmd_identify .= "--hsp-cover $hsp_cover --diff-ratio $diff_ratio --diff-contig-cover $diff_contig_cover --diff-contig-length $diff_contig_length ";
-	$cmd_identify .= "--coverage-cutoff $coverage_cutoff --depth_cutoff $depth_cutoff ";
+	$cmd_identify .= "--coverage-cutoff $coverage_cutoff --depth-cutoff $depth_cutoff ";
 	$cmd_identify .= "--novel-len-cutoff $novel_len_cutoff ";
 	$cmd_identify .= "-d " if $debug;
 	$cmd_identify .= "$sample $sample.combined ";

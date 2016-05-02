@@ -574,7 +574,7 @@ mkdir $temp_dir unless -s $temp_dir;
 =cut
 sub velvet_optimiser_combine
 {
-	my ($sample, $output_contig, $kmer_start, $kmer_end, $coverage_start, $coverage_end, $objective_type, $bin_dir, $temp_dir, $debug) = @_;
+	my ($sample, $output_contig, $kmer_start, $kmer_end, $coverage_start, $coverage_end, $objective_type, $bin_dir, $temp_dir, $rm_dup, $debug) = @_;
 
 	my $current_folder;
    	my $statfile;
@@ -583,7 +583,14 @@ sub velvet_optimiser_combine
 	my $opt_kmer = $kmer_start; 			# the optimization kmer_length when objective is max
 	my $opt_coverage = $coverage_start;		# the optimization coverage when objective is max
 	my $opt_avgLen = 0;						# the avg Length when objective is max
-		
+	
+	# remove duplicated reads
+	if ($rm_dup) {
+		Util::remove_dup($sample);
+		die "[ERR]remove dupliate file is not exist\n" unless -s $sample.'.uniq';
+		$sample = $sample.'.uniq';
+	}
+	
 	# optimize k-mer length using fixed coverage
 	for(my $i=$kmer_start; $i<= $kmer_end; $i=$i+2) 
 	{
