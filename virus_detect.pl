@@ -212,6 +212,13 @@ die "[ERR]kmer range: $kmer_range\n" if $kmer_min > $kmer_max;
 # main
 foreach my $sample (@ARGV) 
 {
+	# parse zip file
+	if ($sample =~ m/\.gz$/) {
+		system("gunzip $sample") && die "[ERR]unzip file $sample\n";
+		$sample =~ s/\.gz$//;
+	}
+
+	# check file
 	my $file_type = Util::detect_FileType($sample);
 	my $data_type = Util::detect_DataType($sample);
 	my $seq_num = Util::detect_seqNum($sample);
