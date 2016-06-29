@@ -7,6 +7,7 @@ use Cwd;
 use IO::File;
 use File::Basename;
 use FindBin;
+#use Mail::Sendmail;
 use lib "$FindBin::RealBin/bin";
 use Util;
 use align;
@@ -124,8 +125,7 @@ my $objective_type='maxLen';	# objective type for Velvet assembler:
 my $diff_ratio= 0.25;
 my $diff_contig_cover = 0.5;
 my $diff_contig_length= 100; 
-my $debug;
-
+my $debug; my $email; my $user;
 # get input paras #
 GetOptions(
 	'r|reference=s'		=> \$reference,
@@ -168,7 +168,10 @@ GetOptions(
 	'coverage-cutoff=f' => \$coverage_cutoff,
 	'depth-cutoff=f' 	=> \$depth_cutoff,
 	'norm-depth-cutoff=f'	=> \$norm_depth_cutoff,
-	'novel-len-cutoff=i'=> \$novel_len_cutoff
+	'novel-len-cutoff=i'=> \$novel_len_cutoff,
+
+	'email=s' 			=> \$email,
+	'user=s'  			=> \$user,
 );
 
 # check input parameters
@@ -425,3 +428,15 @@ foreach my $sample (@ARGV)
 	print ("####################################################################\n\n");
 
 }
+
+# ===== send mail to user when the online task is finished =====
+
+if (defined $email && $email && defined $user && $user) {
+	my $file = basename($ARGV[0]);
+	my %mail = ( To => $email,
+		From => 'bioinfo@cornell.edu',
+		Subject => "VirusDetect analysis for $file is finished",
+		Message => "Dear $user,\nThe analysis for $file is finished. Please login VirusDetect to view and download your results.\nThank you for using VirusDetect.\n\nBest Regards,\nVirusDetect");
+	#sendmail(%mail) or die $Mail::Sendmail::error;
+}
+
