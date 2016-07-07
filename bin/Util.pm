@@ -1469,7 +1469,7 @@ sub plot_result
 
 	$out_table = qq'<!-- Top 6 lines shoud be removed when load html into virome database -->
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+<script src="http://libs.baidu.com/jquery/2.1.3/jquery.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
 <script> \$(function() { \$(\'a\').tooltip(); }) </script>
 <br><br><br><br><br>
