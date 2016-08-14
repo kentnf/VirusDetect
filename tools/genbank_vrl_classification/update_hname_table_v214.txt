@@ -437,3 +437,21 @@ sandfly	sandflies
 single unknown drosophilid	Drosophila
 single unknown fly	Drosophila
 unknown Araneae,Neoscona nautica	brown sailor spider
+# patch v214
+Dolphin	Burrunan dolphin
+Yunling goat	goat
+black bear	bear
+boar	pigs
+captive wild boar	pigs
+domestic swine	pigs
+farmed rabbit	rabbit
+feral swine	pigs
+free-living Vitis californica x Vitis vinifera hybrid	Vitis vinifera
+humna	human
+pet pig	pigs
+ridge gourd	white-flowered gourd	
+roe deer	deer
+specific pathogen-free rabbit	rabbit
+tortoise	tortoises
+wild bird	birds
+wild rabbit	rabbit

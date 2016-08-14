@@ -473,3 +473,14 @@ reptarenavirus	G10	Vertebrates
 rosadnavirus	G4	Plants
 sakobuvirus	G10	Vertebrates
 sicinivirus	G10	Vertebrates
+# patch v214
+alphacarmotetravirus	G10	Vertebrates
+anphevirus	G1	Invertebrates
+arlivirus	G1	Invertebrates
+chapparvovirus	G10	Vertebrates
+crustavirus	G1	Invertebrates
+cryspovirus	G1	Invertebrates
+orthohepevirus	G10,G1	Vertebrates,Invertebrates
+orthopneumovirus	G10	Vertebrates
+sclerotimonavirus	G4	Plants
+socyvirus	G1	Invertebrates
