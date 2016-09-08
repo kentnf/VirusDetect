@@ -320,7 +320,7 @@ foreach my $sample (@ARGV)
 		Util::print_user_message("De novo assembly");
 
 		if ($data_type eq 'mRNA') {
-			align::velvet_optimiser_combine("$sample.unmapped", "$sample.assembled", 31, 31, 10, 10, $objective_type, $BIN_DIR, $TEMP_DIR, $rm_dup, $debug) if -s "$sample.unmapped";
+			align::velvet_optimiser_combine($sample, "$sample.assembled", 31, 31, 10, 10, $objective_type, $BIN_DIR, $TEMP_DIR, $rm_dup, $debug) if -s $sample;
 		} 
 		else {
 			align::velvet_optimiser_combine($sample, "$sample.assembled", $kmer_min, $kmer_max, 5, 25, $objective_type, $BIN_DIR, $TEMP_DIR, $rm_dup, $debug);
