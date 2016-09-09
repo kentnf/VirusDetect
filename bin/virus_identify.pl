@@ -20,7 +20,8 @@ Usage: virus_itentify.pl [options] --reference reference input_read contig
  
  blast-related options(7):
   --word-size           Minimum word size - length of best perfect match [11]
-  --exp-value           Maximum e-value [1e-5]
+  --exp-value           Maximum e-value for blastn [1e-5]
+  --exp-valuex          Maximum e-value for blastx [1e-2 for sRNA; 1e-5 for mRNA]
   --percent-identity    Minimum identity percentage for the alignment [25] 
   --cpu-num             Number of threads to use [8] 
   --mis-penalty         Penalty for a nucleotide mismatch [-3]
@@ -84,7 +85,8 @@ my $cpu_num = 8;				# megablast: thread number
 my $mis_penalty = -3;			# megablast: penalty for mismatch
 my $gap_cost = -1;				# megablast: penalty for gap open
 my $gap_extension = -1;			# megablast: penalty for gap extension
-my $exp_value = 1e-5;			#
+my $exp_value = 1e-5;			# for blastn
+my $exp_valuex = 1e-2;			# for blastx
 my $identity_percen = 25;		# tblastx: hsp_identity cutoff for protein blast
 
 my $filter_query = "F";			# megablast: F - disable remove simple sequence
@@ -104,6 +106,7 @@ GetOptions(
 	'diff-contig-length=i'	=> \$diff_contig_length,
 	'word-size=i' 			=> \$word_size,
 	'exp-value=f' 			=> \$exp_value,
+	'exp-valuex=f'			=> \$exp_valuex,
 	'percent-identity=f' 	=> \$identity_percen,
 	'cpu-num=i' 			=> \$cpu_num,
 	'mis-penalty=i' 		=> \$mis_penalty,
@@ -318,8 +321,9 @@ main: {
 		# compare noval contigs against virus database using tblastx
 		$blast_output = "$sample.novel.paired";
 		$blast_program = $BIN_DIR."/blastall -p blastx";
-		#$blast_param = "-F $filter_query -a $cpu_num -e $exp_value";
-		$blast_param = "-F $filter_query -a $cpu_num -e 1e-2"; # change as Fei suggestion Feb 05				
+		$blast_param = "-F $filter_query -a $cpu_num -e $exp_valuex"; # change back to setting evalue as user suggest
+																	  # the default, 1e-2 for sRNA, 1e-5 for mRNA
+		#$blast_param = "-F $filter_query -a $cpu_num -e 1e-2"; # change as Fei suggestion Feb 05				
 		my $reference_prot = $reference."_prot"; 
 		Util::process_cmd("$blast_program -i $novel_contig -d $reference_prot -o $blast_output $blast_param", $debug) unless -s $blast_output;
 		my $blast_novel_table = Util::parse_blast_to_table($blast_output, $blast_program);

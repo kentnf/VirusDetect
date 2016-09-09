@@ -49,7 +49,8 @@ Usage: virus_detect.pl [option] --reference reference input1 input2 ...
  Megablast-related options (align virus contigs to reference virus 
   database for virus identification):
   --word-size	       Minimum word size - length of best perfect match [11] 
-  --exp-value	       Maximum e-value [1e-5]
+  --exp-value	       Maximum e-value for blastn[1e-5]
+  --exp-valuex         Maximum e-value for blastx[1e-2 (sRNA), 1e-5(RNA-seq)]
   --percent-identity   Minimum percent identity for the alignment [25] 
   --mis-penalty-b      Penalty score for a nucleotide mismatch [-3]
   --gap-cost-b         Cost to open a gap [-1] 
@@ -104,6 +105,7 @@ my $cpu_num = 8;
 # paras for blast && identification 
 my $word_size = 11;
 my $exp_value = 1e-5;			#
+my $exp_valuex = 1e-2;			# 
 my $percent_identity = 25;		# percent identity for tblastx
 my $mis_penalty_b = -3;			# megablast mismatch penlty, minus integer
 my $gap_cost_b = -1;				# megablast gap open cost, plus integer
@@ -126,6 +128,7 @@ my $diff_ratio= 0.25;
 my $diff_contig_cover = 0.5;
 my $diff_contig_length= 100; 
 my $debug; my $email; my $user;
+my $exp_valuexs;
 # get input paras #
 GetOptions(
 	'r|reference=s'		=> \$reference,
@@ -154,7 +157,8 @@ GetOptions(
 	'gap-extension=i' 	=> \$gap_extension,
 	
 	'word-size=i' 		=> \$word_size,
-	'exp-value-s' 		=> \$exp_value,
+	'exp-value=s' 		=> \$exp_value,
+	'exp-valuex=s'		=> \$exp_valuexs,
 	'percent-identity=s'=> \$percent_identity,
 	'mis-penalty-b=i' 	=> \$mis_penalty_b,
 	'gap-cost-b=i' 		=> \$gap_cost_b,
@@ -224,6 +228,9 @@ foreach my $sample (@ARGV)
 	# check file
 	my $file_type = Util::detect_FileType($sample);
 	my $data_type = Util::detect_DataType($sample);
+	$exp_valuex = 1e-5 if $data_type eq 'mRNA';
+	$exp_valuex = $exp_valuexs if defined $exp_valuexs;
+
 	my $seq_num = Util::detect_seqNum($sample);
 	my $sample_base = basename($sample);
 
@@ -403,9 +410,10 @@ foreach my $sample (@ARGV)
 	}
 
 	# identify the virus
+
 	Util::print_user_message("Virus identification");
 	my $cmd_identify = "$BIN_DIR/virus_identify.pl --reference $reference ";
-	$cmd_identify .= "--word-size $word_size --exp-value $exp_value --percent-identity $percent_identity ";
+	$cmd_identify .= "--word-size $word_size --exp-value $exp_value --exp-valuex $exp_valuex --percent-identity $percent_identity ";
 	$cmd_identify .= "--cpu-num $thread_num --mis-penalty $mis_penalty_b --gap-cost $gap_cost_b --gap-extension $gap_extension_b ";
 	$cmd_identify .= "--hsp-cover $hsp_cover --diff-ratio $diff_ratio --diff-contig-cover $diff_contig_cover --diff-contig-length $diff_contig_length ";
 	$cmd_identify .= "--coverage-cutoff $coverage_cutoff --depth-cutoff $depth_cutoff ";
