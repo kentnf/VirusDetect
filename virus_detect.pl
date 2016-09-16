@@ -420,7 +420,6 @@ foreach my $sample (@ARGV)
 	$cmd_identify .= "--novel-len-cutoff $novel_len_cutoff ";
 	$cmd_identify .= "-d " if $debug;
 	$cmd_identify .= "$sample $sample.combined ";
-
 	if (-s "$sample.combined") {
 		Util::process_cmd($cmd_identify, $debug);
 	} else {
