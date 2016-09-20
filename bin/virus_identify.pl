@@ -67,8 +67,10 @@ my $prot_tab  = $DATABASE_DIR."/vrl_idmapping.gz";	# virus protein table
 ############################
 ## ====  global vars ==== ##
 ############################
-my $hsp_cover = 0.75;			# for blast filter
-my $drop_off = 5;				# for blast filter
+my $hsp_cover = 0.75;			# for blastn filter
+my $drop_off = 5;				# for blastn filter
+my $hsp_coverx = 0.60;			# for blastx filter
+my $drop_offx = 5;				# for blastx filter
 my $diff_ratio= 0.25;			# ratio for number of diff contig
 my $diff_contig_cover = 0.5;	# for hit filter
 my $diff_contig_length = 100;	# for hit filter
@@ -328,7 +330,7 @@ main: {
 		Util::process_cmd("$blast_program -i $novel_contig -d $reference_prot -o $blast_output $blast_param", $debug) unless -s $blast_output;
 		my $blast_novel_table = Util::parse_blast_to_table($blast_output, $blast_program);
 		my $mm1 = Util::line_num($blast_novel_table);
-		$blast_novel_table = Util::filter_blast_table($blast_novel_table, 0, $drop_off, $blast_program);
+		$blast_novel_table = Util::filter_blast_table($blast_novel_table, $hsp_coverx, $drop_offx, $blast_program);
 		unlink($blast_output) unless $debug;
 
 		# report information
