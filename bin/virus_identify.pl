@@ -89,7 +89,7 @@ my $gap_cost = -1;				# megablast: penalty for gap open
 my $gap_extension = -1;			# megablast: penalty for gap extension
 my $exp_value = 1e-5;			# for blastn
 my $exp_valuex = 1e-2;			# for blastx
-my $identity_percen = 25;		# tblastx: hsp_identity cutoff for protein blast
+my $identity_percen = 25;		# for blastx: hsp_identity cutoff for protein blast
 
 my $filter_query = "F";			# megablast: F - disable remove simple sequence
 my $hits_return = 500;			# megablast: hit number
@@ -193,7 +193,13 @@ main: {
 
 	unlink($blast_output) unless $debug;
 
-	my %contig_depth = get_contig_mapped_depth($contig, $sample, $cpu_num, $file_type);
+	# save mapped sRNA length for each contig to hash: map_sRNA_len_stat	
+	# key1: contig ID 
+	# key2: sRNA lenh
+	# value: number of mapped sRNA
+	# % only works with sRNA
+	my ($contig_depth, $map_sRNA_len_stat) = get_contig_mapped_depth($contig, $sample, $cpu_num, $file_type);
+
 	my ($final_known_ctgs, $removed_ctgs, $final_novel_ctgs, $removed_novel_ctgs);
 
 	# if there is known contig 
@@ -230,7 +236,7 @@ main: {
 		# 		   value: raw depth, normalized depth
 		# filter the depth and coverage by depth cutoff and coverage cutoff, save the file
 		# my %contig_depth = get_contig_mapped_depth($contig, $sample, $cpu_num, $file_type);
-		my %known_depth  = correct_depth($known_identified, \%contig_depth, \%contig_info, $sample, $depth_norm); # input sample will provide lib_size for depth normalization
+		my %known_depth  = correct_depth($known_identified, $contig_depth, \%contig_info, $sample, $depth_norm); # input sample will provide lib_size for depth normalization
 
 		# 7 the known identified table was filter again using depth and coverage
 		#   define coverage: query contig cov / total viral seq, 
@@ -349,7 +355,7 @@ main: {
 		my $novel_identified = Util::remove_redundancy_hit($novel_coverage, $blast_novel_table, $diff_ratio, $diff_contig_cover, $diff_contig_length);		
 
 		# 5. get depth
-		my %novel_depth  = correct_depth($novel_identified, \%contig_depth, \%contig_info, $sample, $depth_norm);
+		my %novel_depth  = correct_depth($novel_identified, $contig_depth, \%contig_info, $sample, $depth_norm);
 		($novel_identified, $final_novel_ctgs, $removed_novel_ctgs) = filter_by_coverage_depth($novel_identified, \%novel_depth, $coverage_cutoff, $depth_cutoff, $norm_depth_cutoff);
 		
 		# combine
@@ -392,6 +398,10 @@ main: {
 	#    known contigs: contigs in final result known.xls
 	#    novel contigs: contigs in final result novel.xls
 	#    undetermined_contigs: contigs that not belong to known contigs:
+
+	# put the undetermined_contigs to below hash
+	my %select_ctg_for_sRNA_len_check;
+
 	my ($known_contig_content, $novel_contig_content, $undet_contig_content) = ('', '', '');
 	foreach my $cid (sort keys %contig_info) {
 		if (defined $contig_info{$cid}{'type'})	
@@ -404,6 +414,7 @@ main: {
 			} 
 			elsif ($contig_info{$cid}{'type'} eq 'undetermined' || $contig_info{$cid}{'type'} eq 'unused') {
 				$undet_contig_content.=">$cid\n$contig_info{$cid}{'seq'}\n";
+				$select_ctg_for_sRNA_len_check{$cid} = 1;
 			}
 			else {
 				die "[ERR]contig type: $cid-> $contig_info{$cid}{'type'}\n";
@@ -413,6 +424,49 @@ main: {
 			$undet_contig_content.=">$cid\n$contig_info{$cid}{'seq'}\n";
 		}
 	}
+
+	# output html for select_ctg_for_sRNA_len_check	
+	my %select_ctg;
+	my $select_num = 0;
+	foreach my $cid (sort keys %select_ctg_for_sRNA_len_check) {
+		my $ctg_len = $contig_info{$cid}{'length'};
+		my $total = 0;
+		my $max = 0;
+		my $max_len = 0;
+		for(15 .. 40) {
+			my $n = 0;
+			$n = $$map_sRNA_len_stat{$cid}{$_} if defined $$map_sRNA_len_stat{$cid}{$_};
+			$total = $total + $n;
+			if ($n > $max) {
+				$max = $n;
+				$max_len = $_;
+			}
+		}
+
+		if (($max_len == 21 || $max_len == 22) && $ctg_len >= $novel_len_cutoff) {
+			$select_ctg{$cid} = $ctg_len;
+			$select_num++;
+		}
+	}
+
+	if ($select_num > 0) {
+		# plot the select ctg
+		Util::plot_select(\%select_ctg, $map_sRNA_len_stat, $sample_dir, 'sRNA_enrich');
+
+		# report to screen
+		my $select_message = '';; 
+		if ($select_num == 1) {
+			$select_message.="1 of contig show the large numbers of 21-22nt siRNAs which derive from it. Please check: ";
+		} else {
+			$select_message.="$select_num of contig show the large numbers of 21-22nt siRNAs which derive from it. Please check: ";
+		}
+		foreach my $cid (sort keys %select_ctg) {
+			$select_message.="$cid,";
+		}
+		$select_message =~ s/,$/ in contig_sequences\.undetermined\.fa/;
+		Util::print_user_submessage($select_message);
+	}
+
 	Util::save_file($known_contig_content, "$sample_dir/contig_sequences.blastn.fa") if length($known_contig_content) > 1;
 	Util::save_file($novel_contig_content, "$sample_dir/contig_sequences.blastx.fa") if length($novel_contig_content) > 1;
 	Util::save_file($undet_contig_content, "$sample_dir/contig_sequences.undetermined.fa") if length($undet_contig_content) > 1;
@@ -536,12 +590,12 @@ sub arrange_col2
 =head2
 
  get_contig_mapped_depth -- align reads to contig, then get mean mapped depth, total mapped length, coverage
-
+ 						    # new function # get mapped sRNA length distirubiton # save it to hash
+							# if the contig is mapped by 21, 22nt sRNA, it may novel virus 
 =cut
 sub get_contig_mapped_depth
 {
 	my ($contig, $sample, $cpu_num, $file_type) = @_;
-
 
 	# using bw
 	my $sai = $sample."_bwa.sai";
@@ -552,6 +606,27 @@ sub get_contig_mapped_depth
 	Util::process_cmd("$BIN_DIR/bwa aln $parameters $contig $sample 1> $sai 2>> $log", $debug);
 	Util::process_cmd("$BIN_DIR/bwa samse $bwa_mhit_param $contig $sai $sample 1> $sample.sam 2>> $log", $debug);
 	Util::xa2multi("$sample.sam");
+
+	# save map sRNA stat to hash
+	# key1: contig ID 
+	# key2: sRNA lenh
+	# value: number of mapped sRNA
+	my %map_sRNA_len_stat;
+	my $in_sam = IO::File->new("$sample.sam") || die $!;
+	while(<$in_sam>) {
+		chomp;
+		next if $_ =~ m/^@/;
+		my @a = split(/\t/, $_);
+		next if $a[1] == 4;
+		my $len = length($a[9]);
+		next if $len > 40;
+		if (defined $map_sRNA_len_stat{$a[2]}{$len}) {
+			$map_sRNA_len_stat{$a[2]}{$len}++;
+		} else {
+			$map_sRNA_len_stat{$a[2]}{$len} = 1;
+		} 
+	}
+	$in_sam->close;
 	
 	# using bowtie
 	# my $format = ''; if( $file_type eq "fasta" ){ $format = "-f" };
@@ -573,7 +648,7 @@ sub get_contig_mapped_depth
 	# unlink temp file
 	unlink("$sample.pileup", "$sample.sorted.bam", "$sample.bam", "$contig.fai", "$sample.sam") unless $debug;
 
-	return %depth;
+	return(\%depth, \%map_sRNA_len_stat);
 }
 
 =head2

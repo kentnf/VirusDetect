@@ -1362,6 +1362,48 @@ sub aln2cm
 }
 
 =head2
+ plot_select -- plot the select contigs which sRNA enriched in 21-22nt
+=cut
+sub plot_select
+{
+	my ($select_ctg, $map_sRNA_len_stat, $output_dir, $output_prefix) = @_;
+
+	my $output_file = "$output_dir/$output_prefix.html";
+
+	my $out_table;
+	$out_table = qq'<!-- Top 6 lines shoud be removed when load html into virome database -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+<script src="http://libs.baidu.com/jquery/2.1.3/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+<script> \$(function() { \$(\'a\').tooltip(); }) </script>
+<br><br><br><br><br>
+
+<table class="table table-bordered table-condensed" style="font-size:12px; width: 780px;" align=center>
+  <tr bgcolor=#e2e8ec>
+    <th>Contig ID</th>
+    <th>Length</th>
+';
+	for (15 .. 40) {
+		$out_table.= qq'<th><a title="" data-placement="top" data-toggle="tooltip" data-original-title="sRNA length">$_</a></th>\n';
+	}
+	$out_table.= "</tr>\n";
+
+	foreach my $cid (sort keys %$select_ctg) {
+		my $ctg_len = $$select_ctg{$cid};
+		$out_table.= "<tr><td>$cid</td><td>$ctg_len</td>";
+		for(15 .. 40) {
+			my $n = 0;
+			$n = $$map_sRNA_len_stat{$cid}{$_} if defined $$map_sRNA_len_stat{$cid}{$_};
+			$out_table.= "<td>$n</td>";
+		}
+		$out_table.= "</tr>\n";
+	}
+	$out_table.= qq'</table>';
+
+    # output table to file
+    save_file($out_table, $output_file);
+}
+=head2
  plot_result -- plot the result
 =cut
 sub plot_result
