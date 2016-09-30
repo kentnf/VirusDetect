@@ -1366,7 +1366,11 @@ sub aln2cm
 =cut
 sub plot_select
 {
-	my ($select_ctg, $map_sRNA_len_stat, $output_dir, $output_prefix) = @_;
+	my ($select_ctg, $label_ctg, $contig_best_blast, $virus_info, $map_sRNA_len_stat, $output_dir, $output_prefix) = @_;
+
+	foreach my $cc (sort keys %$contig_best_blast) {
+		print $cc."\t".$$contig_best_blast{$cc}."\n";
+	}
 
 	my $output_file = "$output_dir/$output_prefix.html";
 
@@ -1378,6 +1382,10 @@ sub plot_select
 <script> \$(function() { \$(\'a\').tooltip(); }) </script>
 <br><br><br><br><br>
 
+<table class="table" style="font-size:12px; width: 780px;" align=center>
+ <tr><td>* potential novel viruses do not have sequence similarity with known viruses</td></tr>
+</table>
+
 <table class="table table-bordered table-condensed" style="font-size:12px; width: 780px;" align=center>
   <tr bgcolor=#e2e8ec>
     <th>Contig ID</th>
@@ -1386,16 +1394,46 @@ sub plot_select
 	for (15 .. 40) {
 		$out_table.= qq'<th><a title="" data-placement="top" data-toggle="tooltip" data-original-title="sRNA length">$_</a></th>\n';
 	}
+	$out_table.= "<th>BLAST</th>";
 	$out_table.= "</tr>\n";
 
-	foreach my $cid (sort keys %$select_ctg) {
+	my ($tr_style, $td_style);
+
+	foreach my $cid (sort {$$select_ctg{$b}<=>$$select_ctg{$a}} keys %$select_ctg) {
 		my $ctg_len = $$select_ctg{$cid};
-		$out_table.= "<tr><td>$cid</td><td>$ctg_len</td>";
+
+		if (defined $$label_ctg{$cid}) {
+			$tr_style = 'style="font-weight:bold"';
+			$td_style = '';
+		} else {
+			$tr_style = '';
+			$td_style = '';
+		}
+
+		$out_table.= "<tr $tr_style><td>$cid";
+		$out_table.= "*" if defined $$label_ctg{$cid};
+		$out_table.= "</td><td>$ctg_len</td>";
 		for(15 .. 40) {
 			my $n = 0;
 			$n = $$map_sRNA_len_stat{$cid}{$_} if defined $$map_sRNA_len_stat{$cid}{$_};
-			$out_table.= "<td>$n</td>";
+			if ($_ == 21 || $_ == 22) {
+				$out_table.= "<td bgcolor=\"#e6ccb3\">$n</td>";
+			} else {
+				$out_table.= "<td>$n</td>";
+			}
 		}
+
+		# add virus information
+		if (defined $$contig_best_blast{$cid}) {
+			my $vid = $$contig_best_blast{$cid};
+			my $genus = $$virus_info{$vid}{'genus'};
+			my $desc = $$virus_info{$vid}{'genus'};
+			my $vir_desc = "[$vid] $desc";
+			$out_table.= qq'<td><a title="" data-placement="top" data-toggle="tooltip" data-original-title="$vir_desc">$genus</a></td>\n';
+		} else {
+			$out_table.= "<td>NA</td>\n";
+		}
+
 		$out_table.= "</tr>\n";
 	}
 	$out_table.= qq'</table>';

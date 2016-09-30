@@ -181,6 +181,7 @@ main: {
 	my $blast_param   = "-F $filter_query -a $cpu_num -W $word_size -q $mis_penalty -G $gap_cost -E $gap_extension -b $hits_return -e $exp_value";
 	Util::process_cmd("$blast_program -i $contig -d $reference -o $blast_output $blast_param", $debug) unless -s $blast_output;
 	my $blast_table  = Util::parse_blast_to_table($blast_output, $blast_program);
+	my $raw_blast_table = $blast_table;
 
 	Util::save_file($blast_table, "$sample.blastn.table1");	# checking files
 
@@ -324,6 +325,7 @@ main: {
 	
 	# 2. 
 	# blast 
+	my $raw_blast_novel_table;
 	if ( $novel_check && $num_undetermined > 0 )
 	{
 		# compare noval contigs against virus database using tblastx
@@ -335,6 +337,7 @@ main: {
 		my $reference_prot = $reference."_prot"; 
 		Util::process_cmd("$blast_program -i $novel_contig -d $reference_prot -o $blast_output $blast_param", $debug) unless -s $blast_output;
 		my $blast_novel_table = Util::parse_blast_to_table($blast_output, $blast_program);
+		$raw_blast_novel_table = $blast_novel_table;
 		my $mm1 = Util::line_num($blast_novel_table);
 		$blast_novel_table = Util::filter_blast_table($blast_novel_table, $hsp_coverx, $drop_offx, $blast_program);
 		unlink($blast_output) unless $debug;
@@ -430,38 +433,51 @@ main: {
 		}
 	}
 
+	# parse raw blast table to retrieve best hit for each contig;
+	my %best_vid;
+	my %contig_best_blast;
+	chomp($raw_blast_table);
+	my @m = split(/\n/, $raw_blast_table);
+	foreach my $m (@m) {
+		my @a = split(/\t/, $m);
+		unless (defined $contig_best_blast{$a[0]}) {
+			$contig_best_blast{$a[0]} = $a[2];
+			$best_vid{$a[2]} = 1;
+		}	
+	}
+
+	chomp($raw_blast_novel_table);
+	@m = split(/\n/, $raw_blast_novel_table);
+	foreach my $m (@m) {
+		my @a = split(/\t/, $m);
+		unless (defined $contig_best_blast{$a[0]}) {
+			$contig_best_blast{$a[0]} = $a[2];
+			$best_vid{$a[2]} = 1;
+		}
+	}
+	my %best_virus_info = Util::fetch_virus_info($seq_info, $prot_tab, \%best_vid);
+
 	# label contig for select_ctg_for_sRNA_len_check	
-	# my %select_label;
-	# my $select_num = 0;
-	# foreach my $cid (sort keys %select_ctg_for_sRNA_len_check) {
-	#	my $ctg_len = $contig_info{$cid}{'length'};
-	#	my $total = 0;
-	#	my $max = 0;
-	#	my $max_len = 0;
-	#
-	#	print "kentnf:$cid\t$ctg_len";
-	#
-	#	for(15 .. 40) {
-	#		my $n = 0;
-	#		$n = $$map_sRNA_len_stat{$cid}{$_} if defined $$map_sRNA_len_stat{$cid}{$_};
-	#		$total = $total + $n;
-	#		if ($n > $max) {
-	#			$max = $n;
-	#			$max_len = $_;
-	#		}
-	#		print "\t$n";
-	#	}
-	#	print "\n";
-	#
-	#	#if (($max_len == 21 || $max_len == 22) && $ctg_len >= $novel_len_cutoff) {
-	#		$select_ctg{$cid} = $ctg_len;
-	#		$select_num++;
-	#	#}
-	# }
+	my %select_label;
+	foreach my $cid (sort keys %select_ctg_for_sRNA_len_check) {
+		my $ctg_len = $contig_info{$cid}{'length'};
+		my $total = 0;
+		my $siRNA = 0;
+		for(15 .. 40) {
+			my $n = 0;
+			$n = $$map_sRNA_len_stat{$cid}{$_} if defined $$map_sRNA_len_stat{$cid}{$_};
+			$total = $total + $n;
+			$siRNA+= $n if ($_ == 21 || $_ == 22)
+		}
+
+		if ($siRNA / $total > 0.5) {
+			$select_label{$cid} = 1;
+		}
+	}
 
 	if ($select_ctg_num > 0) {
 		# plot the select ctg
-		Util::plot_select(\%select_ctg_for_sRNA_len_check, $map_sRNA_len_stat, $sample_dir, 'undetermined');
+		Util::plot_select(\%select_ctg_for_sRNA_len_check, \%select_label, \%contig_best_blast, \%best_virus_info, $map_sRNA_len_stat, $sample_dir, 'undetermined');
 		# report to screen
 		my $select_message = 'Contigs having enrichment of 21-22nt sRNAs were identified as potential virus sequences. Please check undetermined.htm';
 		Util::print_user_submessage($select_message);
