@@ -401,9 +401,11 @@ main: {
 
 	# put the undetermined_contigs to below hash
 	my %select_ctg_for_sRNA_len_check;
+	my $select_ctg_num = 0;
 
 	my ($known_contig_content, $novel_contig_content, $undet_contig_content) = ('', '', '');
 	foreach my $cid (sort keys %contig_info) {
+		my $ctg_len = $contig_info{$cid}{'length'};
 		if (defined $contig_info{$cid}{'type'})	
 		{
 			if ($contig_info{$cid}{'type'} eq 'known') {
@@ -414,7 +416,8 @@ main: {
 			} 
 			elsif ($contig_info{$cid}{'type'} eq 'undetermined' || $contig_info{$cid}{'type'} eq 'unused') {
 				$undet_contig_content.=">$cid\n$contig_info{$cid}{'seq'}\n";
-				$select_ctg_for_sRNA_len_check{$cid} = 1;
+				$select_ctg_for_sRNA_len_check{$cid} = $ctg_len;
+				$select_ctg_num++;
 			}
 			else {
 				die "[ERR]contig type: $cid-> $contig_info{$cid}{'type'}\n";
@@ -422,48 +425,45 @@ main: {
 		}
 		else {
 			$undet_contig_content.=">$cid\n$contig_info{$cid}{'seq'}\n";
+			$select_ctg_for_sRNA_len_check{$cid} = $ctg_len;
+			$select_ctg_num++;
 		}
 	}
 
-	# output html for select_ctg_for_sRNA_len_check	
-	my %select_ctg;
-	my $select_num = 0;
-	foreach my $cid (sort keys %select_ctg_for_sRNA_len_check) {
-		my $ctg_len = $contig_info{$cid}{'length'};
-		my $total = 0;
-		my $max = 0;
-		my $max_len = 0;
-		for(15 .. 40) {
-			my $n = 0;
-			$n = $$map_sRNA_len_stat{$cid}{$_} if defined $$map_sRNA_len_stat{$cid}{$_};
-			$total = $total + $n;
-			if ($n > $max) {
-				$max = $n;
-				$max_len = $_;
-			}
-		}
+	# label contig for select_ctg_for_sRNA_len_check	
+	# my %select_label;
+	# my $select_num = 0;
+	# foreach my $cid (sort keys %select_ctg_for_sRNA_len_check) {
+	#	my $ctg_len = $contig_info{$cid}{'length'};
+	#	my $total = 0;
+	#	my $max = 0;
+	#	my $max_len = 0;
+	#
+	#	print "kentnf:$cid\t$ctg_len";
+	#
+	#	for(15 .. 40) {
+	#		my $n = 0;
+	#		$n = $$map_sRNA_len_stat{$cid}{$_} if defined $$map_sRNA_len_stat{$cid}{$_};
+	#		$total = $total + $n;
+	#		if ($n > $max) {
+	#			$max = $n;
+	#			$max_len = $_;
+	#		}
+	#		print "\t$n";
+	#	}
+	#	print "\n";
+	#
+	#	#if (($max_len == 21 || $max_len == 22) && $ctg_len >= $novel_len_cutoff) {
+	#		$select_ctg{$cid} = $ctg_len;
+	#		$select_num++;
+	#	#}
+	# }
 
-		if (($max_len == 21 || $max_len == 22) && $ctg_len >= $novel_len_cutoff) {
-			$select_ctg{$cid} = $ctg_len;
-			$select_num++;
-		}
-	}
-
-	if ($select_num > 0) {
+	if ($select_ctg_num > 0) {
 		# plot the select ctg
-		Util::plot_select(\%select_ctg, $map_sRNA_len_stat, $sample_dir, 'sRNA_enrich');
-
+		Util::plot_select(\%select_ctg_for_sRNA_len_check, $map_sRNA_len_stat, $sample_dir, 'undetermined');
 		# report to screen
-		my $select_message = '';; 
-		if ($select_num == 1) {
-			$select_message.="1 of contig show the large numbers of 21-22nt siRNAs which derive from it. Please check: ";
-		} else {
-			$select_message.="$select_num of contig show the large numbers of 21-22nt siRNAs which derive from it. Please check: ";
-		}
-		foreach my $cid (sort keys %select_ctg) {
-			$select_message.="$cid,";
-		}
-		$select_message =~ s/,$/ in contig_sequences\.undetermined\.fa/;
+		my $select_message = 'Contigs having enrichment of 21-22nt sRNAs were identified as potential virus sequences. Please check undetermined.htm';
 		Util::print_user_submessage($select_message);
 	}
 
