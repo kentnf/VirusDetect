@@ -42,6 +42,7 @@ Usage: virus_itentify.pl [options] --reference reference input_read contig
                          when it is not reported as known, but it may 
                          shows similarity with the reference virus 
                          sequences. The default is 100bp [100]
+  --novel-siRNA-ratio	Cutoff of 21-22 nt siRNA ratio to determine potential novel virus [0.5]
 
 _EOUSAGE_
 
@@ -94,6 +95,7 @@ my $identity_percen = 25;		# for blastx: hsp_identity cutoff for protein blast
 my $filter_query = "F";			# megablast: F - disable remove simple sequence
 my $hits_return = 500;			# megablast: hit number
 my $input_suffix = '';
+my $novel_siRNA_ratio = 0.5;		#
 
 my ($debug, $debug_force);
 
@@ -119,6 +121,7 @@ GetOptions(
 	'norm-depth-cutoff=f'	=> \$norm_depth_cutoff,
 	'd|debug'				=> \$debug,
 	'novel-len-cutoff=i'	=> \$novel_len_cutoff,
+	'novel-siRNA-ratio=f'	=> \$novel_siRNA_ratio,
 	'f|force'				=> \$debug_force,
 );
 
@@ -413,6 +416,7 @@ main: {
 		{
 			if ($contig_info{$cid}{'type'} eq 'known') {
 				$known_contig_content.=">$cid\n$contig_info{$cid}{'seq'}\n";
+				# $select_ctg_for_sRNA_len_check{$cid} = $ctg_len;
 			} 
 			elsif ($contig_info{$cid}{'type'} eq 'novel') {
 				$novel_contig_content.=">$cid\n$contig_info{$cid}{'seq'}\n";
@@ -441,7 +445,7 @@ main: {
 	foreach my $m (@m) {
 		my @a = split(/\t/, $m);
 		unless (defined $contig_best_blast{$a[0]}) {
-			$contig_best_blast{$a[0]} = $a[2];
+			$contig_best_blast{$a[0]} = $a[2]."\tblastn\t".$a[6];
 			$best_vid{$a[2]} = 1;
 		}	
 	}
@@ -451,7 +455,7 @@ main: {
 	foreach my $m (@m) {
 		my @a = split(/\t/, $m);
 		unless (defined $contig_best_blast{$a[0]}) {
-			$contig_best_blast{$a[0]} = $a[2];
+			$contig_best_blast{$a[0]} = $a[2]."\tblastx\t".$a[6];
 			$best_vid{$a[2]} = 1;
 		}
 	}
@@ -463,14 +467,14 @@ main: {
 		my $ctg_len = $contig_info{$cid}{'length'};
 		my $total = 0;
 		my $siRNA = 0;
-		for(15 .. 40) {
+		for(18 .. 33) {
 			my $n = 0;
 			$n = $$map_sRNA_len_stat{$cid}{$_} if defined $$map_sRNA_len_stat{$cid}{$_};
 			$total = $total + $n;
 			$siRNA+= $n if ($_ == 21 || $_ == 22)
 		}
 
-		if ($siRNA / $total > 0.5) {
+		if ($siRNA / $total >= $novel_siRNA_ratio) {
 			$select_label{$cid} = 1;
 		}
 	}
@@ -479,7 +483,7 @@ main: {
 		# plot the select ctg
 		Util::plot_select(\%select_ctg_for_sRNA_len_check, \%select_label, \%contig_best_blast, \%best_virus_info, $map_sRNA_len_stat, $sample_dir, 'undetermined');
 		# report to screen
-		my $select_message = 'Contigs having enrichment of 21-22nt sRNAs were identified as potential virus sequences. Please check undetermined.htm';
+		my $select_message = 'Contigs having enrichment of 21-22nt sRNAs were identified as potential virus sequences. Please check undetermined.html';
 		Util::print_user_submessage($select_message);
 	}
 

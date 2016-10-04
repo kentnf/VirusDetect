@@ -1368,10 +1368,6 @@ sub plot_select
 {
 	my ($select_ctg, $label_ctg, $contig_best_blast, $virus_info, $map_sRNA_len_stat, $output_dir, $output_prefix) = @_;
 
-	foreach my $cc (sort keys %$contig_best_blast) {
-		print $cc."\t".$$contig_best_blast{$cc}."\n";
-	}
-
 	my $output_file = "$output_dir/$output_prefix.html";
 
 	my $out_table;
@@ -1380,20 +1376,26 @@ sub plot_select
 <script src="http://libs.baidu.com/jquery/2.1.3/jquery.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
 <script> \$(function() { \$(\'a\').tooltip(); }) </script>
-<br><br><br><br><br>
-
-<table class="table" style="font-size:12px; width: 780px;" align=center>
- <tr><td>* potential novel viruses do not have sequence similarity with known viruses</td></tr>
-</table>
-
-<table class="table table-bordered table-condensed" style="font-size:12px; width: 780px;" align=center>
+<br>
+<center><h4>Undetermined contigs</h4></center>
+<p>* potential novel virus contigs are highlighted in green</p>
+<table class="table table-bordered table-hover table-condensed" style="font-size:12px;" align=center>
   <tr bgcolor=#e2e8ec>
-    <th>Contig ID</th>
+	<th colspan="2">Contig</th>
+    <th colspan="17">siRNA size distribution</th>
+    <th colspan="5">BLAST hit in virus database</th>
+  <tr bgcolor=#e2e8ec>
+    <th>ID</th>
     <th>Length</th>
 ';
-	for (15 .. 40) {
-		$out_table.= qq'<th><a title="" data-placement="top" data-toggle="tooltip" data-original-title="sRNA length">$_</a></th>\n';
+	for (18 .. 33) {
+		$out_table.= qq'<th>$_</th>\n';
 	}
+	$out_table.= "<th>21-22 (%)</th>";
+	$out_table.= "<th>Acc#</th>";
+	$out_table.= "<th>Genus</th>";
+	$out_table.= "<th>Description</th>";
+	$out_table.= "<th>E value</th>";
 	$out_table.= "<th>BLAST</th>";
 	$out_table.= "</tr>\n";
 
@@ -1403,7 +1405,7 @@ sub plot_select
 		my $ctg_len = $$select_ctg{$cid};
 
 		if (defined $$label_ctg{$cid}) {
-			$tr_style = 'style="font-weight:bold"';
+			$tr_style = 'bgcolor=#b3ffd9';
 			$td_style = '';
 		} else {
 			$tr_style = '';
@@ -1411,27 +1413,35 @@ sub plot_select
 		}
 
 		$out_table.= "<tr $tr_style><td>$cid";
-		$out_table.= "*" if defined $$label_ctg{$cid};
+		# $out_table.= "*" if defined $$label_ctg{$cid};
 		$out_table.= "</td><td>$ctg_len</td>";
-		for(15 .. 40) {
+
+		my $total = 0;
+		my $siRNA = 0;
+
+		for(18 .. 33) {
 			my $n = 0;
 			$n = $$map_sRNA_len_stat{$cid}{$_} if defined $$map_sRNA_len_stat{$cid}{$_};
+			$total = $total + $n;
+			$out_table.= "<td>$n</td>";
 			if ($_ == 21 || $_ == 22) {
-				$out_table.= "<td bgcolor=\"#e6ccb3\">$n</td>";
-			} else {
-				$out_table.= "<td>$n</td>";
-			}
+				$siRNA = $siRNA + $n;
+			} 
 		}
+		my $ratio = sprintf("%.2f", $siRNA/$total*100);
+		$out_table.= "<td>$ratio</td>";
 
 		# add virus information
 		if (defined $$contig_best_blast{$cid}) {
-			my $vid = $$contig_best_blast{$cid};
+			my @vm = split(/\t/, $$contig_best_blast{$cid});
+			my $vid = $vm[0];
+			my $blast_type = $vm[1];
+			my $evalue = $vm[2];
 			my $genus = $$virus_info{$vid}{'genus'};
-			my $desc = $$virus_info{$vid}{'genus'};
-			my $vir_desc = "[$vid] $desc";
-			$out_table.= qq'<td><a title="" data-placement="top" data-toggle="tooltip" data-original-title="$vir_desc">$genus</a></td>\n';
+			my $desc = $$virus_info{$vid}{'desc'};
+			$out_table.= qq'<td>$vid</td><td>$genus</td><td>$desc</td><td>$evalue</td><td>$blast_type</td>\n';
 		} else {
-			$out_table.= "<td>NA</td>\n";
+			$out_table.= "<td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td>\n";
 		}
 
 		$out_table.= "</tr>\n";
