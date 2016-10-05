@@ -698,6 +698,13 @@ sub filter_blast_table
 		}
 	}
 
+	#if ($blast_program eq 'blastx') {
+	#	print $input_blast_table;
+	#	print "\nkentnf\n\nkentnf\n";
+	#	print $output_blast_table;
+	#	exit;
+	#}
+	
 	return $output_blast_table;
 }
 
@@ -1366,12 +1373,13 @@ sub aln2cm
 =cut
 sub plot_select
 {
-	my ($select_ctg, $label_ctg, $contig_best_blast, $virus_info, $map_sRNA_len_stat, $output_dir, $output_prefix) = @_;
+	my ($select_ctg, $label_ctg, $ctg_depth, $contig_best_blast, $virus_info, $map_sRNA_len_stat, $output_dir, $output_prefix) = @_;
 
 	my $output_file = "$output_dir/$output_prefix.html";
+	my $output_file_blast = "$output_dir/$output_prefix\_blast.html";
 
-	my $out_table;
-	$out_table = qq'<!-- Top 6 lines shoud be removed when load html into virome database -->
+	my ($out_table, $out_table_blast);
+	$out_table_blast = qq'<!-- Top 6 lines shoud be removed when load html into virome database -->
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
 <script src="http://libs.baidu.com/jquery/2.1.3/jquery.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
@@ -1382,27 +1390,54 @@ sub plot_select
 <table class="table table-bordered table-hover table-condensed" style="font-size:12px;" align=center>
   <tr bgcolor=#e2e8ec>
 	<th colspan="2">Contig</th>
-    <th colspan="17">siRNA size distribution</th>
+    <th colspan="19">siRNA size distribution</th>
+';
+	$out_table = $out_table_blast."</tr>\n";
+
+	$out_table_blast.= qq'
     <th colspan="5">BLAST hit in virus database</th>
+  </tr>
+';
+
+	$out_table_blast.= qq'
   <tr bgcolor=#e2e8ec>
     <th>ID</th>
     <th>Length</th>
 ';
+	$out_table.= qq'
+  <tr bgcolor=#e2e8ec>
+    <th>ID</th>
+    <th>Length</th>
+';
+
 	for (18 .. 33) {
+		$out_table_blast.= qq'<th>$_</th>\n';
 		$out_table.= qq'<th>$_</th>\n';
 	}
+	$out_table_blast.= "<th>21-22 (%)</th>";
+	$out_table_blast.= "<th>Depth</th>";
+	$out_table_blast.= "<th>Depth (Norm)</th>";
+	$out_table_blast.= "<th>Acc#</th>";
+    $out_table_blast.= "<th>Genus</th>";
+    $out_table_blast.= "<th>Description</th>";
+    $out_table_blast.= "<th>E value</th>";
+    $out_table_blast.= "<th>BLAST</th>";
+    $out_table_blast.= "</tr>\n";
+
 	$out_table.= "<th>21-22 (%)</th>";
-	$out_table.= "<th>Acc#</th>";
-	$out_table.= "<th>Genus</th>";
-	$out_table.= "<th>Description</th>";
-	$out_table.= "<th>E value</th>";
-	$out_table.= "<th>BLAST</th>";
+	$out_table.= "<th>Depth</th>";
+	$out_table.= "<th>Depth (Norm)</th>";
 	$out_table.= "</tr>\n";
 
 	my ($tr_style, $td_style);
-
+	my $contig_tr;
+	my $ud_num = 0; 
+	my $ud_num_blast = 0;
 	foreach my $cid (sort {$$select_ctg{$b}<=>$$select_ctg{$a}} keys %$select_ctg) {
+		$contig_tr = '';
 		my $ctg_len = $$select_ctg{$cid};
+		my $depth = $$ctg_depth{$cid}{'depth'};
+		my $norm_depth = $$ctg_depth{$cid}{'norm'};
 
 		if (defined $$label_ctg{$cid}) {
 			$tr_style = 'bgcolor=#b3ffd9';
@@ -1412,9 +1447,9 @@ sub plot_select
 			$td_style = '';
 		}
 
-		$out_table.= "<tr $tr_style><td>$cid";
+		$contig_tr.= "<tr $tr_style><td>$cid";
 		# $out_table.= "*" if defined $$label_ctg{$cid};
-		$out_table.= "</td><td>$ctg_len</td>";
+		$contig_tr.= "</td><td>$ctg_len</td>";
 
 		my $total = 0;
 		my $siRNA = 0;
@@ -1423,33 +1458,43 @@ sub plot_select
 			my $n = 0;
 			$n = $$map_sRNA_len_stat{$cid}{$_} if defined $$map_sRNA_len_stat{$cid}{$_};
 			$total = $total + $n;
-			$out_table.= "<td>$n</td>";
+			$contig_tr.= "<td>$n</td>";
 			if ($_ == 21 || $_ == 22) {
 				$siRNA = $siRNA + $n;
 			} 
 		}
 		my $ratio = sprintf("%.2f", $siRNA/$total*100);
-		$out_table.= "<td>$ratio</td>";
+		$contig_tr.= "<td>$ratio</td>";
+		$contig_tr.= "<td>$depth</td>";
+		$contig_tr.= "<td>$norm_depth</td>";
 
 		# add virus information
 		if (defined $$contig_best_blast{$cid}) {
 			my @vm = split(/\t/, $$contig_best_blast{$cid});
 			my $vid = $vm[0];
-			my $blast_type = $vm[1];
-			my $evalue = $vm[2];
+			my $vlen = $vm[1];
+			my $blast_type = $vm[2];
+			my $evalue = $vm[3];
+			my $param = 1;
+			$param = 3 if $blast_type =~ m/blastx/ig;
+			my $cov = sprintf('%.2f', $ctg_len/($vlen*$param));
 			my $genus = $$virus_info{$vid}{'genus'};
 			my $desc = $$virus_info{$vid}{'desc'};
-			$out_table.= qq'<td>$vid</td><td>$genus</td><td>$desc</td><td>$evalue</td><td>$blast_type</td>\n';
+			$contig_tr.= qq'<td>$vid</td><td>$genus</td><td>$desc</td><td>$evalue</td><td>$blast_type</td>\n';
+			$out_table_blast.=$contig_tr."</tr>\n";
+			$ud_num_blast++;
 		} else {
-			$out_table.= "<td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td>\n";
+			#$out_table.= "<td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td>\n";
+			$out_table.=$contig_tr."</tr>\n";	
+			$ud_num++;
 		}
-
-		$out_table.= "</tr>\n";
 	}
+	$out_table_blast.= qq'</table>';
 	$out_table.= qq'</table>';
 
     # output table to file
-    save_file($out_table, $output_file);
+    save_file($out_table, $output_file) if $ud_num > 0;
+	save_file($out_table_blast, $output_file_blast) if $ud_num_blast > 0;
 }
 =head2
  plot_result -- plot the result

@@ -203,6 +203,7 @@ main: {
 	# value: number of mapped sRNA
 	# % only works with sRNA
 	my ($contig_depth, $map_sRNA_len_stat) = get_contig_mapped_depth($contig, $sample, $cpu_num, $file_type);
+	my %ctg_norm_depth; # define contig normalized depth
 
 	my ($final_known_ctgs, $removed_ctgs, $final_novel_ctgs, $removed_novel_ctgs);
 
@@ -240,14 +241,15 @@ main: {
 		# 		   value: raw depth, normalized depth
 		# filter the depth and coverage by depth cutoff and coverage cutoff, save the file
 		# my %contig_depth = get_contig_mapped_depth($contig, $sample, $cpu_num, $file_type);
-		my %known_depth  = correct_depth($known_identified, $contig_depth, \%contig_info, $sample, $depth_norm); # input sample will provide lib_size for depth normalization
+		my ($known_depth, $ctg_depth) = correct_depth($known_identified, $contig_depth, \%contig_info, $sample, $depth_norm); # input sample will provide lib_size for depth normalization
+		%ctg_norm_depth = %$ctg_depth;
 
 		# 7 the known identified table was filter again using depth and coverage
 		#   define coverage: query contig cov / total viral seq, 
 		#   define depth:
 		#   if the coverage meet cutoff, and raw & normalized depth meet the cutoff, identified virus will reported (final table)
 		# my ($final_known_ctgs, $removed_ctgs);
-		($known_identified, $final_known_ctgs, $removed_ctgs) = filter_by_coverage_depth($known_identified, \%known_depth, $coverage_cutoff, $depth_cutoff, $norm_depth_cutoff);
+		($known_identified, $final_known_ctgs, $removed_ctgs) = filter_by_coverage_depth($known_identified, $known_depth, $coverage_cutoff, $depth_cutoff, $norm_depth_cutoff);
 		Util::save_file($known_identified, "$sample.known.identified_with_depth");
 
 		my ($known_contig_table, $known_contig_blast_table, $known_reference) =  combine_table1($known_identified, $known_blast_table, \%contig_info, $reference);
@@ -339,6 +341,7 @@ main: {
 		#$blast_param = "-F $filter_query -a $cpu_num -e 1e-2"; # change as Fei suggestion Feb 05				
 		my $reference_prot = $reference."_prot"; 
 		Util::process_cmd("$blast_program -i $novel_contig -d $reference_prot -o $blast_output $blast_param", $debug) unless -s $blast_output;
+
 		my $blast_novel_table = Util::parse_blast_to_table($blast_output, $blast_program);
 		$raw_blast_novel_table = $blast_novel_table;
 		my $mm1 = Util::line_num($blast_novel_table);
@@ -361,8 +364,8 @@ main: {
 		my $novel_identified = Util::remove_redundancy_hit($novel_coverage, $blast_novel_table, $diff_ratio, $diff_contig_cover, $diff_contig_length);		
 
 		# 5. get depth
-		my %novel_depth  = correct_depth($novel_identified, $contig_depth, \%contig_info, $sample, $depth_norm);
-		($novel_identified, $final_novel_ctgs, $removed_novel_ctgs) = filter_by_coverage_depth($novel_identified, \%novel_depth, $coverage_cutoff, $depth_cutoff, $norm_depth_cutoff);
+		my ($novel_depth, $unuse) = correct_depth($novel_identified, $contig_depth, \%contig_info, $sample, $depth_norm);
+		($novel_identified, $final_novel_ctgs, $removed_novel_ctgs) = filter_by_coverage_depth($novel_identified, $novel_depth, $coverage_cutoff, $depth_cutoff, $norm_depth_cutoff);
 		
 		# combine
 		my ($novel_contig_table, $novel_contig_blast_table, $novel_reference) =  combine_table1($novel_identified, $blast_novel_table, \%contig_info, $reference."_prot");
@@ -444,8 +447,10 @@ main: {
 	my @m = split(/\n/, $raw_blast_table);
 	foreach my $m (@m) {
 		my @a = split(/\t/, $m);
+		# $query_name, $query_length, $hit_name, $hit_length, $hsp_length, $identity, $evalue, $score, $strand, $query_start, $query_end, $hit_start, $hit_end, $query_to_end, $hit_to_end, $identity2, $aligned_query, $aligned_hit, $aligned_string#
+
 		unless (defined $contig_best_blast{$a[0]}) {
-			$contig_best_blast{$a[0]} = $a[2]."\tblastn\t".$a[6];
+			$contig_best_blast{$a[0]} = $a[2]."\t".$a[3]."\tblastn\t".$a[6];
 			$best_vid{$a[2]} = 1;
 		}	
 	}
@@ -455,7 +460,7 @@ main: {
 	foreach my $m (@m) {
 		my @a = split(/\t/, $m);
 		unless (defined $contig_best_blast{$a[0]}) {
-			$contig_best_blast{$a[0]} = $a[2]."\tblastx\t".$a[6];
+			$contig_best_blast{$a[0]} = $a[2]."\t".$a[3]."\tblastx\t".$a[6];
 			$best_vid{$a[2]} = 1;
 		}
 	}
@@ -481,7 +486,7 @@ main: {
 
 	if ($select_ctg_num > 0) {
 		# plot the select ctg
-		Util::plot_select(\%select_ctg_for_sRNA_len_check, \%select_label, \%contig_best_blast, \%best_virus_info, $map_sRNA_len_stat, $sample_dir, 'undetermined');
+		Util::plot_select(\%select_ctg_for_sRNA_len_check, \%select_label, \%ctg_norm_depth, \%contig_best_blast, \%best_virus_info, $map_sRNA_len_stat, $sample_dir, 'undetermined');
 		# report to screen
 		my $select_message = 'Contigs having enrichment of 21-22nt sRNAs were identified as potential virus sequences. Please check undetermined.html';
 		Util::print_user_submessage($select_message);
@@ -692,8 +697,26 @@ sub correct_depth
 	$fh->close;
 
 	# convert contig depth to reference depth
+	# key1: virus ID
+	# key2: norm, depth
+	# value: norm, depth
 	my %known_depth;
 	my %known_depth_norm;
+
+	# normalization of contig depth
+	# key1: contig ID
+	# key2: norm, depth
+	# value: norm, depth
+	my %ctg_depth;
+
+	foreach my $cid (sort keys %$contig_depth) {
+		my $total	= $$contig_depth{$cid}{'total'};
+		my $ctg_len = $$contig_info{$cid}{'length'};
+		my $depth	= sprintf('%.2f', ($total/$ctg_len));
+		my $norm_depth = sprintf('%.2f', ((1e+6 * $total) / ($ctg_len * $lib_size)));
+		$ctg_depth{$cid}{'norm'}  = $norm_depth;
+		$ctg_depth{$cid}{'depth'} = $depth;
+	}
 
 	chomp($known_identified);
 	my @l = split(/\n/, $known_identified);
@@ -727,7 +750,7 @@ sub correct_depth
 		$known_depth{$a[0]}{'depth'} = $ref_depth;
 	}
 	
-	return %known_depth;
+	return (\%known_depth, \%ctg_depth);
 }
 
 =head2
