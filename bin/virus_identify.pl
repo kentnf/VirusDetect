@@ -447,8 +447,6 @@ main: {
 	my @m = split(/\n/, $raw_blast_table);
 	foreach my $m (@m) {
 		my @a = split(/\t/, $m);
-		# $query_name, $query_length, $hit_name, $hit_length, $hsp_length, $identity, $evalue, $score, $strand, $query_start, $query_end, $hit_start, $hit_end, $query_to_end, $hit_to_end, $identity2, $aligned_query, $aligned_hit, $aligned_string#
-
 		unless (defined $contig_best_blast{$a[0]}) {
 			$contig_best_blast{$a[0]} = $a[2]."\t".$a[3]."\tblastn\t".$a[6];
 			$best_vid{$a[2]} = 1;

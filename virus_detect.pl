@@ -19,54 +19,55 @@ Usage: virus_detect.pl [option] --reference reference input1 input2 ...
  Basic options:
   --reference       Name of the reference virus sequences database 
                       [vrl_plant]
-  --host-reference  Name of the host reference database used 
+  --host_reference  Name of the host reference database used 
                       for host sRNA subtraction [Null]
-  --thread-num      Number of threads used for alignments [8]
-  --rm-dup          Remove duplicated reads [disable]
-  --kmer-range      Set kmer range for denove assembly [default:9-23]
+  --thread_num      Number of threads used for alignments [8]
  
  BWA-related options (align sRNA to reference virus database or host 
   reference):
-  --max-dist		Maximum edit distance [1]  
-  --max-open		Maximum number of gap opens [1]  
-  --max-extension	Maximum number of gap extensions [1]  
-  --len-seed		Seed length [15] 
-  --dist-seed		Maximum edit distance in the seed [1]  
+  --max_dist		Maximum edit distance [1]  
+  --max_open		Maximum number of gap opens [1]  
+  --max_extension	Maximum number of gap extensions [1]  
+  --len_seed		Seed length [15] 
+  --dist_seed		Maximum edit distance in the seed [1]  
 
  HISAT-related options (align mRNA to host reference)
-  --hisat-dist		Maximum edit distance for HISAT [5]
+  --hisat_dist		Maximum edit distance for HISAT [5]
 
  Megablast-related options (remove redundancy within virus contigs):
-  --min-overlap		Minimum overlap length between two 
+  --min_overlap		Minimum overlap length between two 
                       contigs to be combined [30]
-  --max-end-clip	Maximum length of end clips [6]
-  --min-identity	Minimum identity between two contigs to be 
+  --max_end_clip	Maximum length of end clips [6]
+  --min_identity	Minimum identity between two contigs to be 
   			 combined [97]
-  --mis-penalty		Penalty score for a nucleotide mismatch [-3]
-  --gap-cost		Cost to open a gap [-1] 
-  --gap-extension	Cost to extend a gap [-1] 
+  --mis_penalty		Penalty score for a nucleotide mismatch [-3]
+  --gap_cost		Cost to open a gap [-1] 
+  --gap_extension	Cost to extend a gap [-1] 
 
  Megablast-related options (align virus contigs to reference virus 
   database for virus identification):
-  --word-size	       Minimum word size - length of best perfect match [11] 
-  --exp-value	       Maximum e-value for blastn[1e-5]
-  --exp-valuex         Maximum e-value for blastx[1e-2 (sRNA), 1e-5(RNA-seq)]
-  --percent-identity   Minimum percent identity for the alignment [25] 
-  --mis-penalty-b      Penalty score for a nucleotide mismatch [-3]
-  --gap-cost-b         Cost to open a gap [-1] 
-  --gap-extension-b    Cost to extend a gap [-1]
+  --word_size	       Minimum word size - length of best perfect match [11] 
+  --exp_value	       Maximum e-value for blastn[1e-5]
+  --percent_identity   Minimum percent identity for the alignment [25] 
+  --mis_penalty_b      Penalty score for a nucleotide mismatch [-3]
+  --gap_cost_b         Cost to open a gap [-1] 
+  --gap_extension_b    Cost to extend a gap [-1]
 
  Result filtering options:
-  --hsp-cover          Coverage cutoff of a reported virus contig by
+  --hsp_cover          Coverage cutoff of a reported virus contig by
                          reference virus sequences [0.75]
-  --coverage-cutoff    Coverage cutoff of a reported virus reference 
+  --coverage_cutoff    Coverage cutoff of a reported virus reference 
                          sequence by assembled virus contigs [0.1] 
-  --depth-cutoff       Depth cutoff of a reported virus reference [5]
-  --norm-depth-cutoff  Normalized depth cutoff of a reported virus 
-                         reference [5]
+  --depth_cutoff       Depth cutoff of a reported virus reference [5]
+
 _EOUSAGE_
 ;
-
+# 
+# remove temp
+# --rm_dup			Remove duplicated reads [disable]
+# --kmer_range		Set kmer range for denove assembly [default:9-23]
+# --exp_valuex		Maximum e-value for blastx[1e-2 (sRNA), 1e-5(RNA-seq)]
+# 
 =head1 discard parameters
  --strand-specific	Only for sequences assembled from strand-specific RNA-seq [false]
  --novel-len-cutoff   Length cutoff of a contig categorized as novel
@@ -132,47 +133,47 @@ my $exp_valuexs;
 # get input paras #
 GetOptions(
 	'r|reference=s'		=> \$reference,
-	'h|host-reference=s'=> \$host_reference,
-	't|thread-num=i'	=> \$thread_num,
+	'h|host_reference=s'=> \$host_reference,
+	't|thread_num=i'	=> \$thread_num,
 	'd|debug'			=> \$debug,
-	'rm-dup'			=> \$rm_dup,
-	'kmer-range=s'		=> \$kmer_range,
+	'rm_dup'			=> \$rm_dup,
+	'kmer_range=s'		=> \$kmer_range,
 
-	'max-dist=i' 		=> \$max_dist,
-	'max-open=i' 		=> \$max_open,
-	'max-extension=i' 	=> \$max_extension,
-	'len-seed=i' 		=> \$len_seed,
-	'dist-seed=i' 		=> \$dist_seed,			 
+	'max_dist=i' 		=> \$max_dist,
+	'max_open=i' 		=> \$max_open,
+	'max_extension=i' 	=> \$max_extension,
+	'len_seed=i' 		=> \$len_seed,
+	'dist_seed=i' 		=> \$dist_seed,			 
 	
-	'hisat-dist=i'		=> \$hisat_ed,
+	'hisat_dist=i'		=> \$hisat_ed,
 	
-	'strand-specific!' 	=> \$strand_specific,
-	'min-overlap=i' 	=> \$min_overlap,
-	'max-end-clip=i' 	=> \$max_end_clip,
-	'min-identity=s'	=> \$min_identity,
+	'strand_specific!' 	=> \$strand_specific,
+	'min_overlap=i' 	=> \$min_overlap,
+	'max_end_clip=i' 	=> \$max_end_clip,
+	'min_identity=s'	=> \$min_identity,
 
-	'cpu-num=i' 		=> \$cpu_num,
-	'mis-penalty=i' 	=> \$mis_penalty,
-	'gap-cost=i' 		=> \$gap_cost,
-	'gap-extension=i' 	=> \$gap_extension,
+	'cpu_num=i' 		=> \$cpu_num,
+	'mis_penalty=i' 	=> \$mis_penalty,
+	'gap_cost=i' 		=> \$gap_cost,
+	'gap_extension=i' 	=> \$gap_extension,
 	
 	'word-size=i' 		=> \$word_size,
-	'exp-value=s' 		=> \$exp_value,
+	'exp_value=s' 		=> \$exp_value,
 	'exp-valuex=s'		=> \$exp_valuexs,
-	'percent-identity=s'=> \$percent_identity,
-	'mis-penalty-b=i' 	=> \$mis_penalty_b,
-	'gap-cost-b=i' 		=> \$gap_cost_b,
-	'gap-extension-b=i' => \$gap_extension_b,
+	'percent_identity=s'=> \$percent_identity,
+	'mis_penalty_b=i' 	=> \$mis_penalty_b,
+	'gap_cost_b=i' 		=> \$gap_cost_b,
+	'gap_extension-b=i' => \$gap_extension_b,
 
-	'hsp-cover=s' 		=> \$hsp_cover,
-	'diff-ratio=s' 		=> \$diff_ratio,
-	'diff-contig-cover=s' 	=> \$diff_contig_cover,
-	'diff-contig-length=s'	=> \$diff_contig_length,
+	'hsp_cover=s' 		=> \$hsp_cover,
+	'diff_ratio=s' 		=> \$diff_ratio,
+	'diff_contig_cover=s' 	=> \$diff_contig_cover,
+	'diff_contig_length=s'	=> \$diff_contig_length,
 
-	'coverage-cutoff=f' => \$coverage_cutoff,
-	'depth-cutoff=f' 	=> \$depth_cutoff,
-	'norm-depth-cutoff=f'	=> \$norm_depth_cutoff,
-	'novel-len-cutoff=i'=> \$novel_len_cutoff,
+	'coverage_cutoff=f' => \$coverage_cutoff,
+	'depth_cutoff=f' 	=> \$depth_cutoff,
+	'norm_depth_cutoff=f'	=> \$norm_depth_cutoff,
+	'novel_len_cutoff=i'=> \$novel_len_cutoff,
 
 	'email=s' 			=> \$email,
 	'user=s'  			=> \$user,

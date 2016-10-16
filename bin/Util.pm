@@ -698,13 +698,6 @@ sub filter_blast_table
 		}
 	}
 
-	#if ($blast_program eq 'blastx') {
-	#	print $input_blast_table;
-	#	print "\nkentnf\n\nkentnf\n";
-	#	print $output_blast_table;
-	#	exit;
-	#}
-	
 	return $output_blast_table;
 }
 
@@ -1385,6 +1378,7 @@ sub plot_select
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
 <script> \$(function() { \$(\'a\').tooltip(); }) </script>
 <br>
+<div style="font-size:12px; margin-left:30px; margin-right:30px;">
 <center><h4>Undetermined contigs</h4></center>
 <p>* potential novel virus contigs are highlighted in green</p>
 <table class="table table-bordered table-hover table-condensed" style="font-size:12px;" align=center>
@@ -1489,8 +1483,8 @@ sub plot_select
 			$ud_num++;
 		}
 	}
-	$out_table_blast.= qq'</table>';
-	$out_table.= qq'</table>';
+	$out_table_blast.= qq'</table></div>';
+	$out_table.= qq'</table></div>';
 
     # output table to file
     save_file($out_table, $output_file) if $ud_num > 0;
