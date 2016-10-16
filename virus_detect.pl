@@ -14,7 +14,7 @@ use align;
 
 my $usage = <<_EOUSAGE_;
 
-Usage: virus_detect.pl [option] --reference reference input1 input2 ...
+Usage: perl virus_detect.pl [option] --reference reference input1 input2 ...
   
  Basic options:
   --reference       Name of the reference virus sequences database 
@@ -157,13 +157,13 @@ GetOptions(
 	'gap_cost=i' 		=> \$gap_cost,
 	'gap_extension=i' 	=> \$gap_extension,
 	
-	'word-size=i' 		=> \$word_size,
+	'word_size=i' 		=> \$word_size,
 	'exp_value=s' 		=> \$exp_value,
 	'exp-valuex=s'		=> \$exp_valuexs,
 	'percent_identity=s'=> \$percent_identity,
 	'mis_penalty_b=i' 	=> \$mis_penalty_b,
 	'gap_cost_b=i' 		=> \$gap_cost_b,
-	'gap_extension-b=i' => \$gap_extension_b,
+	'gap_extension_b=i' => \$gap_extension_b,
 
 	'hsp_cover=s' 		=> \$hsp_cover,
 	'diff_ratio=s' 		=> \$diff_ratio,
