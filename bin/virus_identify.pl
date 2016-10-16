@@ -12,7 +12,7 @@ use Util;
 
 my $usage = <<_EOUSAGE_;
 
-Usage: virus_itentify.pl [options] --reference reference input_read contig
+Usage: virus_identify.pl [options] --reference reference input_read contig
 
  Options(3):
   --reference           Name of the reference virus sequences database [vrl_plant]
@@ -43,6 +43,7 @@ Usage: virus_itentify.pl [options] --reference reference input_read contig
                          shows similarity with the reference virus 
                          sequences. The default is 100bp [100]
   --novel-siRNA-ratio	Cutoff of 21-22 nt siRNA ratio to determine potential novel virus [0.5]
+  --siRNA-percent       Proportion cutoff of 21-nt and 22-nt siRNAs for viral-like contigs [0.5]
 
 _EOUSAGE_
 
@@ -95,7 +96,7 @@ my $identity_percen = 25;		# for blastx: hsp_identity cutoff for protein blast
 my $filter_query = "F";			# megablast: F - disable remove simple sequence
 my $hits_return = 500;			# megablast: hit number
 my $input_suffix = '';
-my $novel_siRNA_ratio = 0.5;		#
+my $siRNA_percent = 0.5;		#
 
 my ($debug, $debug_force);
 
@@ -121,7 +122,7 @@ GetOptions(
 	'norm-depth-cutoff=f'	=> \$norm_depth_cutoff,
 	'd|debug'				=> \$debug,
 	'novel-len-cutoff=i'	=> \$novel_len_cutoff,
-	'novel-siRNA-ratio=f'	=> \$novel_siRNA_ratio,
+	'siRNA-percent=f'		=> \$siRNA_percent,
 	'f|force'				=> \$debug_force,
 );
 
@@ -477,7 +478,7 @@ main: {
 			$siRNA+= $n if ($_ == 21 || $_ == 22)
 		}
 
-		if ($siRNA / $total >= $novel_siRNA_ratio) {
+		if ($siRNA / $total >= $siRNA_percent) {
 			$select_label{$cid} = 1;
 		}
 	}

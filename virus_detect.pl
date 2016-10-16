@@ -59,6 +59,8 @@ Usage: perl virus_detect.pl [option] --reference reference input1 input2 ...
   --coverage_cutoff    Coverage cutoff of a reported virus reference 
                          sequence by assembled virus contigs [0.1] 
   --depth_cutoff       Depth cutoff of a reported virus reference [5]
+  --siRNA_percent      Proportion cutoff of 21-nt and 22-nt siRNAs for 
+                         viral-like contigs [0.5]
 
 _EOUSAGE_
 ;
@@ -130,6 +132,10 @@ my $diff_contig_cover = 0.5;
 my $diff_contig_length= 100; 
 my $debug; my $email; my $user;
 my $exp_valuexs;
+
+my $siRNA_percent = 0.5;		# Proportion cutoff of 21-nt and 22-nt siRNAs for 
+                         		# viral-like contigs [0.5]
+
 # get input paras #
 GetOptions(
 	'r|reference=s'		=> \$reference,
@@ -174,6 +180,7 @@ GetOptions(
 	'depth_cutoff=f' 	=> \$depth_cutoff,
 	'norm_depth_cutoff=f'	=> \$norm_depth_cutoff,
 	'novel_len_cutoff=i'=> \$novel_len_cutoff,
+	'siRNA_percent=f'	=> \$siRNA_percent,
 
 	'email=s' 			=> \$email,
 	'user=s'  			=> \$user,
@@ -417,7 +424,7 @@ foreach my $sample (@ARGV)
 	$cmd_identify .= "--word-size $word_size --exp-value $exp_value --exp-valuex $exp_valuex --percent-identity $percent_identity ";
 	$cmd_identify .= "--cpu-num $thread_num --mis-penalty $mis_penalty_b --gap-cost $gap_cost_b --gap-extension $gap_extension_b ";
 	$cmd_identify .= "--hsp-cover $hsp_cover --diff-ratio $diff_ratio --diff-contig-cover $diff_contig_cover --diff-contig-length $diff_contig_length ";
-	$cmd_identify .= "--coverage-cutoff $coverage_cutoff --depth-cutoff $depth_cutoff ";
+	$cmd_identify .= "--coverage-cutoff $coverage_cutoff --depth-cutoff $depth_cutoff --siRNA-percent $siRNA_percent ";
 	$cmd_identify .= "--novel-len-cutoff $novel_len_cutoff ";
 	$cmd_identify .= "-d " if $debug;
 	$cmd_identify .= "$sample $sample.combined ";
