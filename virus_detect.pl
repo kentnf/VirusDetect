@@ -245,8 +245,9 @@ foreach my $sample (@ARGV)
 	$exp_valuex = $exp_valuexs if defined $exp_valuexs;
 
 	my $seq_num = Util::detect_seqNum($sample);
+	#print "[ERR]no sequence find in $sample.\n" and exit if $seq_num < 5;
+	
 	my $sample_base = basename($sample);
-
 	# set path and folder for sample
 	my $TEMP_DIR      = $WORKING_DIR."/".$sample_base."_temp";	# set temp folder
 	print "Working: $WORKING_DIR\nDatabase: $DATABASE_DIR\nBin: $BIN_DIR\nTemp: $TEMP_DIR\n" if $debug;

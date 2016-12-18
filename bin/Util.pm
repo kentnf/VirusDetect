@@ -1920,6 +1920,7 @@ srna_range(read_length, input, output);
     }
 
 	my $format;
+	my $seq_num = 0;
 	my $out = IO::File->new(">".$output) || die $!;
 	my $in =  IO::File->new($input) || die $!;
 	while(<$in>) {
@@ -1939,10 +1940,14 @@ srna_range(read_length, input, output);
 		my $len = length($seq);
 		if (defined $length{$len}) {
 			print $out $out_seq;
+			$seq_num++;
 		}
 	}
 	$in->close;
 	$out->close;
+
+	print "[ERR]no sRNA sequence in $input\n" and exit if ($seq_num == 0);
+	print "[Warning]very limited sRNAs in $input\n" if ($seq_num < 1000);
 }
 
 1;
