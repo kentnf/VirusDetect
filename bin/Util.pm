@@ -1884,4 +1884,65 @@ $align
 	return $out_table;
 }
 
+
+=head2
+ srna_range -- only get selected size of sRNA reads for next analysis
+=cut
+sub srna_range
+{
+    my ($read_length, $input, $output) = @_;
+    my $usage = qq'
+srna_range(read_length, input, output);
+
+* example of set read_length parameters:
+  21-23:25:27:32-34
+  reads with length 21,22,23,25,27,32,33,34 were selected
+
+';
+    print $usage and exit unless (defined $read_length && defined $input && defined $output);
+
+    my @m = split(/:/, $read_length);
+
+    my @length;
+    foreach my $m (@m) {
+        if ($m =~ m/-/) {
+            my @a = split(/-/, $m, 2);
+            for($a[0] .. $a[1]) { push(@length, $_); }
+        } else {
+            push(@length, $m);
+        }
+    }
+
+    my %length;
+    foreach my $len (@length) {
+        die "[ERR]select length $len\n" unless $len > 0;
+        $length{$len} = 1;
+    }
+
+	my $format;
+	my $out = IO::File->new(">".$output) || die $!;
+	my $in =  IO::File->new($input) || die $!;
+	while(<$in>) {
+		my $id1 = $_;    chomp($id1);
+		my $seq = <$in>; chomp($seq);
+
+		if  ($id1 =~ m/^>/) { $format = 'fasta'; }
+		elsif   ($id1 =~ m/^@/) { $format = 'fastq'; }
+
+		my $out_seq = $id1."\n".$seq."\n";
+
+		if ($format eq 'fastq') {
+			$out_seq.= <$in>;
+			$out_seq.= <$in>;
+		}
+
+		my $len = length($seq);
+		if (defined $length{$len}) {
+			print $out $out_seq;
+		}
+	}
+	$in->close;
+	$out->close;
+}
+
 1;

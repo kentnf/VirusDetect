@@ -136,6 +136,8 @@ my $exp_valuexs;
 my $siRNA_percent = 0.5;		# Proportion cutoff of 21-nt and 22-nt siRNAs for 
                          		# viral-like contigs [0.5]
 
+my $read_length;
+
 # get input paras #
 GetOptions(
 	'r|reference=s'		=> \$reference,
@@ -144,7 +146,10 @@ GetOptions(
 	'd|debug'			=> \$debug,
 	'rm_dup'			=> \$rm_dup,
 	'kmer_range=s'		=> \$kmer_range,
-
+	'read_length=s'		=> \$read_length,	# only reads length in this range were used in analysis
+											# this parameter is useful for online version
+											#* example of set read_length parameters: 21-23:25:27:32-34
+  											# reads with length 21,22,23,25,27,32,33,34 were selected
 	'max_dist=i' 		=> \$max_dist,
 	'max_open=i' 		=> \$max_open,
 	'max_extension=i' 	=> \$max_extension,
@@ -234,8 +239,8 @@ foreach my $sample (@ARGV)
 	}
 
 	# check file
-	my $file_type = Util::detect_FileType($sample);
-	my $data_type = Util::detect_DataType($sample);
+	my $file_type = Util::detect_FileType($sample); # fastq or fasta
+	my $data_type = Util::detect_DataType($sample); # mRNA or sRNA reads
 	$exp_valuex = 1e-5 if $data_type eq 'mRNA';
 	$exp_valuex = $exp_valuexs if defined $exp_valuexs;
 
@@ -252,8 +257,13 @@ foreach my $sample (@ARGV)
 	if ($sample =~ m/^\//) { $sample_abs_source = $sample; }
 	else { $sample_abs_source = "$WORKING_DIR/$sample"; }
 
-	Util::process_cmd("ln -s $sample_abs_source $TEMP_DIR/$sample_base", $debug) unless -e "$TEMP_DIR/$sample_base";
-	$sample = "$TEMP_DIR/$sample_base";				# change the sample name to the linke from this step
+	# process input sample [select 18-32 nt reads]
+	if (defined $read_length) {
+		Util::srna_range($read_length, $sample_abs_source, "$TEMP_DIR/$sample_base");	
+	} else {
+		Util::process_cmd("ln -s $sample_abs_source $TEMP_DIR/$sample_base", $debug) unless -e "$TEMP_DIR/$sample_base";
+	}
+	$sample = "$TEMP_DIR/$sample_base";             # change the sample name to the linke from this step
 
 	# set parameters for remove reduncancy (rr)
 	my $rr_blast_word_size = int($min_overlap/3);
