@@ -478,8 +478,12 @@ main: {
 			$siRNA+= $n if ($_ == 21 || $_ == 22)
 		}
 
-		if ($siRNA / $total >= $siRNA_percent) {
-			$select_label{$cid} = 1;
+        if ($total == 0) {
+			$select_label{$cid} = 0;
+        } else {
+			if ($siRNA / $total >= $siRNA_percent) {
+				$select_label{$cid} = 1;
+			}
 		}
 	}
 

@@ -1457,7 +1457,13 @@ sub plot_select
 				$siRNA = $siRNA + $n;
 			} 
 		}
-		my $ratio = sprintf("%.2f", $siRNA/$total*100);
+
+		my $ratio;
+		if ($total == 0) {
+			$ratio = 'NA';
+		} else {
+			$ratio = sprintf("%.2f", $siRNA/$total*100);
+		}
 		$contig_tr.= "<td>$ratio</td>";
 		$contig_tr.= "<td>$depth</td>";
 		$contig_tr.= "<td>$norm_depth</td>";
