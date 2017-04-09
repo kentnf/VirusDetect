@@ -331,7 +331,7 @@ main: {
 	
 	# 2. 
 	# blast 
-	my $raw_blast_novel_table;
+	my $raw_blast_novel_table = '';
 	if ( $novel_check && $num_undetermined > 0 )
 	{
 		# compare noval contigs against virus database using tblastx
