@@ -183,10 +183,19 @@ sub host_subtraction
     my %query_len;
     my %host;
     
-	chomp($input_blast_table);
-	my @a = split(/\n/, $input_blast_table);
-	foreach my $line (@a)
-	{
+	# Split loop , so change it to open a file 
+	open(FH, ">tmp") || die $!;
+	print FH $input_blast_table;
+	close(FH);
+
+
+	open(FH2, 'tmp') || die $!;
+	while(<FH2>) {
+	#chomp($input_blast_table);
+	#my @a = split(/\n/, $input_blast_table);
+	#foreach my $line (@a)
+	#{
+		my $line = $_;
 		# $query_name, $query_length, $hit_name, $hit_length, $hsp_length, $identity, $evalue, $score, $strand, $query_start, $query_end, $hit_start, $hit_end, $query_to_end, $hit_to_end, $identity2, $aligned_query, $aligned_hit, $aligned_string#
 		chomp($line); 
 		next if $line =~ m/^#/;
@@ -196,7 +205,9 @@ sub host_subtraction
 			push(@{$blk{$ta[0]}}, [@ta[9,10]]); # create blk hash for query ID and [query_start,query_end], query is contig
 			defined $query_len{$ta[0]} or $query_len{$ta[0]} = $ta[1];
 		}
+	#}
 	}
+	close(FH2);
 
 	foreach my $tk (sort keys %blk)
 	{   
