@@ -6,6 +6,27 @@ use Bio::SeqIO;
 use Bio::Graphics;
 use Bio::SeqFeature::Generic;
 
+sub generate_reads {
+	my $input = shift;
+	my $output = $input;
+	$output =~ s/\.(fa|fasta|fq|fastq)$//;
+	$output.= ".read.fa";
+	my $out = IO::File->new(">".$output) || die $!;
+	my $in = Bio::SeqIO->new(-format=>'fasta', -file=>$input);
+	while(my $inseq = $in->next_seq) {
+		my $id  = $inseq->id;
+		my $seq = $inseq->seq;
+		my $len = $inseq->length;
+		for(my $i=0; $i<$len-21; $i++) {
+			my $nid = $id."-".$i;
+			my $rd  = substr($seq, $i, 21);
+			print $out ">$nid\n$rd\n";
+		}
+	}
+	$out->close;
+	return $output;
+}
+
 sub line_num {
 	my $input = shift;
 	my $num = $input =~ tr/\n/\n/;

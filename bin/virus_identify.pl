@@ -126,13 +126,25 @@ GetOptions(
 	'f|force'				=> \$debug_force,
 );
 
-if (scalar(@ARGV) != 2) {
-	print $usage;
-	exit;
-}
+# mode 1: identify virus only use de novo assembled contigs (with short reads input)
+# mode 2: normal mode 
+# set mode to 2 by default
+my $mode = 2;
+if 		(scalar(@ARGV) == 1) { $mode = 1; }
+elsif 	(scalar(@ARGV) == 2) { $mode = 2; }
+else 	{ print $usage; exit;  }
 
 main: {
-	my ($sample, $contig) = @ARGV;
+	my ($sample, $contig);
+	if ($mode == 1) {
+		# generate sample using contig
+		$contig = $ARGV[0];
+		$sample = Util::generate_reads($contig);
+	}
+	else {
+		($sample, $contig) = @ARGV;
+	}
+
 	my $file_type = Util::detect_FileType($sample);
 	die "[ERROR]undef input reads: $sample\n$usage" unless -s $sample;
 	die "[ERROR]undef input contig: $contig\n$usage" unless -s $contig;
