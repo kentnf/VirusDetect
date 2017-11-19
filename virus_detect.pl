@@ -440,7 +440,7 @@ foreach my $sample (@ARGV)
 	$cmd_identify .= "-d " if $debug;
 	$cmd_identify .= "$sample $sample.combined ";
 	if (-s "$sample.combined") {
-		print $cmd_identify;
+		#print $cmd_identify;
 		Util::process_cmd($cmd_identify, $debug);
 	} else {
 		Util::print_user_submessage("No virus was identified");
