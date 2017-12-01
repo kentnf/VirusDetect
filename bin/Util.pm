@@ -1533,7 +1533,7 @@ sub plot_select
 =cut
 sub plot_result
 {
-	my ($known_identified, $known_contig_blast_table, $output, $type) = @_;
+	my ($known_identified, $known_contig_blast_table, $output, $type, $mode) = @_;
 
 	# parse blast result to get contig_length and match length
 	# push contig and match info to hash
@@ -1615,8 +1615,10 @@ sub plot_result
 
 		my $link = $type."_references/".$ref.".html";
 		$coverage = sprintf("%.3f", $coverage) * 100;
-		$raw_depth = sprintf("%.1f", $raw_depth);
-		$norm_depth = sprintf("%.1f", $norm_depth);
+		$raw_depth = 'NA' if $mode == 1;
+		$norm_depth = 'NA' if $mode == 1;
+		$raw_depth = sprintf("%.1f", $raw_depth) if $mode == 2;
+		$norm_depth = sprintf("%.1f", $norm_depth) if $mode == 2;
 
 		$out_table .= qq' 
   <tr>

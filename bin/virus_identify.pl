@@ -274,7 +274,7 @@ main: {
 		my $known_num = 0; ($known_num, $known_identified) = arrange_col2($known_identified);
 
 		if ( length($known_identified) > 1 ) { 
-			Util::plot_result($known_identified, $known_contig_blast_table, $sample_dir, 'blastn'); 
+			Util::plot_result($known_identified, $known_contig_blast_table, $sample_dir, 'blastn', $mode); 
 		} else {
 			unlink "$sample_dir/$sample_base.blastn.xls" if -e "$sample_dir/$sample_base.blastn.xls";
 		}
@@ -390,7 +390,7 @@ main: {
 		my $novel_num = 0; ($novel_num, $novel_identified) = arrange_col2($novel_identified);
 
 		if ( length($novel_identified) > 1 ) { 
-			Util::plot_result($novel_identified, $novel_contig_blast_table, $sample_dir, 'blastx'); 
+			Util::plot_result($novel_identified, $novel_contig_blast_table, $sample_dir, 'blastx', $mode); 
 		} else {
 			unlink "$sample_dir/$sample_base.blastx.xls" if -e "$sample_dir/$sample_base.blastx.xls";
 		}
@@ -499,7 +499,7 @@ main: {
 		}
 	}
 
-	if ($select_ctg_num > 0) {
+	if ($select_ctg_num > 0 && $mode == 2) {
 		# plot the select ctg
 		Util::plot_select(\%select_ctg_for_sRNA_len_check, \%select_label, \%ctg_norm_depth, \%contig_best_blast, \%best_virus_info, $map_sRNA_len_stat, $sample_dir, 'undetermined');
 		# report to screen
