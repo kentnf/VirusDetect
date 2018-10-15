@@ -510,6 +510,15 @@ main: {
 	Util::save_file($known_contig_content, "$sample_dir/contig_sequences.blastn.fa") if length($known_contig_content) > 1;
 	Util::save_file($novel_contig_content, "$sample_dir/contig_sequences.blastx.fa") if length($novel_contig_content) > 1;
 	Util::save_file($undet_contig_content, "$sample_dir/contig_sequences.undetermined.fa") if length($undet_contig_content) > 1;
+
+
+	# remove temp file
+	if ($mode == 1) {
+		unlink("$contig.amb", "$contig.ann", "$contig.bwt", "$contig.pac", "$contig.sa");
+		unlink("$sample", "$sample.blastn.table", "$sample.blastn.table1", "$sample\_bwa.log", "$sample\_bwa.sai");
+		unlink("$sample.known.cov", "$sample.known.identified", "$sample.known.identified_with_depth");
+		unlink("$sample.novel.contigs", "$sample.samtools.log");
+	}
 }
 
 # put folder new folder
