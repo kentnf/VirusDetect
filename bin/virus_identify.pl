@@ -6,6 +6,7 @@ use Getopt::Long;
 use Cwd;
 use IO::File;
 use File::Basename;
+#use Mail::Sendmail;
 use FindBin;
 use lib "$FindBin::RealBin";
 use Util;
@@ -98,7 +99,7 @@ my $hits_return = 500;			# megablast: hit number
 my $input_suffix = '';
 my $siRNA_percent = 0.5;		#
 
-my ($debug, $debug_force);
+my ($debug, $debug_force, $email, $user);
 
 ########################
 # get input parameters #
@@ -124,6 +125,10 @@ GetOptions(
 	'novel-len-cutoff=i'	=> \$novel_len_cutoff,
 	'siRNA-percent=f'		=> \$siRNA_percent,
 	'f|force'				=> \$debug_force,
+
+	'email=s'	=> \$email,
+	'user=s'	=> \$user,
+
 );
 
 # mode 1: identify virus only use de novo assembled contigs (with short reads input)
@@ -518,6 +523,17 @@ main: {
 		unlink("$sample", "$sample.blastn.table", "$sample.blastn.table1", "$sample\_bwa.log", "$sample\_bwa.sai");
 		unlink("$sample.known.cov", "$sample.known.identified", "$sample.known.identified_with_depth");
 		unlink("$sample.novel.contigs", "$sample.samtools.log");
+	}
+
+	# send mail to user
+	# ===== send mail to user when the online task is finished =====
+	if (defined $email && $email && defined $user && $user) {
+        	my $file = basename($contig);
+        	my %mail = ( To => $email,
+                	From => 'bioinfo@cornell.edu',
+                	Subject => "VirusDetect analysis for $file is finished",
+                	Message => "Dear $user,\nThe analysis for $file is finished. Please login VirusDetect to view and download your results.\nThank you for using VirusDetect.\n\nBest Regards,\nVirusDetect");
+		# sendmail(%mail) or die $Mail::Sendmail::error;
 	}
 }
 
