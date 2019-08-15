@@ -202,7 +202,13 @@ my $BIN_DIR       = ${FindBin::RealBin}."/bin";				# set script folder
 $reference		  = $DATABASE_DIR."/".$reference;			# set reference
 my $seq_info	  = $DATABASE_DIR."/vrl_genbank.info.gz";	# set vrl info
 if (-s $DATABASE_DIR."/vrl_genbank_info.gz") {
-    $seq_info = $DATABASE_DIR."/vrl_genbank_info.gz"
+    $seq_info = $DATABASE_DIR."/vrl_genbank_info.gz";
+}
+elsif (-s $DATABASE_DIR."/vrl_genbank.info.gz") {
+    $seq_info = $DATABASE_DIR."/vrl_genbank.info.gz";
+}
+else {
+    die "[ERR]cant not find vrl_genebank_info file\n";
 }
 
 # check host reference & format 
