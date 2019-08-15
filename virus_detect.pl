@@ -201,6 +201,9 @@ my $DATABASE_DIR  = ${FindBin::RealBin}."/databases";		# set database folder
 my $BIN_DIR       = ${FindBin::RealBin}."/bin";				# set script folder
 $reference		  = $DATABASE_DIR."/".$reference;			# set reference
 my $seq_info	  = $DATABASE_DIR."/vrl_genbank.info.gz";	# set vrl info
+if (-s $DATABASE_DIR."/vrl_genbank_info.gz") {
+    $seq_info = $DATABASE_DIR."/vrl_genbank_info.gz"
+}
 
 # check host reference & format 
 if ( $host_reference ) {
