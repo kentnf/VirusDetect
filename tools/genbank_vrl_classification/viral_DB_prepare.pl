@@ -610,39 +610,46 @@ Please manually check and update these files:
 =cut
 sub vrl_download
 {
-	my ($options, $files) = @_;
-	my $download_cmd = '';
-	my $download_cmd_all = '';
-	my $genbank_ftp = "ftp.ncbi.nih.gov";
-	my $ftp = Net::FTP->new($genbank_ftp, Debug=>0) || die "[ERR]Cannot connect to $genbank_ftp $@\n";
-	$ftp->login("anonymous",'-anonymous@') || die "[ERR]Cannot login ", $ftp->message, "\n";
-	$ftp->cwd("/genbank") || die "[ERR]Cannot change working directory ", $ftp->message;
-	my @vrl_files;
-	my @files = $ftp->ls();
-	foreach my $f (@files) {
-		if ($f =~ m/gbvrl\d+\.seq\.gz/) {
-			#$ftp->get($f) unless -s $f;
-			#push(@vrl_files, $f);
-			if ( -s $f ) {
-				print "# == $f has been download from genbank ==\n";
-			} else {
-				$download_cmd.="wget ftp://ftp.ncbi.nih.gov/genbank/$f\n";
-			}
-			$download_cmd_all.="wget ftp://ftp.ncbi.nih.gov/genbank/$f\n";
-		}
-	}
-	$ftp->quit;
+    my ($options, $files) = @_;
+    my $download_cmd = '';
+    my $download_cmd_all = '';
+    #my $genbank_ftp = "ftp.ncbi.nih.gov";
+    #my $ftp = Net::FTP->new($genbank_ftp, Debug=>0) || die "[ERR]Cannot connect to $genbank_ftp $@\n";
+    #$ftp->login("anonymous",'-anonymous@') || die "[ERR]Cannot login ", $ftp->message, "\n";
+    #$ftp->cwd("/genbank") || die "[ERR]Cannot change working directory ", $ftp->message;
 
-	#print "# cmd for download vrl database\n$download_cmd\n\n";
-	print "# cmd for download all vrl database files\n$download_cmd_all\n\n";
-	print "cat gbvrl*.seq.gz > GB_virus.gz\nrm gbvrl*.seq.gz\n";
-	print "# cmd for dwonload taxonomy database\nwget ftp://ftp.ncbi.nih.gov/pub/taxonomy/taxdump.tar.gz\n";
-	my @del_f = qw/citations.dmp delnodes.dmp division.dmp gc.prt gencode.dmp merged.dmp readme.txt taxdump.tar.gz/;
-	my @zip_f = qw/names.dmp nodes.dmp/;
-	print "tar -xzvf taxdump.tar.gz\n";
-	print "rm ".join(" ", @del_f)."\n";
-	print "gzip ".join(" ", @zip_f)."\n";
-	exit;
+    my $doc=get("https://ftp.ncbi.nih.gov/genbank/");
+    my @lines = split(/\n/, $doc);
+
+    my @vrl_files;
+    #my @files = $ftp->ls();
+    my @files;
+    foreach my $f (@lines) {
+        if ($f =~ m/gbvrl(\d+)\.seq\.gz/) {
+            my $file = "gbvrl$1.seq\.gz";
+            #$ftp->get($f) unless -s $f;
+            #push(@vrl_files, $f);
+            #print $f."\t$file\n";
+            #if ( -s $f ) {
+            #   print "# == $f has been download from genbank ==\n";
+            #} else {
+            #   $download_cmd.="wget http://ftp.ncbi.nih.gov/genbank/$f\n";
+            #}
+            $download_cmd_all.="wget https://ftp.ncbi.nih.gov/genbank/$file\n";
+        }
+    }
+    #$ftp->quit;
+
+    #print "# cmd for download vrl database\n$download_cmd\n\n";
+    print "# cmd for download all vrl database files\n$download_cmd_all\n\n";
+    print "cat gbvrl*.seq.gz > GB_virus.gz\nrm gbvrl*.seq.gz\n";
+    print "# cmd for dwonload taxonomy database\nwget https://ftp.ncbi.nih.gov/pub/taxonomy/taxdump.tar.gz\n";
+    my @del_f = qw/citations.dmp delnodes.dmp division.dmp gc.prt gencode.dmp merged.dmp readme.txt taxdump.tar.gz/;
+    my @zip_f = qw/names.dmp nodes.dmp/;
+    print "tar -xzvf taxdump.tar.gz\n";
+    print "rm ".join(" ", @del_f)."\n";
+    print "gzip ".join(" ", @zip_f)."\n";
+    exit;
 }
 
 =head2
