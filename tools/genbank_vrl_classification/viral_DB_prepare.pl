@@ -12,6 +12,7 @@ use warnings;
 use Bio::SeqIO;
 use Bio::DB::GenBank;
 use Net::FTP;
+use LWP::Simple;
 use IO::File;
 use Getopt::Std;
 use FindBin;
@@ -623,7 +624,7 @@ sub vrl_download
 
     my @vrl_files;
     #my @files = $ftp->ls();
-    my @files;
+    #my @files;
     foreach my $f (@lines) {
         if ($f =~ m/gbvrl(\d+)\.seq\.gz/) {
             my $file = "gbvrl$1.seq\.gz";
