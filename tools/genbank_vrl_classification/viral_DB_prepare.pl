@@ -750,7 +750,13 @@ USAGE: $0 -t category [options] input_file1 ... input_fileN
 		my $pre_parse_percent = 0;
 
 		# parse each sequence
-		my $seqin = Bio::SeqIO->new(-format => 'GenBank', -file => "gunzip -c $f |" );
+		my $seqin;
+		if ($f =~ m/\.gz$/) {
+		    	$seqin = Bio::SeqIO->new(-format => 'GenBank', -file => "gunzip -c $f |" );
+		}
+		else {
+			$seqin = Bio::SeqIO->new(-format => 'GenBank', -file => $f );
+		}
 		while(my $inseq = $seqin->next_seq)
 		{
 			# print $inseq->id."\n".$inseq->seq_version."\n".$inseq->desc."\n";
