@@ -117,7 +117,7 @@ Two file will be generate.
 ###6. Remove redundancy in virus sequences (using plant viruses as an example)
 
 ```
-perl viral_DB_prepare.pl -t unique -p 20 vrl_Plants_all.fasta -s 95
+perl viral_DB_prepare.pl -t unique -p 20 -s 95 vrl_Plants_all.fasta
 ```
 This will collapse redundant sequences with 95% sequence similarity
 
