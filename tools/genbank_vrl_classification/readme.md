@@ -6,7 +6,7 @@ Virus Classification Pipeline (version 0.1)
 >This document describes how the **Virus Classification Pipeline** works.
 
 
-###1. Download virus sequences and the taxonomy database from GenBank (ftp://ftp.ncbi.nih.gov/genbank/)
+###1. Download virus sequences and the taxonomy database from GenBank (https://ftp.ncbi.nlm.nih.gov/genbank/)
 
 ```
 $ perl viral_DB_prepare.pl -t download > download.sh  
@@ -17,7 +17,8 @@ These two commands will: 1) generate the download script (download.sh), and 2) d
 ###2. Run viral_DB_prepare.pl script to classify virus sequences into different kingdoms
 
 ``` 
-$ perl viral_DB_prepare.pl -t category -c 1 GB_virus.gz 1>report.txt 2>&1
+$ gunzip GB_virus.gz
+$ perl viral_DB_prepare.pl -t category -c 1 GB_virus 1>report.txt 2>&1
 ```
 
 This will generate three files:
@@ -32,7 +33,7 @@ The automatic classification in step 2 may contain errors or unclassified viruse
 
 ####3.1 Manually correct host names associated with the virus sequences
 
-The pipeline will classify some viruses according to their host names, if they cannot be classified using the genus information in ICTV (http://www.ictvonline.org/). However some host names in GenBank may not follow the standard descriptions thus they cannot match entries in the taxonomy database. The file ***manual_hname_table.txt*** contains all the non-standard host names identified by the pipeline.
+For viruses that cannot be classified using the genus information in ICTV (http://www.ictvonline.org/), the pipeline will classify them according to their host names. However, some host names in GenBank may not follow the standard descriptions thus they cannot match entries in the taxonomy database. The file ***manual_hname_table.txt*** contains all the non-standard host names identified by the pipeline.
 
 Example:
 
@@ -85,33 +86,34 @@ The pipeline automatically does this step and generates the file ***manual_desc_
 
 ####3.4 Add the manually corrected file to the classification
 
-Next, the manually corrected files should be append to previous files provide by the system. The parameter -v indicate the version of GenBank (current version no. can be obtained at ftp://ftp.ncbi.nih.gov/genbank/GB_Release_Number).
+Next, the manually corrected files should be appended to previous files provide by the system. The parameter -v indicate the version of GenBank (current version no. can be obtained at https://ftp.ncbi.nlm.nih.gov/genbank/GB_Release_Number; e.g., 248).
 
 ```
-$ perl viral_DB_prepare.pl -t patch -v 211
+$ perl viral_DB_prepare.pl -t patch -v 248
 ```
 
 Three new update files will be generated
-- ***update_genus_table_v211.txt***
-- ***update_hname_table_v211.txt***
-- ***update_desc_table_v211.txt***
+- ***update_genus_table_v248.txt***
+- ***update_hname_table_v248.txt***
+- ***update_desc_table_v248.txt***
 
+After this step, please change the version number of file “current_genbank_version” that contain the version of last update to current version no.
 
 ###4. Run viral_DB_prepare.pl script to classify viruses again
 
 ```
-$ perl viral_DB_prepare.pl -t category -c 1 GB_virus.gz
+$ perl viral_DB_prepare.pl -t category -c 1 GB_virus
 ```
 
 ###5. Extract protein sequences from the viruses
 
 ```
-$ perl viral_DB_prepare.pl -t extProt GB_virus.gz
+$ perl viral_DB_prepare.pl -t extProt GB_virus
 ```
 
 Two file will be generate. 
 - ***vrl_genbank_prot***: virus protein sequences
-- ***vrl_genbank_tab***: virus nucleotide accession and protein accession
+- ***vrl_idmapping***: virus nucleotide accession and protein accession
 
 
 ###6. Remove redundancy in virus sequences (using plant viruses as an example)
@@ -119,20 +121,24 @@ Two file will be generate.
 ```
 perl viral_DB_prepare.pl -t unique -p 20 -s 95 vrl_Plants_all.fasta
 ```
-This will collapse redundant sequences with 95% sequence similarity
+This will collapse redundant sequences with 95% sequence similarity and generate file “vrl_Plants_all_U95.fasta”.
 
 
-###7. Retrieve proteins for each division (using vrl_Plants_u95 as an example)
+###7. Retrieve proteins for each division (using vrl_Plants_all_U95.fasta as an example)
 
 ```
-$ perl viral_DB_prepare.pl -t genProt vrl_Plants_u95 vrl_genbank_prot vrl_genbank_tab
+$ perl viral_DB_prepare.pl -t genProt vrl_Plants_all_U95.fasta vrl_genbank_prot vrl_idmapping
 ```
 
-The output protein sequences will be named as: ***vrl_Plants_u95_prot***
+The output protein sequences will be named as: *** vrl_Plants_all_U95.fasta_prot ***
 
+###8. Create index for each of the generated sequence files (using vrl_Plants_all_U95.fasta as an example)
 
-
-
-
-
+```
+$ ../../bin/bwa index vrl_Plants_all_U95.fasta
+$ ../../bin/samtools faidx vrl_Plants_all_U95.fasta
+$ ../../bin/formatdb -i vrl_Plants_all_U95.fasta -p F
+$ ../../bin/formatdb -i vrl_Plants_all_U95.fasta_prot
+```
+###9. Move the sequence and the associated index files, and the files “vrl_genbank.info” and “vrl_idmapping” (can be gziped) to the “database” folder of VirusDetect
 

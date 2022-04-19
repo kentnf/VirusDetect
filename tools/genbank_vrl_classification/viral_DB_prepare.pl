@@ -63,7 +63,7 @@ sub vrl_genProt
         my ($options, $files) = @_;
 
         my $usage = qq'
-USAGE: $0 -t genProt input_seq vrl_genbank_prot vrl_genbank_tab
+USAGE: $0 -t genProt input_seq vrl_genbank_prot vrl_idmapping
        
 		* the output file is protein sequence of input_seq
 		* input_seq_prot
@@ -126,7 +126,7 @@ USAGE: $0 -t extProt [options] gbvrl1.seq.gz gbvrl2.seq.gz ... gbvrlN.seq.gz
 
 	* two file will be generate
 	* 1. vrl_genbank_prot: protein sequences used for blastx
-	* 2. vrl_genbank_tab: id_mapping file for virus detection
+	* 2. vrl_idmapping: id_mapping file for virus detection
 
 ';
 	print $usage and exit unless defined $$files[0];
@@ -136,7 +136,7 @@ USAGE: $0 -t extProt [options] gbvrl1.seq.gz gbvrl2.seq.gz ... gbvrlN.seq.gz
 
 	my $output_prefix = 'vrl_genbank';
 	my $output_protein = $output_prefix."_prot";
-	my $output_table   = $output_prefix."_tab";
+	my $output_table   = "vrl_idmapping";
 
 	# extract_protein_seq
 	my $out1 = IO::File->new(">".$output_protein) || die $!;
@@ -144,7 +144,8 @@ USAGE: $0 -t extProt [options] gbvrl1.seq.gz gbvrl2.seq.gz ... gbvrlN.seq.gz
 
 	foreach my $f (@$files)
 	{
-		my $seqin = Bio::SeqIO->new(-format => 'GenBank', -file => "gunzip -c $f |" );
+#		my $seqin = Bio::SeqIO->new(-format => 'GenBank', -file => "gunzip -c $f |" );
+		my $seqin = Bio::SeqIO->new(-format => 'GenBank', -file => "$f" );
 		while(my $inseq = $seqin->next_seq)
 		{
 			my $sid = $inseq->id;
@@ -173,7 +174,7 @@ USAGE: $0 -t extProt [options] gbvrl1.seq.gz gbvrl2.seq.gz ... gbvrlN.seq.gz
 sub vrl_refine
 {
 	my @fasta = qw/vrl_Algae_all.fasta vrl_Archaea_all.fasta vrl_Bacteria_all.fasta vrl_Fungi_all.fasta vrl_Invertebrates_all.fasta vrl_Plants_all.fasta vrl_Protozoa_all.fasta vrl_Unassigned_all.fasta vrl_Vertebrates_all.fasta vrl_Viruses_all.fasta/;
-	my $input_file = 'vrl_genbank.txt';
+	my $input_file = 'vrl_genbank.info';
 
 	# load seq to hash	
 	my %seq_info;
@@ -726,7 +727,7 @@ USAGE: $0 -t category [options] input_file1 ... input_fileN
 	# foreach my $tid (sort keys %$virus_genus_taxon) { print $tid."\t".$$virus_genus_taxon{$tid}."\n"; } exit;
 
 	# parse viral sequence to database file
-	my $vrl_info_classified   = "vrl_genbank.txt";
+	my $vrl_info_classified   = "vrl_genbank.info";
 	my $manual_hname = "manual_hname_table.txt";
 	my $manual_genus = "manual_genus_table.txt";
 	my $manual_desc  = "manual_desc_table.txt";
@@ -1552,5 +1553,4 @@ sub classify_by_classified
         }
         $out3->close;
 }
-
 
