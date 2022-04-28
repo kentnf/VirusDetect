@@ -202,8 +202,21 @@ sub pileup_filter
 {
 	my ($input_pileup, $virus_seq_info, $coverage, $output_pileup) = @_;
 
-	# put plant virus sequence length to hash
+	# put plant virus sequence length to hash (low memory method)
 	my %seq_len;
+	my $fha = IO::File->new($input_pileup) || die $!;
+	while(<$fha>) {
+		chomp;
+		# ref pos base depth match Qual?
+		# AB000282 216 T 1 ^!, ~
+		my @a = split(/\t/, $_);
+		die "[ERR]Pileup File, Line $_\n" if scalar @a < 4;
+		next if scalar @a < 6;
+		my ($id, $pos, $base, $depth) = ($a[0], $a[1], $a[2], $a[3]);
+		$seq_len{$id} = 0;
+	}
+	$fha->close;
+	#print "num seq:".scalar(keys(%seq_len))."\n";
 
 	my $fh1;
 	if ($virus_seq_info =~ m/\.gz$/) {
@@ -218,9 +231,10 @@ sub pileup_filter
 		# ID Len Desc
 		# AB000048 2007 Parvovirus Feline panleukopenia virus gene ...... 1 Vertebrata
 		my @a = split(/\t/, $_);
-		$seq_len{$a[0]} = $a[1];
+		$seq_len{$a[0]} = $a[1] if defined $seq_len{$a[0]};
 	}
 	close($fh1);
+	#print "num seq:".scalar(keys(%seq_len))."\n";
 
 	# filter the pileup file by coverage length
 	my $pre_id;
