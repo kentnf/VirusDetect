@@ -738,6 +738,7 @@ USAGE: $0 -t category [options] input_file1 ... input_fileN
 	my %vrl_seq_info;
 
 	my $out1 = IO::File->new(">".$vrl_info_classified) || die $!;
+	my $tmp1 = IO::File->new(">vrl_seq_tmp") || die $!; # save seq to temp fasta for saving memory 
 
 	foreach my $f (@vrl_files)
 	{
@@ -753,7 +754,7 @@ USAGE: $0 -t category [options] input_file1 ... input_fileN
 		# parse each sequence
 		my $seqin;
 		if ($f =~ m/\.gz$/) {
-		    	$seqin = Bio::SeqIO->new(-format => 'GenBank', -file => "gunzip -c $f |" );
+		    $seqin = Bio::SeqIO->new(-format => 'GenBank', -file => "gunzip -c $f |" );
 		}
 		else {
 			$seqin = Bio::SeqIO->new(-format => 'GenBank', -file => $f );
@@ -763,9 +764,11 @@ USAGE: $0 -t category [options] input_file1 ... input_fileN
 			# print $inseq->id."\n".$inseq->seq_version."\n".$inseq->desc."\n";
 			#my $sid = $inseq->id;
 			my $sid = $inseq->accession;
+			my $vdesc = $inseq->desc;
+			my $vseq  = $inseq->seq;
 			$vrl_seq_info{$sid}{'ver'} = $inseq->seq_version;
-			$vrl_seq_info{$sid}{'seq'} = $inseq->seq;
-			$vrl_seq_info{$sid}{'des'} = $inseq->desc;
+			$vrl_seq_info{$sid}{'des'} = $vdesc;
+			print $tmp1 ">$sid\t$vdesc\n$vseq\n";
 
 			my %host_division = ();	# key: divID, value, classification method
 
@@ -1009,31 +1012,36 @@ USAGE: $0 -t category [options] input_file1 ... input_fileN
 	}
 
 	$out1->close;
+	$tmp1->close;
+
+	my $samtools_bin = ${FindBin::RealBin}."/../../bin/samtools";
+	my $fa_idx_cmd =  "$samtools_bin faidx vrl_seq_tmp";
+	system($fa_idx_cmd) && die "[ERR]cmd $fa_idx_cmd\n";	
 
 	# output sequence for each division
-	my %out_div_seq;	
+	my %out_div_seq; # key: div_name; value: array of virus seq id
 	foreach my $id (sort keys %vrl_seq_info) {
 		my $host_division = $vrl_seq_info{$id}{'host_div'} if defined $vrl_seq_info{$id}{'host_div'};
 		foreach my $host_div_id (sort keys %$host_division) {
 			die "[ERR]undef div id $host_div_id\n" unless defined $division{$host_div_id};
 			my $div_name = $division{$host_div_id};
-			if (defined $out_div_seq{$div_name}) {
-				$out_div_seq{$div_name}.= ">$id\n$vrl_seq_info{$id}{'seq'}\n";
-			} else {
-				$out_div_seq{$div_name} = ">$id\n$vrl_seq_info{$id}{'seq'}\n";
-			}
+			push(@{$out_div_seq{$div_name}}, $id);
 		}
 	}
 
 	foreach my $div_name (sort keys %out_div_seq) {
 		$div_name =~ s/ /_/ig;
 		my $vrl_seq_file = "vrl_".$div_name."_all.fasta";
-		my $vrl_seq = $out_div_seq{$div_name};
-		if ($vrl_seq) {
-			my $fhs = IO::File->new(">".$vrl_seq_file) || die $!;
-			print $fhs $vrl_seq;
-			$fhs->close;
+		my @ids = @{$out_div_seq{$div_name}};	
+		next unless scalar(@ids) > 0;	
+
+		my $fhs = IO::File->new(">".$vrl_seq_file) || die $!;
+		foreach my $id ( @ids ) {
+			# print $id."\t$div_name\n";
+			my $seq = `$samtools_bin faidx vrl_seq_tmp $id`;
+			print $fhs $seq;
 		}
+		$fhs->close;
 	}
 
 	# output put manually changed file
@@ -1042,7 +1050,7 @@ USAGE: $0 -t category [options] input_file1 ... input_fileN
 		print $outx $hname."\n";
 	}
 	$outx->close;
-		
+
 	my $outy = IO::File->new(">".$manual_genus) || die $!;
 	foreach my $genus (sort keys %manual_genus_check) 
 	{
