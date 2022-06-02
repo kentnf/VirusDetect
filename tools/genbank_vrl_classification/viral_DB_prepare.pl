@@ -16,9 +16,11 @@ use LWP::Simple;
 use IO::File;
 use Getopt::Std;
 use FindBin;
+#use Memory::Usage;
 
 my $version = 0.1;
 my $debug = 0;
+my @keywords = ('SARS');
 
 my %options;
 getopts('a:b:c:d:e:f:g:i:j:k:l:m:n:o:p:q:r:s:t:u:v:w:x:y:z:h', \%options);
@@ -668,6 +670,9 @@ USAGE: $0 -t category [options] input_file1 ... input_fileN
 	-c 1 make classify by classification enable
 
 ';
+	#my $mu = Memory::Usage->new();
+	#$mu->record('MU:starting work...');
+
 	print $usage and exit unless defined $$files[0];
 	my @vrl_files = @$files;
 
@@ -751,6 +756,9 @@ USAGE: $0 -t category [options] input_file1 ... input_fileN
 		my $parse_seq_num = 0; 
 		my $pre_parse_percent = 0;
 
+		# store SOUCE to hash, which used to filter SARS-CoV-2 and SARS
+		my %vsource = gb2source($f);
+
 		# parse each sequence
 		my $seqin;
 		if ($f =~ m/\.gz$/) {
@@ -759,6 +767,8 @@ USAGE: $0 -t category [options] input_file1 ... input_fileN
 		else {
 			$seqin = Bio::SeqIO->new(-format => 'GenBank', -file => $f );
 		}
+
+		#$mu->record("start load to hash");
 		while(my $inseq = $seqin->next_seq)
 		{
 			# print $inseq->id."\n".$inseq->seq_version."\n".$inseq->desc."\n";
@@ -766,6 +776,18 @@ USAGE: $0 -t category [options] input_file1 ... input_fileN
 			my $sid = $inseq->accession;
 			my $vdesc = $inseq->desc;
 			my $vseq  = $inseq->seq;
+
+			my $next_label = 0;
+			if (defined $vsource{$sid}) {
+				my $vsource = $vsource{$sid};
+				foreach my $vkey (@keywords) {
+					if ($vsource =~ m/\Q$vkey\E/) {
+						$next_label = 1;
+					}
+				}
+			}
+			next if $next_label == 1;
+
 			$vrl_seq_info{$sid}{'ver'} = $inseq->seq_version;
 			$vrl_seq_info{$sid}{'des'} = $vdesc;
 			print $tmp1 ">$sid\t$vdesc\n$vseq\n";
@@ -1008,11 +1030,15 @@ USAGE: $0 -t category [options] input_file1 ... input_fileN
 			#$pre_parse_percent = $parse_percent;
 		}
 
+		#$mu->record("end load to hash of $f");
+
 		print print "parsing file $f end ......\n\n";
 	}
 
 	$out1->close;
 	$tmp1->close;
+
+	#$mu->record("end parse all virus gb");
 
 	my $samtools_bin = ${FindBin::RealBin}."/../../bin/samtools";
 	my $fa_idx_cmd =  "$samtools_bin faidx vrl_seq_tmp";
@@ -1079,6 +1105,9 @@ USAGE: $0 -t category [options] input_file1 ... input_fileN
 	$outy->close;
 
 	classify_by_classified($vrl_info_classified,  $manual_desc) if $cbc;
+
+	#$mu->record('MU:ending work');
+	#$mu->dump();
 }
 
 #################################################################
@@ -1149,6 +1178,53 @@ sub load_host_div
 	$fh2->close;
 
 	return %virus_hostdiv;
+}
+
+=head2
+ gb2source -- save source to hash
+=cut
+sub gb2source
+{
+    my $gb = shift;
+	my %source;
+
+    my $fh;
+    if ($gb =~ m/\.gz$/) {
+        $fh = IO::File->new("gunzip -c $gb |") || die $!;
+    } else {
+        $fh = IO::File->new($gb) || die $!;
+    }
+
+    # init vars
+    my ($id, $source);
+
+    # process gb file
+    while(<$fh>) {
+        chomp;
+        if ($_ =~ m/^SOURCE/) {
+			$source = $_;
+			$source =~ s/^SOURCE\s+//;
+        }
+        elsif ($_ =~ m/^ACCESSION/) {
+			$id = $_;
+			$id =~ s/.*\s+//;
+        }
+        elsif ($_ eq '//') {
+            if (length($id) > 0 && length($source) > 0) {
+                $source{$id} = $source;
+            }
+            else {
+                die "[ERR]ID:$id\nSOURCE:$source\n";
+            }
+            $id = ''; 
+			$source = '';
+        }
+        else {
+			next;
+        }
+    }
+    $fh->close;
+	return %source;
 }
 
 =head2
