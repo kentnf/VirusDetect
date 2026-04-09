@@ -8,6 +8,8 @@ The legacy Perl release history remains on the `v1` branch and the historical `v
 
 ### Added
 
+- Bioconda recipe scaffold under `recipes/virusdetect/meta.yaml`
+- release packaging notes in `BIOCONDA.md` and a repository `LICENSE` file for downstream packaging metadata
 - `virusdetect db bundle` to package a legacy or v2 database directory into a release-ready `database/` tarball
 - generated database manifests and sibling `.sha256` checksum files for packaged database archives
 - default GitHub release asset resolution for `virusdetect db download`, including automatic checksum URL lookup

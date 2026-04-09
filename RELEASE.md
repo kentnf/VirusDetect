@@ -22,7 +22,7 @@ Not included in this alpha:
 
 - legacy `Bio::Graphics` image reports
 - siRNA size-distribution reporting
-- published downloadable v2 database bundles
+- public Bioconda package publication
 - full report parity with the Perl workflow
 
 ## Pre-Release Checklist
@@ -75,21 +75,29 @@ vd_identify_release/result_test_data/test_data.summary.json
 pixi run package
 ```
 
-9. Build the database bundle when preparing a database release:
+9. Upload the Python package assets to GitHub Release:
+
+```bash
+gh release upload v2.0.0a0 dist/virusdetect-2.0.0a0.tar.gz dist/virusdetect-2.0.0a0-py3-none-any.whl --clobber
+```
+
+10. Build the database bundle when preparing a database release:
 
 ```bash
 pixi run package-db
 ```
 
-10. Upload the database archive and checksum to the matching GitHub release:
+11. Upload the database archive and checksum to the matching GitHub release:
 
 ```bash
 gh release upload v2.0.0a0 dist/virusdetect-db-2026.04.tar.gz dist/virusdetect-db-2026.04.tar.gz.sha256 --clobber
 ```
 
-11. Verify the generated artifacts exist under `dist/` and on the release page.
+12. Verify the generated artifacts exist under `dist/` and on the release page.
 
-12. Tag the release only after the worktree is reviewed and committed.
+13. Update [recipes/virusdetect/meta.yaml](/Users/kentnf/projects/cornell/VirusDetect/recipes/virusdetect/meta.yaml) and validate it with `conda render` when preparing a Bioconda submission.
+
+14. Tag the release only after the worktree is reviewed and committed.
 
 ## Suggested Tagging
 

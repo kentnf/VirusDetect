@@ -21,7 +21,7 @@ The v2 branch currently provides:
 
 The legacy backend remains available during the migration, but the Python backend can now run end-to-end through `identify_virus`.
 
-This is still an alpha release line: the Python pipeline is functional through identification and reporting, but report parity and packaged database delivery are not finished yet.
+This is still an alpha release line: the Python pipeline is functional through identification and reporting, but report parity and package-manager distribution are not finished yet.
 
 ## Migration Snapshot
 
@@ -49,7 +49,7 @@ Not yet ported from the legacy Perl workflow:
 - `Bio::Graphics` alignment images and detailed graphical layouts
 - siRNA size-distribution tables and highlighting logic
 - full parity for every historical HTML artifact and formatting detail
-- final packaging of downloadable v2 databases separate from the repository
+- final publication flow for package-manager distribution and future database refreshes
 
 ## Quick Start
 
@@ -95,6 +95,8 @@ pixi run virusdetect -- tools install-hint
 During the migration, `virusdetect tools check` will also fall back to bundled legacy tools in `bin/` when needed for transitional development.
 
 When you use `--backend legacy`, the original Perl dependencies still apply. In particular, BioPerl modules such as `Bio::SeqIO` and `Bio::Graphics` must be installed.
+
+Bioconda packaging scaffolding now lives in [BIOCONDA.md](/Users/kentnf/projects/cornell/VirusDetect/BIOCONDA.md) and [recipes/virusdetect/meta.yaml](/Users/kentnf/projects/cornell/VirusDetect/recipes/virusdetect/meta.yaml). The public package is not published there yet, but the repository now carries the recipe and release-asset layout needed for submission.
 
 ### Alternative: local editable install
 

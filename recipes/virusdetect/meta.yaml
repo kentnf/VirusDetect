@@ -1,0 +1,47 @@
+{% set name = "virusdetect" %}
+{% set version = "2.0.0a0" %}
+
+package:
+  name: {{ name|lower }}
+  version: {{ version }}
+
+source:
+  url: https://github.com/kentnf/VirusDetect/releases/download/v{{ version }}/virusdetect-{{ version }}.tar.gz
+  sha256: d741cbb5150adae0e61962f5d26c0fbecae11b10a0744c24a9558e22c3b9e4c6
+
+build:
+  noarch: python
+  number: 0
+  script: {{ PYTHON }} -m pip install . --no-deps --ignore-installed -vv
+
+requirements:
+  host:
+    - python >=3.10
+    - pip
+    - setuptools >=68
+    - wheel
+  run:
+    - python >=3.10
+    - bwa
+    - samtools
+    - blast
+    - hisat2
+    - spades
+    - perl
+    - perl-bioperl
+
+test:
+  commands:
+    - virusdetect --version
+    - virusdetect db path --target
+    - python -c "import virusdetect; print(virusdetect.__version__)"
+
+about:
+  home: https://github.com/kentnf/VirusDetect
+  summary: Python rewrite of the VirusDetect plant virus discovery pipeline
+  license: MIT
+  dev_url: https://github.com/kentnf/VirusDetect
+
+extra:
+  recipe-maintainers:
+    - kentnf
