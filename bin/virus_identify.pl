@@ -55,7 +55,7 @@ _EOUSAGE_
 ################################
 
 my $WORKING_DIR = cwd();				# current folder : working folder
-my $BIN_DIR = ${FindBin::RealBin};			# bin folder
+my $BIN_DIR = $ENV{'VIRUSDETECT_TOOL_DIR'} || ${FindBin::RealBin};	# bin folder
 my $result_dir = $WORKING_DIR."/result";		# result folder
 my $tf = $WORKING_DIR."/temp";				# temp folder
 
@@ -938,5 +938,4 @@ sub combine_table1
 
 	return ($output_table, $output_blast_table, $reference_seq);
 }
-
 

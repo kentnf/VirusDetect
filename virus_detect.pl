@@ -198,7 +198,7 @@ foreach my $sample (@ARGV) { print "[ERR]cat not find input file: $sample\n$usag
 # set path and folder
 my $WORKING_DIR   = cwd();									# set current folder as working folder
 my $DATABASE_DIR  = ${FindBin::RealBin}."/databases";		# set database folder
-my $BIN_DIR       = ${FindBin::RealBin}."/bin";				# set script folder
+my $BIN_DIR       = $ENV{'VIRUSDETECT_TOOL_DIR'} || ${FindBin::RealBin}."/bin";	# set script folder
 $reference		  = $DATABASE_DIR."/".$reference;			# set reference
 my $seq_info	  = $DATABASE_DIR."/vrl_genbank.info.gz";	# set vrl info
 if (-s $DATABASE_DIR."/vrl_genbank_info.gz") {
@@ -475,4 +475,3 @@ if (defined $email && $email && defined $user && $user) {
 		Message => "Dear $user,\nThe analysis for $file is finished. Please login VirusDetect to view and download your results.\nThank you for using VirusDetect.\n\nBest Regards,\nVirusDetect");
 	#sendmail(%mail) or die $Mail::Sendmail::error;
 }
-

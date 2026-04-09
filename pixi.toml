@@ -1,0 +1,20 @@
+[workspace]
+channels = ["conda-forge", "bioconda"]
+platforms = ["linux-64", "osx-64", "osx-arm64"]
+
+[dependencies]
+python = "3.11.*"
+pip = "*"
+bwa = "*"
+samtools = "*"
+blast = "*"
+hisat2 = "*"
+spades = "*"
+perl = "*"
+perl-bioperl = "*"
+
+[tasks]
+virusdetect = "PYTHONPATH=src python -m virusdetect"
+test = "PYTHONPATH=src python -m unittest discover -s tests -v"
+package = "python -m pip install build && python -m build"
+smoke-identify = "PYTHONPATH=src python -m virusdetect run test_data --backend python --stop-after identify_virus -o vd_identify_release -t 2"

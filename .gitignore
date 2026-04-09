@@ -1,0 +1,15 @@
+__pycache__/
+*.py[cod]
+.DS_Store
+.pytest_cache/
+.pixi/
+.venv/
+build/
+dist/
+*.egg-info/
+result_*/
+*.tar.gz
+vd_identify_py*/
+vd_identify_release/
+vd_identify_test*/
+vd_nr_test*/

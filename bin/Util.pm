@@ -478,6 +478,18 @@ sub parse_blast_to_table
 			$query_length = $1;
 			$query_length =~ s/,//g;
 		}
+		elsif (/^\s*Length\s*=\s*(\d+)/)
+		{
+			my $parsed_length = $1;
+			$parsed_length =~ s/,//g;
+
+			if ($hit_name eq '') {
+				$query_length = $parsed_length;
+			}
+			elsif ($hit_length eq '') {
+				$hit_length = $parsed_length;
+			}
+		}
 		elsif (/>(\S+)/)# Hit Name, parse hit info
 		{
 			# previous hsp information
@@ -493,11 +505,6 @@ sub parse_blast_to_table
 			# start new hit
 			$hit_name = $1; $hit_length = "";
 
-		}
-		elsif (/\s+Length = (\d+)/)
-		{
-			$hit_length = $1;
-			$hit_length =~ s/,//g;
 		}
 		elsif (/Score =\s+(\S+) bits.+Expect(\(\d+\))? = (\S+)/) # parse hsp info
 		{
@@ -515,6 +522,9 @@ sub parse_blast_to_table
 			$score = $1; $evalue = $3;
 			$evalue = "1$evalue" if ($evalue =~ m/^e/);
 			$query_start = 0; $query_end = 0; $hit_start = 0; $hit_end = 0;
+			$strand = 1;
+			$query_strand = undef;
+			$hit_strand = undef;
 			$aligned_query = ""; $aligned_hit= ""; $aligned_string= "";
 
 		}
@@ -548,7 +558,7 @@ sub parse_blast_to_table
 			if ( $a =~ /\+/ ) { $strand = 1;} else { $strand = -1;}
 		}
 
-		elsif (/Query\:\s(\d+)\s+(\S+)\s(\d+)/ && $hsp_count >= 1) 		# query sequence, && aligned string
+		elsif (/Query\:?[\s]+(\d+)\s+(\S+)\s+(\d+)/ && $hsp_count >= 1) 		# query sequence, && aligned string
 		{
 			if ($query_start == 0) { $query_start = $1; $query_start =~ s/,//g;}
 			$query_end = $3;
@@ -567,7 +577,7 @@ sub parse_blast_to_table
 			chomp($next_line); 
 			$aligned_string .= $next_line.",";
 		}
-		elsif (/Sbjct\:\s(\d+)\s+(\S+)\s(\d+)/ && $hsp_count >= 1)		# subject sequence
+		elsif (/Sbjct\:?[\s]+(\d+)\s+(\S+)\s+(\d+)/ && $hsp_count >= 1)		# subject sequence
 		{
 			if (defined $hit_strand && $blast eq 'tblastx') 
 			{
@@ -1330,15 +1340,15 @@ sub blast_table_to_sam
 
 		for (my $i = 0; $i < $l; ++$i)
 		{
-			$q_seqs[$i] =~ /Query\:\s(\d+)\s*(\S+)\s(\d+)/;
-			$q = $2;
-			my $x = $q;
-			$x =~ s/-//g; 
-			$sam[9] .= $x;				# connect query seq from blast result
-		
-			$s_seqs[$i] =~ /Sbjct\:\s(\d+)\s*(\S+)\s(\d+)/;
-			$s = $2;
-			aln2cm(\@cigar, \$q, \$s, \@cmaux);	# get cigar from query and hit seq
+				$q_seqs[$i] =~ /Query\:?[\s]+(\d+)\s*(\S+)\s+(\d+)/;
+				$q = $2;
+				my $x = $q;
+				$x =~ s/-//g; 
+				$sam[9] .= $x;				# connect query seq from blast result
+			
+				$s_seqs[$i] =~ /Sbjct\:?[\s]+(\d+)\s*(\S+)\s+(\d+)/;
+				$s = $2;
+				aln2cm(\@cigar, \$q, \$s, \@cmaux);	# get cigar from query and hit seq
 		}	
 
 		# additional info
