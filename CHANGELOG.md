@@ -10,6 +10,7 @@ The legacy Perl release history remains on the `v1` branch and the historical `v
 
 - `virusdetect db bundle` to package a legacy or v2 database directory into a release-ready `database/` tarball
 - generated database manifests and sibling `.sha256` checksum files for packaged database archives
+- default GitHub release asset resolution for `virusdetect db download`, including automatic checksum URL lookup
 - `pixi run package-db` maintainer task for building the default database bundle from `databases/`
 
 ## [2.0.0a0] - 2026-04-10

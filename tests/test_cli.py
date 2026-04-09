@@ -67,6 +67,30 @@ class VirusDetectCliTests(unittest.TestCase):
         self.assertIn("Database bundle created", output.getvalue())
         self.assertIn("SHA256 file written", output.getvalue())
 
+    def test_db_download_uses_default_release_source(self):
+        args = cli.build_parser().parse_args(["db", "download"])
+
+        with mock.patch("virusdetect.cli.resolve_database_target_dir", return_value="/tmp/install") as mock_target:
+            with mock.patch(
+                "virusdetect.cli.resolve_database_download_source",
+                return_value=mock.Mock(
+                    url="https://github.com/kentnf/VirusDetect/releases/download/v2.0.0a0/virusdetect-db-2026.04.tar.gz",
+                    sha256=None,
+                    sha256_url="https://github.com/kentnf/VirusDetect/releases/download/v2.0.0a0/virusdetect-db-2026.04.tar.gz.sha256",
+                ),
+            ) as mock_source:
+                with mock.patch("virusdetect.cli.install_database_archive", return_value="/tmp/install") as mock_install:
+                    output = io.StringIO()
+                    with redirect_stdout(output):
+                        exit_code = cli.handle_db(args)
+
+        self.assertEqual(exit_code, 0)
+        mock_target.assert_called_once_with(None)
+        self.assertEqual(mock_source.call_args.kwargs["db_version"], "2026.04")
+        self.assertEqual(mock_install.call_args.kwargs["destination_dir"], "/tmp/install")
+        self.assertIn("Database source:", output.getvalue())
+        self.assertIn("Database installed to: /tmp/install", output.getvalue())
+
     def test_tools_check_json(self):
         args = cli.build_parser().parse_args(["tools", "check", "--json"])
         output = io.StringIO()

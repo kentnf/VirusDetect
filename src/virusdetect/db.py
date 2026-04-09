@@ -11,7 +11,13 @@ from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 
+from virusdetect import __db_release_repo__, __db_version__, __version__
+
 DEFAULT_DB_ENV_VAR = "VIRUSDETECT_DB_DIR"
+DEFAULT_DB_RELEASE_REPO_ENV_VAR = "VIRUSDETECT_DB_RELEASE_REPO"
+DEFAULT_DB_RELEASE_TAG_ENV_VAR = "VIRUSDETECT_DB_RELEASE_TAG"
+DEFAULT_DB_ASSET_NAME_ENV_VAR = "VIRUSDETECT_DB_ASSET_NAME"
+DEFAULT_DB_SHA256_ASSET_NAME_ENV_VAR = "VIRUSDETECT_DB_SHA256_ASSET_NAME"
 USER_DB_DIR = Path.home() / ".local" / "share" / "virusdetect" / "database"
 MANIFEST_NAME = "manifest.json"
 LEGACY_MARKER_FILES = (
@@ -35,6 +41,17 @@ class DatabaseLocation:
 class DatabaseBundle:
     archive_path: str
     sha256_path: str
+
+
+@dataclass(frozen=True)
+class DatabaseDownloadSource:
+    url: str
+    sha256: str | None
+    sha256_url: str | None
+    release_repo: str | None
+    release_tag: str | None
+    asset_name: str | None
+    sha256_asset_name: str | None
 
 
 def read_manifest(db_path: str) -> dict | None:
@@ -200,6 +217,52 @@ def build_database_manifest(db_path: str, db_version: str, db_name: str = "virus
         "created_at": datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z"),
         "files": collect_database_files(str(candidate)),
     }
+
+
+def default_database_asset_name(db_version: str) -> str:
+    return f"virusdetect-db-{db_version}.tar.gz"
+
+
+def resolve_database_download_source(
+    url: str | None = None,
+    sha256: str | None = None,
+    sha256_url: str | None = None,
+    release_repo: str | None = None,
+    release_tag: str | None = None,
+    asset_name: str | None = None,
+    sha256_asset_name: str | None = None,
+    db_version: str = __db_version__,
+) -> DatabaseDownloadSource:
+    if url:
+        return DatabaseDownloadSource(
+            url=url,
+            sha256=sha256,
+            sha256_url=sha256_url,
+            release_repo=release_repo,
+            release_tag=release_tag,
+            asset_name=asset_name,
+            sha256_asset_name=sha256_asset_name,
+        )
+
+    resolved_release_repo = release_repo or os.getenv(DEFAULT_DB_RELEASE_REPO_ENV_VAR) or __db_release_repo__
+    resolved_release_tag = release_tag or os.getenv(DEFAULT_DB_RELEASE_TAG_ENV_VAR) or f"v{__version__}"
+    resolved_asset_name = asset_name or os.getenv(DEFAULT_DB_ASSET_NAME_ENV_VAR) or default_database_asset_name(db_version)
+    resolved_sha256_asset_name = (
+        sha256_asset_name
+        or os.getenv(DEFAULT_DB_SHA256_ASSET_NAME_ENV_VAR)
+        or f"{resolved_asset_name}.sha256"
+    )
+
+    base_url = f"https://github.com/{resolved_release_repo}/releases/download/{resolved_release_tag}"
+    return DatabaseDownloadSource(
+        url=f"{base_url}/{resolved_asset_name}",
+        sha256=sha256,
+        sha256_url=sha256_url or f"{base_url}/{resolved_sha256_asset_name}",
+        release_repo=resolved_release_repo,
+        release_tag=resolved_release_tag,
+        asset_name=resolved_asset_name,
+        sha256_asset_name=resolved_sha256_asset_name,
+    )
 
 
 def download_file(url: str, destination_path: Path) -> None:

@@ -127,6 +127,8 @@ At the moment the bundled legacy `databases/` directory is still recognized by `
 virusdetect --version
 virusdetect db path
 virusdetect db verify
+virusdetect db download
+virusdetect db download --release-tag v2.0.0a0 --db-version 2026.04
 virusdetect db download --url <archive-url>
 virusdetect db bundle --path databases --output dist/virusdetect-db-2.0.0a1.tar.gz
 virusdetect tools check
@@ -149,6 +151,8 @@ virusdetect db bundle --path databases --db-version 2026.04
 ```
 
 This writes a tarball under `dist/` with a generated `manifest.json` and a sibling `.sha256` file.
+
+By default, `virusdetect db download` resolves to the current VirusDetect GitHub release assets and uses the matching `.sha256` file automatically. You can override the repository, tag, or asset names with CLI flags when staging a different database bundle.
 
 ## Python Identify Outputs
 

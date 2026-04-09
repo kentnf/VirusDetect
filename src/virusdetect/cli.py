@@ -5,10 +5,11 @@ import json
 import sys
 from pathlib import Path
 
-from virusdetect import __version__
+from virusdetect import __db_version__, __version__
 from virusdetect.db import (
     bundle_database_archive,
     install_database_archive,
+    resolve_database_download_source,
     resolve_database_location,
     resolve_database_target_dir,
     verify_database_files,
@@ -99,9 +100,14 @@ def build_db_parser(subparsers) -> None:
 
     download_parser = db_subparsers.add_parser("download", help="Download and install a database archive")
     download_parser.add_argument("--path", dest="db_path", help="Install database into this directory")
-    download_parser.add_argument("--url", required=True, help="Database archive URL")
+    download_parser.add_argument("--url", help="Database archive URL")
     download_parser.add_argument("--sha256", help="Expected SHA256 for the archive")
     download_parser.add_argument("--sha256-url", help="URL pointing to a SHA256 checksum file")
+    download_parser.add_argument("--repo", help="GitHub repository that hosts database release assets")
+    download_parser.add_argument("--release-tag", help="Git tag of the release that hosts database assets")
+    download_parser.add_argument("--asset-name", help="Database archive asset name")
+    download_parser.add_argument("--sha256-asset-name", help="Checksum asset name")
+    download_parser.add_argument("--db-version", default=__db_version__, help="Default database bundle version label")
     download_parser.set_defaults(handler=handle_db)
 
     bundle_parser = db_subparsers.add_parser("bundle", help="Create a distributable database archive")
@@ -162,12 +168,23 @@ def handle_db(args) -> int:
 
     if args.db_command == "download":
         target_dir = resolve_database_target_dir(args.db_path)
-        installed_path = install_database_archive(
+        source = resolve_database_download_source(
             url=args.url,
-            destination_dir=target_dir,
             sha256=args.sha256,
             sha256_url=args.sha256_url,
+            release_repo=args.repo,
+            release_tag=args.release_tag,
+            asset_name=args.asset_name,
+            sha256_asset_name=args.sha256_asset_name,
+            db_version=args.db_version,
         )
+        installed_path = install_database_archive(
+            url=source.url,
+            destination_dir=target_dir,
+            sha256=source.sha256,
+            sha256_url=source.sha256_url,
+        )
+        print(f"Database source: {source.url}")
         print(f"Database installed to: {installed_path}")
         return 0
 

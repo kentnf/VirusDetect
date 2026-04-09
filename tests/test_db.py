@@ -9,6 +9,7 @@ from virusdetect.db import (
     LEGACY_REFERENCE_FILES,
     build_database_manifest,
     bundle_database_archive,
+    resolve_database_download_source,
     verify_database_files,
 )
 
@@ -62,6 +63,27 @@ class DatabaseBundleTests(unittest.TestCase):
             self.assertEqual(manifest["db_name"], "VirusDetect plant references")
             self.assertEqual(manifest["db_version"], "2026.04")
             self.assertIn("vrl_genbank.info.gz", manifest["files"])
+
+    def test_resolve_database_download_source_uses_default_release_assets(self):
+        source = resolve_database_download_source(db_version="2026.04")
+
+        self.assertEqual(
+            source.url,
+            "https://github.com/kentnf/VirusDetect/releases/download/v2.0.0a0/virusdetect-db-2026.04.tar.gz",
+        )
+        self.assertEqual(
+            source.sha256_url,
+            "https://github.com/kentnf/VirusDetect/releases/download/v2.0.0a0/virusdetect-db-2026.04.tar.gz.sha256",
+        )
+        self.assertEqual(source.release_repo, "kentnf/VirusDetect")
+        self.assertEqual(source.release_tag, "v2.0.0a0")
+
+    def test_resolve_database_download_source_preserves_explicit_url(self):
+        source = resolve_database_download_source(url="https://example.org/db.tar.gz", sha256="abc123")
+
+        self.assertEqual(source.url, "https://example.org/db.tar.gz")
+        self.assertEqual(source.sha256, "abc123")
+        self.assertIsNone(source.sha256_url)
 
 
 if __name__ == "__main__":

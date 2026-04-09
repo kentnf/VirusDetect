@@ -81,9 +81,15 @@ pixi run package
 pixi run package-db
 ```
 
-10. Verify the generated artifacts exist under `dist/`.
+10. Upload the database archive and checksum to the matching GitHub release:
 
-11. Tag the release only after the worktree is reviewed and committed.
+```bash
+gh release upload v2.0.0a0 dist/virusdetect-db-2026.04.tar.gz dist/virusdetect-db-2026.04.tar.gz.sha256 --clobber
+```
+
+11. Verify the generated artifacts exist under `dist/` and on the release page.
+
+12. Tag the release only after the worktree is reviewed and committed.
 
 ## Suggested Tagging
 
