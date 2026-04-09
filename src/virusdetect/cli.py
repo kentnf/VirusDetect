@@ -3,9 +3,11 @@ from __future__ import annotations
 import argparse
 import json
 import sys
+from pathlib import Path
 
 from virusdetect import __version__
 from virusdetect.db import (
+    bundle_database_archive,
     install_database_archive,
     resolve_database_location,
     resolve_database_target_dir,
@@ -102,6 +104,13 @@ def build_db_parser(subparsers) -> None:
     download_parser.add_argument("--sha256-url", help="URL pointing to a SHA256 checksum file")
     download_parser.set_defaults(handler=handle_db)
 
+    bundle_parser = db_subparsers.add_parser("bundle", help="Create a distributable database archive")
+    bundle_parser.add_argument("--path", dest="db_path", help="Source database path to package")
+    bundle_parser.add_argument("--output", help="Output `.tar.gz` path")
+    bundle_parser.add_argument("--db-version", default=__version__, help="Database bundle version label")
+    bundle_parser.add_argument("--name", default="virusdetect", help="Database bundle name")
+    bundle_parser.set_defaults(handler=handle_db)
+
 
 def build_tools_parser(subparsers) -> None:
     parser = subparsers.add_parser("tools", help="External tool checks")
@@ -160,6 +169,26 @@ def handle_db(args) -> int:
             sha256_url=args.sha256_url,
         )
         print(f"Database installed to: {installed_path}")
+        return 0
+
+    if args.db_command == "bundle":
+        if args.db_path:
+            source_path = args.db_path
+        else:
+            location = resolve_database_location()
+            if location is None:
+                raise SystemExit("No VirusDetect database was found to bundle")
+            source_path = location.path
+
+        output_path = args.output or str(Path("dist") / f"virusdetect-db-{args.db_version}.tar.gz")
+        bundle = bundle_database_archive(
+            source_dir=source_path,
+            destination_archive=output_path,
+            db_version=args.db_version,
+            db_name=args.name,
+        )
+        print(f"Database bundle created: {bundle.archive_path}")
+        print(f"SHA256 file written: {bundle.sha256_path}")
         return 0
 
     raise SystemExit(f"Unknown db command: {args.db_command}")

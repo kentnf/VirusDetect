@@ -45,6 +45,28 @@ class VirusDetectCliTests(unittest.TestCase):
         self.assertEqual(exit_code, 0)
         self.assertIn("Database verification passed", output.getvalue())
 
+    def test_db_bundle_uses_resolved_database_and_default_output(self):
+        args = cli.build_parser().parse_args(["db", "bundle"])
+
+        with mock.patch("virusdetect.cli.resolve_database_location", return_value=mock.Mock(path="/tmp/db", source="cwd", kind="legacy")):
+            with mock.patch(
+                "virusdetect.cli.bundle_database_archive",
+                return_value=mock.Mock(
+                    archive_path="/tmp/dist/virusdetect-db-2.0.0a0.tar.gz",
+                    sha256_path="/tmp/dist/virusdetect-db-2.0.0a0.tar.gz.sha256",
+                ),
+            ) as mock_bundle:
+                output = io.StringIO()
+                with redirect_stdout(output):
+                    exit_code = cli.handle_db(args)
+
+        self.assertEqual(exit_code, 0)
+        self.assertEqual(mock_bundle.call_args.kwargs["source_dir"], "/tmp/db")
+        self.assertTrue(mock_bundle.call_args.kwargs["destination_archive"].endswith("dist/virusdetect-db-2.0.0a0.tar.gz"))
+        self.assertEqual(mock_bundle.call_args.kwargs["db_version"], "2.0.0a0")
+        self.assertIn("Database bundle created", output.getvalue())
+        self.assertIn("SHA256 file written", output.getvalue())
+
     def test_tools_check_json(self):
         args = cli.build_parser().parse_args(["tools", "check", "--json"])
         output = io.StringIO()

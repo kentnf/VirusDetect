@@ -4,6 +4,14 @@ All notable changes to the Python v2 rewrite line will be documented in this fil
 
 The legacy Perl release history remains on the `v1` branch and the historical `v1.x` tags.
 
+## [Unreleased]
+
+### Added
+
+- `virusdetect db bundle` to package a legacy or v2 database directory into a release-ready `database/` tarball
+- generated database manifests and sibling `.sha256` checksum files for packaged database archives
+- `pixi run package-db` maintainer task for building the default database bundle from `databases/`
+
 ## [2.0.0a0] - 2026-04-10
 
 Initial public alpha snapshot of the Python rewrite line on `main`.

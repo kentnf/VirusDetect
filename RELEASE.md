@@ -22,7 +22,7 @@ Not included in this alpha:
 
 - legacy `Bio::Graphics` image reports
 - siRNA size-distribution reporting
-- finalized downloadable v2 database bundles
+- published downloadable v2 database bundles
 - full report parity with the Perl workflow
 
 ## Pre-Release Checklist
@@ -75,9 +75,15 @@ vd_identify_release/result_test_data/test_data.summary.json
 pixi run package
 ```
 
-9. Verify the generated artifacts exist under `dist/`.
+9. Build the database bundle when preparing a database release:
 
-10. Tag the release only after the worktree is reviewed and committed.
+```bash
+pixi run package-db
+```
+
+10. Verify the generated artifacts exist under `dist/`.
+
+11. Tag the release only after the worktree is reviewed and committed.
 
 ## Suggested Tagging
 

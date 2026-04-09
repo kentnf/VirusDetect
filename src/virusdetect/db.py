@@ -8,6 +8,7 @@ import tarfile
 import tempfile
 import urllib.request
 from dataclasses import dataclass
+from datetime import datetime, timezone
 from pathlib import Path
 
 DEFAULT_DB_ENV_VAR = "VIRUSDETECT_DB_DIR"
@@ -28,6 +29,12 @@ class DatabaseLocation:
     path: str
     source: str
     kind: str
+
+
+@dataclass(frozen=True)
+class DatabaseBundle:
+    archive_path: str
+    sha256_path: str
 
 
 def read_manifest(db_path: str) -> dict | None:
@@ -166,6 +173,35 @@ def verify_database_files(db_path: str) -> dict[str, list[str]]:
     return {"database": missing} if missing else {}
 
 
+def collect_database_files(db_path: str) -> list[str]:
+    candidate = Path(db_path)
+    return [
+        path.relative_to(candidate).as_posix()
+        for path in sorted(candidate.rglob("*"))
+        if path.is_file() and path.name != MANIFEST_NAME
+    ]
+
+
+def build_database_manifest(db_path: str, db_version: str, db_name: str = "virusdetect") -> dict:
+    candidate = Path(db_path)
+    if not candidate.is_dir():
+        raise FileNotFoundError(f"Database source directory was not found: {candidate}")
+
+    source_kind = detect_database_kind(str(candidate))
+    if source_kind is None:
+        raise ValueError(f"Database source directory is not a recognized VirusDetect layout: {candidate}")
+
+    return {
+        "format": "virusdetect-database-manifest",
+        "manifest_version": 1,
+        "db_name": db_name,
+        "db_version": db_version,
+        "source_kind": source_kind,
+        "created_at": datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z"),
+        "files": collect_database_files(str(candidate)),
+    }
+
+
 def download_file(url: str, destination_path: Path) -> None:
     with urllib.request.urlopen(url) as response, destination_path.open("wb") as handle:
         shutil.copyfileobj(response, handle)
@@ -183,6 +219,12 @@ def read_expected_sha256(sha256_file: Path) -> str:
     with sha256_file.open("r", encoding="utf-8") as handle:
         first_line = handle.readline().strip()
     return first_line.split()[0]
+
+
+def write_sha256_file(file_path: Path, sha256: str) -> Path:
+    sha256_path = Path(f"{file_path}.sha256")
+    sha256_path.write_text(f"{sha256}  {file_path.name}\n", encoding="utf-8")
+    return sha256_path
 
 
 def find_database_source_dir(extract_root: Path) -> Path:
@@ -248,3 +290,32 @@ def install_database_archive(url: str, destination_dir: str, sha256: str | None 
         shutil.copytree(source_dir, target_dir)
 
     return str(target_dir)
+
+
+def bundle_database_archive(
+    source_dir: str,
+    destination_archive: str,
+    db_version: str,
+    db_name: str = "virusdetect",
+) -> DatabaseBundle:
+    source_path = Path(source_dir).resolve()
+    if detect_database_kind(str(source_path)) is None:
+        raise ValueError(f"Database source directory is not a recognized VirusDetect layout: {source_path}")
+
+    archive_path = Path(destination_archive).resolve()
+    archive_path.parent.mkdir(parents=True, exist_ok=True)
+
+    with tempfile.TemporaryDirectory(prefix="virusdetect-db-bundle-") as tmp_dir:
+        tmp_root = Path(tmp_dir)
+        bundle_root = tmp_root / "database"
+        shutil.copytree(source_path, bundle_root)
+
+        manifest = build_database_manifest(str(bundle_root), db_version=db_version, db_name=db_name)
+        (bundle_root / MANIFEST_NAME).write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
+
+        with tarfile.open(archive_path, "w:gz") as archive_handle:
+            archive_handle.add(bundle_root, arcname="database")
+
+    sha256 = compute_sha256(archive_path)
+    sha256_path = write_sha256_file(archive_path, sha256)
+    return DatabaseBundle(archive_path=str(archive_path), sha256_path=str(sha256_path))

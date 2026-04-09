@@ -111,6 +111,7 @@ Planned behavior:
 
 - database archives will be distributed separately from source code
 - users will install them with `virusdetect db download`
+- maintainers can generate release-ready bundles with `virusdetect db bundle`
 - runtime lookup will use:
   - `VIRUSDETECT_DB_DIR` if set
   - `./database` when it already contains a valid v2 database
@@ -127,6 +128,7 @@ virusdetect --version
 virusdetect db path
 virusdetect db verify
 virusdetect db download --url <archive-url>
+virusdetect db bundle --path databases --output dist/virusdetect-db-2.0.0a1.tar.gz
 virusdetect tools check
 virusdetect tools install-hint
 virusdetect run <reads.fa> --check-only
@@ -139,6 +141,14 @@ virusdetect run <reads.fa> --backend python --stop-after combine_contigs
 virusdetect run <reads.fa> --backend python --stop-after identify_virus
 virusdetect run <reads.fa> --backend legacy -o output_dir
 ```
+
+Maintainer example for packaging the current legacy database as a v2 bundle:
+
+```bash
+virusdetect db bundle --path databases --db-version 2026.04
+```
+
+This writes a tarball under `dist/` with a generated `manifest.json` and a sibling `.sha256` file.
 
 ## Python Identify Outputs
 
