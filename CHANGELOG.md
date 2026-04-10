@@ -22,6 +22,7 @@ The legacy Perl release history remains on the `v1` branch and the historical `v
 - tool resolution on `main` no longer falls back to legacy bundled binaries in `bin/`; runtime tools must come from the active environment
 - `main` no longer auto-discovers the repository `./databases` legacy bundle; transitional runs must opt into it with `--db-path databases`
 - `--backend legacy` is now explicitly treated as a deprecated compatibility mode and prints migration guidance toward the Python backend or the `v1` branch
+- legacy Perl usage notes have been moved out of the main README into `LEGACY.md`
 
 ## [2.0.0a0] - 2026-04-10
 

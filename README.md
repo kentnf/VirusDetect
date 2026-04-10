@@ -225,9 +225,4 @@ tools/             Legacy helper scripts for preprocessing and DB generation
 
 ## Legacy Usage
 
-The legacy Perl workflow is still available on this branch while the migration is in progress:
-
-```bash
-perl virus_detect.pl --reference vrl_plant test_data
-perl bin/virus_identify.pl --reference databases/vrl_plant input_contig.fasta
-```
+Legacy compatibility notes and historical Perl entrypoints now live in [LEGACY.md](/Users/kentnf/projects/cornell/VirusDetect/LEGACY.md).
