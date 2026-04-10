@@ -15,6 +15,10 @@ The legacy Perl release history remains on the `v1` branch and the historical `v
 - default GitHub release asset resolution for `virusdetect db download`, including automatic checksum URL lookup
 - `pixi run package-db` maintainer task for building the default database bundle from `databases/`
 
+### Changed
+
+- `virusdetect run` on `main` now defaults to the Python backend; the Perl workflow remains available through `--backend legacy`
+
 ## [2.0.0a0] - 2026-04-10
 
 Initial public alpha snapshot of the Python rewrite line on `main`.

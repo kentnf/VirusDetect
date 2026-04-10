@@ -150,9 +150,9 @@ class VirusDetectCliTests(unittest.TestCase):
         self.assertIn("100", command)
         self.assertIn("--debug", command)
 
-    def test_run_parser_defaults_to_legacy_backend(self):
+    def test_run_parser_defaults_to_python_backend(self):
         args = cli.build_parser().parse_args(["run", "a.fa"])
-        self.assertEqual(args.backend, "legacy")
+        self.assertEqual(args.backend, "python")
 
     def test_build_legacy_identifier_command_uses_resolved_reference(self):
         with tempfile.TemporaryDirectory() as tmp_dir:

@@ -133,7 +133,7 @@ def run_pipeline(args) -> int:
         location = resolve_database_location()
         if location is None:
             raise SystemExit(
-                "No VirusDetect database was found. Run `virusdetect db verify` or `virusdetect db download --url <archive>` first."
+                "No VirusDetect database was found. Run `virusdetect db verify` or `virusdetect db download` first."
             )
         db_path = location.path
 

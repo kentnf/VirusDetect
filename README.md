@@ -17,9 +17,9 @@ The v2 branch currently provides:
 - a `run` command that can validate inputs, classify samples, and prepare sample working files
 - Python implementations of sample preparation, virus-reference alignment, host subtraction, de novo assembly, aligned contig generation, combined-contig deduplication, and virus identification
 - Python-native `blastn`/`blastx` identification outputs, including raw tables, top-hit tables, contig classification FASTA files, per-sample summary TSV/JSON, HTML summary pages, per-reference detail pages, and undetermined-contig reports
-- a transitional `legacy` backend that runs the existing Perl pipeline from the Python CLI
+- a Python-first `run` command with an optional transitional `legacy` backend for the existing Perl pipeline
 
-The legacy backend remains available during the migration, but the Python backend can now run end-to-end through `identify_virus`.
+The default backend on `main` is now `python`. The legacy backend remains available during the migration through `--backend legacy`.
 
 This is still an alpha release line: the Python pipeline is functional through identification and reporting, but report parity and package-manager distribution are not finished yet.
 
@@ -137,12 +137,12 @@ virusdetect tools check
 virusdetect tools install-hint
 virusdetect run <reads.fa> --check-only
 virusdetect run <reads.fa> --prepare-only --read-length 21-23
-virusdetect run <reads.fa> --backend python --stop-after align_to_virus_reference
-virusdetect run <reads.fa> --backend python --stop-after host_subtraction --host-reference host.fa
-virusdetect run <reads.fa> --backend python --stop-after de_novo_assembly
-virusdetect run <reads.fa> --backend python --stop-after generate_aligned_contigs
-virusdetect run <reads.fa> --backend python --stop-after combine_contigs
-virusdetect run <reads.fa> --backend python --stop-after identify_virus
+virusdetect run <reads.fa> --stop-after align_to_virus_reference
+virusdetect run <reads.fa> --stop-after host_subtraction --host-reference host.fa
+virusdetect run <reads.fa> --stop-after de_novo_assembly
+virusdetect run <reads.fa> --stop-after generate_aligned_contigs
+virusdetect run <reads.fa> --stop-after combine_contigs
+virusdetect run <reads.fa> --stop-after identify_virus
 virusdetect run <reads.fa> --backend legacy -o output_dir
 ```
 
@@ -193,7 +193,7 @@ What is still missing from the Perl workflow:
 Example smoke test for the current Python path:
 
 ```bash
-pixi run virusdetect -- run test_data --backend python --stop-after identify_virus -o vd_identify_py
+pixi run virusdetect -- run test_data --stop-after identify_virus -o vd_identify_py
 ```
 
 See [CHANGELOG.md](/Users/kentnf/projects/cornell/VirusDetect/CHANGELOG.md) for the current alpha release summary.
