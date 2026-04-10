@@ -1,14 +1,17 @@
 import json
+import os
 import tarfile
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 from virusdetect.db import (
     LEGACY_MARKER_FILES,
     LEGACY_REFERENCE_FILES,
     build_database_manifest,
     bundle_database_archive,
+    resolve_database_location,
     resolve_database_download_source,
     verify_database_files,
 )
@@ -84,6 +87,24 @@ class DatabaseBundleTests(unittest.TestCase):
         self.assertEqual(source.url, "https://example.org/db.tar.gz")
         self.assertEqual(source.sha256, "abc123")
         self.assertIsNone(source.sha256_url)
+
+    def test_resolve_database_location_does_not_auto_use_legacy_databases_dir(self):
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            tmp = Path(tmp_dir)
+            self.populate_legacy_database(tmp / "databases")
+            user_db = tmp / "user-db"
+            previous_cwd = Path.cwd()
+            os.chdir(tmp)
+            try:
+                with mock.patch("virusdetect.db.USER_DB_DIR", user_db):
+                    with mock.patch.dict("os.environ", {}, clear=False):
+                        os.environ.pop("VIRUSDETECT_DB_DIR", None)
+                        os.environ.pop("CONDA_PREFIX", None)
+                        location = resolve_database_location()
+            finally:
+                os.chdir(previous_cwd)
+
+        self.assertIsNone(location)
 
 
 if __name__ == "__main__":

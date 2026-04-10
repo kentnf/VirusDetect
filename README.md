@@ -122,11 +122,10 @@ Planned behavior:
 - runtime lookup will use:
   - `VIRUSDETECT_DB_DIR` if set
   - `./database` when it already contains a valid v2 database
-  - `./databases` when it already contains a valid legacy database
   - `$CONDA_PREFIX/share/virusdetect/database`
   - `~/.local/share/virusdetect/database`
 
-At the moment the bundled legacy `databases/` directory is still recognized by `virusdetect db path` and `virusdetect db verify` so the branch remains usable during the transition.
+The bundled legacy `databases/` directory is no longer used implicitly on `main`. During the transition you can still target it explicitly with `--db-path databases` or `virusdetect db verify --path databases`.
 
 ## Current CLI
 
@@ -148,6 +147,7 @@ virusdetect run <reads.fa> --stop-after de_novo_assembly
 virusdetect run <reads.fa> --stop-after generate_aligned_contigs
 virusdetect run <reads.fa> --stop-after combine_contigs
 virusdetect run <reads.fa> --stop-after identify_virus
+virusdetect run test_data --db-path databases --stop-after identify_virus
 virusdetect run <reads.fa> --backend legacy -o output_dir
 ```
 
@@ -198,7 +198,7 @@ What is still missing from the Perl workflow:
 Example smoke test for the current Python path:
 
 ```bash
-pixi run virusdetect -- run test_data --stop-after identify_virus -o vd_identify_py
+pixi run virusdetect -- run test_data --db-path databases --stop-after identify_virus -o vd_identify_py
 ```
 
 See [CHANGELOG.md](/Users/kentnf/projects/cornell/VirusDetect/CHANGELOG.md) for the current alpha release summary.

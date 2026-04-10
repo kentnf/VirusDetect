@@ -100,9 +100,6 @@ def iter_database_candidates():
     cwd_database = Path.cwd() / "database"
     yield DatabaseLocation(path=str(cwd_database), source="cwd:database", kind="unknown")
 
-    cwd_databases = Path.cwd() / "databases"
-    yield DatabaseLocation(path=str(cwd_databases), source="cwd:databases", kind="unknown")
-
     conda_prefix = os.getenv("CONDA_PREFIX")
     if conda_prefix:
         yield DatabaseLocation(
