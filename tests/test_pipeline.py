@@ -1,5 +1,7 @@
 import tempfile
 import unittest
+from contextlib import redirect_stdout
+import io
 from pathlib import Path
 from unittest import mock
 
@@ -99,6 +101,37 @@ class PipelineStageTests(unittest.TestCase):
 
             self.assertEqual(exit_code, 0)
             mock_identify.assert_called_once()
+
+    def test_run_pipeline_warns_when_using_legacy_backend(self):
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            tmp = Path(tmp_dir)
+            input_path = tmp / "reads.fa"
+            input_path.write_text(">r1\nAAAA\n", encoding="utf-8")
+
+            args = cli.build_parser().parse_args(
+                [
+                    "run",
+                    str(input_path),
+                    "--backend",
+                    "legacy",
+                    "--db-path",
+                    str(tmp / "db"),
+                ]
+            )
+
+            output = io.StringIO()
+            with mock.patch("virusdetect.pipeline.verify_database_files", return_value={}):
+                with mock.patch("virusdetect.pipeline.check_tools", return_value=[]):
+                    with mock.patch("virusdetect.pipeline.missing_required_tools", return_value=[]):
+                        with mock.patch("virusdetect.pipeline.missing_legacy_perl_modules", return_value=[]):
+                            with mock.patch("virusdetect.pipeline.run_legacy_pipeline", return_value=0) as mock_legacy:
+                                with redirect_stdout(output):
+                                    exit_code = args.handler(args)
+
+        self.assertEqual(exit_code, 0)
+        mock_legacy.assert_called_once()
+        self.assertIn("Legacy backend is deprecated on `main`", output.getvalue())
+        self.assertIn("use the `v1` branch", output.getvalue())
 
 
 if __name__ == "__main__":

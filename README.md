@@ -19,7 +19,7 @@ The v2 branch currently provides:
 - Python-native `blastn`/`blastx` identification outputs, including raw tables, top-hit tables, contig classification FASTA files, per-sample summary TSV/JSON, HTML summary pages, per-reference detail pages, and undetermined-contig reports
 - a Python-first `run` command with an optional transitional `legacy` backend for the existing Perl pipeline
 
-The default backend on `main` is now `python`. The legacy backend remains available during the migration through `--backend legacy`.
+The default backend on `main` is now `python`. The legacy backend remains available during the migration through `--backend legacy`, but it is now treated as a deprecated compatibility mode.
 
 This is still an alpha release line: the Python pipeline is functional through identification and reporting, but report parity and package-manager distribution are not finished yet.
 

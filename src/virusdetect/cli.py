@@ -34,7 +34,12 @@ def build_parser() -> argparse.ArgumentParser:
 def build_run_parser(subparsers) -> None:
     parser = subparsers.add_parser("run", help="Run the Python pipeline scaffold")
     parser.add_argument("input_paths", nargs="+", help="Input read or contig file(s)")
-    parser.add_argument("--backend", choices=["legacy", "python"], default="python", help="Execution backend")
+    parser.add_argument(
+        "--backend",
+        choices=["legacy", "python"],
+        default="python",
+        help="Execution backend (`legacy` is a deprecated compatibility mode)",
+    )
     parser.add_argument("--db-path", help="Path to a VirusDetect database directory")
     parser.add_argument("--reference", default="vrl_plant", help="Reference database name")
     parser.add_argument("--host-reference", help="Host reference database path or name")

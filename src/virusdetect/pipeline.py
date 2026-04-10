@@ -268,6 +268,8 @@ def run_pipeline(args) -> int:
                 "Legacy backend prerequisites are missing. Install the Perl modules: "
                 + ", ".join(missing_perl_modules)
             )
+        print("Legacy backend is deprecated on `main`; prefer the default Python backend when possible.")
+        print("If you still need the historical workflow long-term, use the `v1` branch.")
         workdir = Path(args.output).resolve() if args.output else Path.cwd()
         return run_legacy_pipeline(args, input_paths, workdir)
     return overall_exit_code
