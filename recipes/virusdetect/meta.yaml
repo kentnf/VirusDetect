@@ -27,8 +27,6 @@ requirements:
     - blast
     - hisat2
     - spades
-    - perl
-    - perl-bioperl
 
 test:
   commands:

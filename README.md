@@ -68,7 +68,12 @@ The `pixi` environment now includes the core command-line tools needed for the c
 - `blast`
 - `hisat2`
 - `spades`
-- transitional legacy Perl packages: `perl`, `perl-bioperl`
+
+Legacy-only extras are no longer installed by default on `main`. If you still need `--backend legacy`, add:
+
+```bash
+pixi add perl perl-bioperl
+```
 
 `Bio::Graphics` is still only a legacy Perl requirement and may need extra platform-specific setup outside the default `pixi` environment, especially on `osx-arm64`.
 

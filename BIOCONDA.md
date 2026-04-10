@@ -55,4 +55,5 @@ conda render recipes/virusdetect/meta.yaml
 
 - The recipe intentionally declares the external command-line tools as runtime dependencies so a Bioconda install pulls the current VirusDetect v2 stack in one step.
 - The package remains `noarch: python`; compiled tools are provided by the runtime dependencies.
+- Legacy Perl support is no longer part of the default runtime dependency set for the v2 package.
 - The release database is still distributed as a separate asset and installed with `virusdetect db download`.
