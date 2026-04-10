@@ -1,7 +1,6 @@
 import tempfile
 import unittest
-from contextlib import redirect_stdout
-import io
+import json
 from pathlib import Path
 from unittest import mock
 
@@ -102,7 +101,7 @@ class PipelineStageTests(unittest.TestCase):
             self.assertEqual(exit_code, 0)
             mock_identify.assert_called_once()
 
-    def test_run_pipeline_warns_when_using_legacy_backend(self):
+    def test_run_pipeline_python_backend_plan_omits_legacy_modules(self):
         with tempfile.TemporaryDirectory() as tmp_dir:
             tmp = Path(tmp_dir)
             input_path = tmp / "reads.fa"
@@ -113,25 +112,25 @@ class PipelineStageTests(unittest.TestCase):
                     "run",
                     str(input_path),
                     "--backend",
-                    "legacy",
+                    "python",
                     "--db-path",
                     str(tmp / "db"),
+                    "--output",
+                    str(tmp / "out"),
+                    "--check-only",
                 ]
             )
 
-            output = io.StringIO()
             with mock.patch("virusdetect.pipeline.verify_database_files", return_value={}):
                 with mock.patch("virusdetect.pipeline.check_tools", return_value=[]):
                     with mock.patch("virusdetect.pipeline.missing_required_tools", return_value=[]):
-                        with mock.patch("virusdetect.pipeline.missing_legacy_perl_modules", return_value=[]):
-                            with mock.patch("virusdetect.pipeline.run_legacy_pipeline", return_value=0) as mock_legacy:
-                                with redirect_stdout(output):
-                                    exit_code = args.handler(args)
+                        exit_code = args.handler(args)
+
+            plan_path = tmp / "out" / "reads.fa.analysis_plan.json"
+            plan = json.loads(plan_path.read_text(encoding="utf-8"))
 
         self.assertEqual(exit_code, 0)
-        mock_legacy.assert_called_once()
-        self.assertIn("Legacy backend is deprecated on `main`", output.getvalue())
-        self.assertIn("use the `v1` branch", output.getvalue())
+        self.assertNotIn("missing_legacy_perl_modules", plan)
 
 
 if __name__ == "__main__":

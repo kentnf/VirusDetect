@@ -18,6 +18,16 @@ from virusdetect.pipeline import run_pipeline
 from virusdetect.tools import check_tools, install_hint_text, missing_required_tools
 
 
+def parse_backend(value: str) -> str:
+    if value == "python":
+        return value
+    if value == "legacy":
+        raise argparse.ArgumentTypeError(
+            "Legacy backend has been removed from `main`. Use the `v1` branch for the historical Perl workflow."
+        )
+    raise argparse.ArgumentTypeError(f"Unsupported backend: {value}. Use `python`.")
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="virusdetect", description="VirusDetect v2 command line interface")
     parser.add_argument("--version", action="version", version=f"%(prog)s {__version__}")
@@ -36,9 +46,10 @@ def build_run_parser(subparsers) -> None:
     parser.add_argument("input_paths", nargs="+", help="Input read or contig file(s)")
     parser.add_argument(
         "--backend",
-        choices=["legacy", "python"],
+        type=parse_backend,
         default="python",
-        help="Execution backend (`legacy` is a deprecated compatibility mode)",
+        metavar="BACKEND",
+        help=argparse.SUPPRESS,
     )
     parser.add_argument("--db-path", help="Path to a VirusDetect database directory")
     parser.add_argument("--reference", default="vrl_plant", help="Reference database name")
@@ -133,6 +144,11 @@ def build_tools_parser(subparsers) -> None:
     check_parser.set_defaults(handler=handle_tools)
 
     install_parser = tools_subparsers.add_parser("install-hint", help="Print recommended pixi/conda install commands")
+    install_parser.add_argument(
+        "--legacy",
+        action="store_true",
+        help="Include the deprecated legacy Perl compatibility packages",
+    )
     install_parser.set_defaults(handler=handle_tools_install_hint)
 
 
@@ -246,8 +262,8 @@ def handle_tools(args) -> int:
     return 1 if args.strict and missing else 0
 
 
-def handle_tools_install_hint(_args) -> int:
-    print(install_hint_text())
+def handle_tools_install_hint(args) -> int:
+    print(install_hint_text(include_legacy=args.legacy))
     return 0
 
 

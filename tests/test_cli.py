@@ -1,18 +1,13 @@
+import argparse
 import io
 import tempfile
 import unittest
-from contextlib import redirect_stdout
+from contextlib import redirect_stderr, redirect_stdout
 from pathlib import Path
 from unittest import mock
 
 import virusdetect.cli as cli
 from virusdetect.db import LEGACY_MARKER_FILES, LEGACY_REFERENCE_FILES
-from virusdetect.legacy import (
-    build_legacy_command,
-    build_legacy_identifier_command,
-    create_legacy_tool_bridge,
-    legacy_execution_env,
-)
 
 
 class VirusDetectCliTests(unittest.TestCase):
@@ -111,10 +106,20 @@ class VirusDetectCliTests(unittest.TestCase):
         self.assertIn("Recommended pixi setup for the Python backend:", output.getvalue())
         self.assertIn("pixi add bwa samtools blast hisat2 spades", output.getvalue())
         self.assertIn("mamba install -c conda-forge -c bioconda", output.getvalue())
-        self.assertIn("Legacy backend extras:", output.getvalue())
-        self.assertIn("pixi add perl perl-bioperl", output.getvalue())
         self.assertIn("host subtraction and de novo assembly", output.getvalue())
         self.assertIn("default `main` workflow no longer needs Perl packages", output.getvalue())
+        self.assertIn("virusdetect tools install-hint --legacy", output.getvalue())
+        self.assertNotIn("Legacy backend extras:", output.getvalue())
+
+    def test_tools_install_hint_legacy_includes_perl_packages(self):
+        args = cli.build_parser().parse_args(["tools", "install-hint", "--legacy"])
+        output = io.StringIO()
+        with redirect_stdout(output):
+            exit_code = cli.handle_tools_install_hint(args)
+
+        self.assertEqual(exit_code, 0)
+        self.assertIn("Historical Perl extras:", output.getvalue())
+        self.assertIn("pixi add perl perl-bioperl", output.getvalue())
 
     def test_run_parser_accepts_multiple_inputs_and_prepare_flag(self):
         args = cli.build_parser().parse_args(["run", "a.fa", "b.fa", "--prepare-only"])
@@ -125,87 +130,34 @@ class VirusDetectCliTests(unittest.TestCase):
         self.assertEqual(args.diff_contig_cover, 0.5)
         self.assertEqual(args.diff_contig_length, 100)
 
-    def test_build_legacy_command_maps_core_args(self):
-        args = cli.build_parser().parse_args(
-            [
-                "run",
-                "a.fa",
-                "--host-reference",
-                "host.fa",
-                "--read-length",
-                "21-23",
-                "--debug",
-            ]
-        )
-        command = build_legacy_command(args, [Path("a.fa")])
-        self.assertIn("--reference", command)
-        self.assertIn("vrl_plant", command)
-        self.assertIn("--host_reference", command)
-        self.assertIn("host.fa", command)
-        self.assertIn("--read_length", command)
-        self.assertIn("21-23", command)
-        self.assertIn("--norm_depth_cutoff", command)
-        self.assertIn("5.0", command)
-        self.assertIn("--diff-ratio", command)
-        self.assertIn("0.25", command)
-        self.assertIn("--diff-contig-cover", command)
-        self.assertIn("0.5", command)
-        self.assertIn("--diff-contig-length", command)
-        self.assertIn("100", command)
-        self.assertIn("--debug", command)
-
     def test_run_parser_defaults_to_python_backend(self):
         args = cli.build_parser().parse_args(["run", "a.fa"])
         self.assertEqual(args.backend, "python")
 
-    def test_build_legacy_identifier_command_uses_resolved_reference(self):
-        with tempfile.TemporaryDirectory() as tmp_dir:
-            tmp = Path(tmp_dir)
-            db = tmp / "db"
-            db.mkdir()
-            (db / "vrl_plant").write_text(">ref\nAAAA\n", encoding="utf-8")
-            args = cli.build_parser().parse_args(["run", "reads.fa"])
-            command = build_legacy_identifier_command(args, str(db), Path("reads.fa"), Path("contigs.fa"))
+    def test_run_parser_rejects_legacy_backend(self):
+        stderr = io.StringIO()
+        with redirect_stderr(stderr):
+            with self.assertRaises(SystemExit):
+                cli.build_parser().parse_args(["run", "a.fa", "--backend", "legacy"])
+        self.assertIn("Legacy backend has been removed from `main`", stderr.getvalue())
 
-        self.assertIn("--reference", command)
-        self.assertIn(str((db / "vrl_plant").resolve()), command)
-        self.assertIn("--norm-depth-cutoff", command)
-        self.assertIn("--diff-ratio", command)
-        self.assertIn("--diff-contig-cover", command)
-        self.assertIn("--diff-contig-length", command)
-        self.assertTrue(command[-2].endswith("reads.fa"))
-        self.assertTrue(command[-1].endswith("contigs.fa"))
+    def test_run_parser_rejects_unknown_backend(self):
+        stderr = io.StringIO()
+        with redirect_stderr(stderr):
+            with self.assertRaises(SystemExit):
+                cli.build_parser().parse_args(["run", "a.fa", "--backend", "perl"])
+        self.assertIn("Unsupported backend: perl. Use `python`.", stderr.getvalue())
 
-    def test_create_legacy_tool_bridge_writes_expected_wrappers(self):
-        with tempfile.TemporaryDirectory() as tmp_dir:
-            tmp = Path(tmp_dir)
-            with mock.patch(
-                "virusdetect.legacy.resolve_tool",
-                side_effect=[
-                    ("/opt/bin/bwa", "PATH"),
-                    ("/opt/bin/samtools", "PATH"),
-                    ("/opt/bin/blastn", "PATH"),
-                    ("/opt/bin/blastx", "PATH"),
-                    ("/opt/bin/makeblastdb", "PATH"),
-                ],
-            ):
-                bridge_dir = create_legacy_tool_bridge(tmp)
-            self.assertTrue((bridge_dir / "bwa").exists())
-            self.assertTrue((bridge_dir / "samtools").exists())
-            self.assertTrue((bridge_dir / "megablast").exists())
-            self.assertTrue((bridge_dir / "blastall").exists())
-            self.assertTrue((bridge_dir / "formatdb").exists())
-
-    def test_legacy_execution_env_prepends_bridge_dir(self):
-        with tempfile.TemporaryDirectory() as tmp_dir:
-            tmp = Path(tmp_dir)
-            with mock.patch("virusdetect.legacy.create_legacy_tool_bridge", return_value=tmp / ".virusdetect-legacy-tools"):
-                with mock.patch.dict("os.environ", {"PATH": "/usr/bin"}, clear=True):
-                    env = legacy_execution_env(tmp)
-
-        self.assertEqual(env["VIRUSDETECT_TOOL_DIR"], str(tmp / ".virusdetect-legacy-tools"))
-        self.assertEqual(env["PATH"], f"{tmp / '.virusdetect-legacy-tools'}:/usr/bin")
-
+    def test_run_help_shows_python_only_interface(self):
+        parser = cli.build_parser()
+        run_parser = next(
+            action.choices["run"]
+            for action in parser._actions
+            if isinstance(action, argparse._SubParsersAction)
+        )
+        help_text = run_parser.format_help()
+        self.assertNotIn("--backend", help_text)
+        self.assertNotIn("{legacy,python}", help_text)
 
 if __name__ == "__main__":
     unittest.main()
