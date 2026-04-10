@@ -16,7 +16,7 @@ Included in this alpha:
 - HTML summary reports
 - per-reference detail HTML reports
 - undetermined contig reports
-- transitional legacy backend from the new CLI
+- Python-only CLI on `main`
 
 Not included in this alpha:
 
@@ -54,6 +54,7 @@ pixi run virusdetect -- --version
 6. Run the Python identify smoke test:
 
 ```bash
+export VIRUSDETECT_SMOKE_DB_PATH=/path/to/database
 pixi run smoke-identify
 ```
 
@@ -84,6 +85,7 @@ gh release upload v2.0.0a0 dist/virusdetect-2.0.0a0.tar.gz dist/virusdetect-2.0.
 10. Build the database bundle when preparing a database release:
 
 ```bash
+export VIRUSDETECT_PACKAGE_DB_PATH=/path/to/database
 pixi run package-db
 ```
 
@@ -125,13 +127,13 @@ VirusDetect v2.0.0a0
 Summary:
 
 ```text
-Alpha release of the Python rewrite line. This release provides a functional Python CLI and pipeline through virus identification, including HTML summary reports, per-reference detail reports, and undetermined-contig reports. Legacy Perl execution remains available through the transitional backend, while graphical Bio::Graphics reports and siRNA-size reporting are still pending.
+Alpha release of the Python rewrite line. This release provides a functional Python CLI and pipeline through virus identification, including HTML summary reports, per-reference detail reports, and undetermined-contig reports. The `main` branch is now Python-only; users who need the historical Perl workflow should use the `v1` branch. Graphical Bio::Graphics reports and siRNA-size reporting are still pending.
 ```
 
 Validation:
 
 ```text
 - pixi run test
-- pixi run smoke-identify
+- export VIRUSDETECT_SMOKE_DB_PATH=/path/to/database && pixi run smoke-identify
 - pixi run package
 ```

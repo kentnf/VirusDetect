@@ -4,7 +4,7 @@ Current package version: `2.0.0a0`
 
 This branch is the Python rewrite line for VirusDetect.
 
-Legacy Perl releases remain available on the `v1` branch and the historical tags (`v1.2` through `v1.8.1`). The old entrypoints such as `virus_detect.pl` and `bin/virus_identify.pl` are still present in this repository during the migration, but new development should target the Python package under `src/virusdetect`.
+Legacy Perl releases remain available on the `v1` branch and the historical tags (`v1.2` through `v1.8.1`). The old Perl entrypoints have been removed from `main`; new development should target the Python package under `src/virusdetect`.
 
 ## Status
 
@@ -17,9 +17,15 @@ The v2 branch currently provides:
 - a `run` command that can validate inputs, classify samples, and prepare sample working files
 - Python implementations of sample preparation, virus-reference alignment, host subtraction, de novo assembly, aligned contig generation, combined-contig deduplication, and virus identification
 - Python-native `blastn`/`blastx` identification outputs, including raw tables, top-hit tables, contig classification FASTA files, per-sample summary TSV/JSON, HTML summary pages, per-reference detail pages, and undetermined-contig reports
-- a Python-first `run` command with an optional transitional `legacy` backend for the existing Perl pipeline
+- a Python-first `run` command for the v2 rewrite line
 
-The default backend on `main` is now `python`. The legacy backend remains available during the migration through `--backend legacy`, but it is now treated as a deprecated compatibility mode.
+The default backend on `main` is `python`. The old Perl workflow is no longer runnable through the `virusdetect` CLI on `main`; use the `v1` branch for supported legacy execution. Historical workflow notes are documented in [LEGACY.md](/Users/kentnf/projects/cornell/VirusDetect/LEGACY.md).
+
+Branch roles:
+
+- `main`: active Python v2 development line
+- `v1`: legacy Perl maintenance line
+- `master`: frozen historical alias of the old v1 state; kept temporarily for compatibility
 
 This is still an alpha release line: the Python pipeline is functional through identification and reporting, but report parity and package-manager distribution are not finished yet.
 
@@ -69,13 +75,7 @@ The `pixi` environment now includes the core command-line tools needed for the c
 - `hisat2`
 - `spades`
 
-Legacy-only extras are no longer installed by default on `main`. If you still need `--backend legacy`, add:
-
-```bash
-pixi add perl perl-bioperl
-```
-
-`Bio::Graphics` is still only a legacy Perl requirement and may need extra platform-specific setup outside the default `pixi` environment, especially on `osx-arm64`.
+Legacy-only extras are no longer installed by default on `main`. If you still need the historical Perl workflow, see [LEGACY.md](/Users/kentnf/projects/cornell/VirusDetect/LEGACY.md) for the extra setup.
 
 Show the new CLI:
 
@@ -99,7 +99,7 @@ pixi run virusdetect -- tools install-hint
 
 On `main`, `virusdetect tools check` now reports only tools found from the active environment, so missing dependencies fail fast instead of silently falling back to legacy bundled binaries.
 
-When you use `--backend legacy`, the original Perl dependencies still apply. In particular, BioPerl modules such as `Bio::SeqIO` and `Bio::Graphics` must be installed.
+If you need the historical Perl dependency set during migration, use `virusdetect tools install-hint --legacy` or the setup notes in [LEGACY.md](/Users/kentnf/projects/cornell/VirusDetect/LEGACY.md).
 
 Bioconda packaging scaffolding now lives in [BIOCONDA.md](/Users/kentnf/projects/cornell/VirusDetect/BIOCONDA.md) and [recipes/virusdetect/meta.yaml](/Users/kentnf/projects/cornell/VirusDetect/recipes/virusdetect/meta.yaml). The public package is not published there yet, but the repository now carries the recipe and release-asset layout needed for submission.
 
@@ -125,7 +125,7 @@ Planned behavior:
   - `$CONDA_PREFIX/share/virusdetect/database`
   - `~/.local/share/virusdetect/database`
 
-The bundled legacy `databases/` directory is no longer used implicitly on `main`. During the transition you can still target it explicitly with `--db-path databases` or `virusdetect db verify --path databases`.
+The historical `databases/` directory has been removed from `main`. Use an installed database directory or a separately staged legacy database path when you need verification, bundle generation, or migration checks.
 
 ## Current CLI
 
@@ -136,7 +136,7 @@ virusdetect db verify
 virusdetect db download
 virusdetect db download --release-tag v2.0.0a0 --db-version 2026.04
 virusdetect db download --url <archive-url>
-virusdetect db bundle --path databases --output dist/virusdetect-db-2.0.0a1.tar.gz
+virusdetect db bundle --path <db_dir> --output dist/virusdetect-db-2.0.0a1.tar.gz
 virusdetect tools check
 virusdetect tools install-hint
 virusdetect run <reads.fa> --check-only
@@ -147,14 +147,13 @@ virusdetect run <reads.fa> --stop-after de_novo_assembly
 virusdetect run <reads.fa> --stop-after generate_aligned_contigs
 virusdetect run <reads.fa> --stop-after combine_contigs
 virusdetect run <reads.fa> --stop-after identify_virus
-virusdetect run test_data --db-path databases --stop-after identify_virus
-virusdetect run <reads.fa> --backend legacy -o output_dir
+virusdetect run test_data --db-path <db_dir> --stop-after identify_virus
 ```
 
-Maintainer example for packaging the current legacy database as a v2 bundle:
+Maintainer example for packaging an external legacy-style database directory as a v2 bundle:
 
 ```bash
-virusdetect db bundle --path databases --db-version 2026.04
+virusdetect db bundle --path <db_dir> --db-version 2026.04
 ```
 
 This writes a tarball under `dist/` with a generated `manifest.json` and a sibling `.sha256` file.
@@ -198,8 +197,10 @@ What is still missing from the Perl workflow:
 Example smoke test for the current Python path:
 
 ```bash
-pixi run virusdetect -- run test_data --db-path databases --stop-after identify_virus -o vd_identify_py
+pixi run virusdetect -- run test_data --db-path <db_dir> --stop-after identify_virus -o vd_identify_py
 ```
+
+For local maintainer tasks, `pixi run package-db` and `pixi run smoke-identify` now require explicit `VIRUSDETECT_PACKAGE_DB_PATH` and `VIRUSDETECT_SMOKE_DB_PATH` environment variables so they no longer depend on the repository `databases/` directory.
 
 See [CHANGELOG.md](/Users/kentnf/projects/cornell/VirusDetect/CHANGELOG.md) for the current alpha release summary.
 See [RELEASE.md](/Users/kentnf/projects/cornell/VirusDetect/RELEASE.md) for the release checklist and tagging workflow.
@@ -217,10 +218,7 @@ Representative outputs from that smoke test include:
 
 ```text
 src/virusdetect/   Python package for v2
-tests/             Unit tests for the Python CLI scaffold
-bin/               Legacy bundled binaries used by v1
-databases/         Legacy bundled reference data used by v1
-tools/             Legacy helper scripts for preprocessing and DB generation
+tests/             Unit tests for the Python rewrite line
 ```
 
 ## Legacy Usage

@@ -13,16 +13,23 @@ The legacy Perl release history remains on the `v1` branch and the historical `v
 - `virusdetect db bundle` to package a legacy or v2 database directory into a release-ready `database/` tarball
 - generated database manifests and sibling `.sha256` checksum files for packaged database archives
 - default GitHub release asset resolution for `virusdetect db download`, including automatic checksum URL lookup
-- `pixi run package-db` maintainer task for building the default database bundle from `databases/`
+- `pixi run package-db` maintainer task for building a database bundle from an explicit database path
 
 ### Changed
 
-- `virusdetect run` on `main` now defaults to the Python backend; the Perl workflow remains available through `--backend legacy`
+- `virusdetect run` on `main` is now Python-only; users who still need the historical Perl workflow should use the `v1` branch
 - default `pixi` and Bioconda dependency sets on `main` no longer include Perl; legacy extras must be installed explicitly
 - tool resolution on `main` no longer falls back to legacy bundled binaries in `bin/`; runtime tools must come from the active environment
-- `main` no longer auto-discovers the repository `./databases` legacy bundle; transitional runs must opt into it with `--db-path databases`
-- `--backend legacy` is now explicitly treated as a deprecated compatibility mode and prints migration guidance toward the Python backend or the `v1` branch
+- the deprecated `--backend legacy` override is now rejected on `main` and points users to the `v1` branch
 - legacy Perl usage notes have been moved out of the main README into `LEGACY.md`
+- `virusdetect run --help` on `main` now presents a Python-only interface
+- `virusdetect tools install-hint` now defaults to Python-only dependency guidance; historical Perl extras move behind `--legacy`
+- the Python-side legacy bridge module and its dedicated tests have been removed from `main`
+- the historical Perl entrypoints and helper modules (`virus_detect.pl`, `bin/virus_identify.pl`, `bin/Util.pm`, `bin/align.pm`, `bin/Bio/Graphics.pm`) have been removed from `main`
+- the repository `databases/` directory has been removed from `main`; maintainers now package external database paths explicitly
+- the historical helper scripts under `tools/` and the bundled legacy binaries under `bin/` have been removed from `main`
+- Python-mode analysis plans no longer include `missing_legacy_perl_modules`
+- maintainer `pixi` tasks now require explicit database-path environment variables instead of hardcoding the repository `databases/` directory
 
 ## [2.0.0a0] - 2026-04-10
 

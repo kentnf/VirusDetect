@@ -16,6 +16,7 @@ The recipe is pinned to the uploaded source distribution for:
 
 ```bash
 pixi run package
+export VIRUSDETECT_PACKAGE_DB_PATH=/path/to/database
 pixi run package-db
 ```
 
