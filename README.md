@@ -97,7 +97,7 @@ pixi run virusdetect -- tools check
 pixi run virusdetect -- tools install-hint
 ```
 
-During the migration, `virusdetect tools check` will also fall back to bundled legacy tools in `bin/` when needed for transitional development.
+On `main`, `virusdetect tools check` now reports only tools found from the active environment, so missing dependencies fail fast instead of silently falling back to legacy bundled binaries.
 
 When you use `--backend legacy`, the original Perl dependencies still apply. In particular, BioPerl modules such as `Bio::SeqIO` and `Bio::Graphics` must be installed.
 

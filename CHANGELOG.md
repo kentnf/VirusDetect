@@ -19,6 +19,7 @@ The legacy Perl release history remains on the `v1` branch and the historical `v
 
 - `virusdetect run` on `main` now defaults to the Python backend; the Perl workflow remains available through `--backend legacy`
 - default `pixi` and Bioconda dependency sets on `main` no longer include Perl; legacy extras must be installed explicitly
+- tool resolution on `main` no longer falls back to legacy bundled binaries in `bin/`; runtime tools must come from the active environment
 
 ## [2.0.0a0] - 2026-04-10
 

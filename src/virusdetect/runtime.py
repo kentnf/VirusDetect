@@ -30,24 +30,9 @@ TOOL_SPECS = (
     ("spades.py", False),
 )
 
-LEGACY_TOOL_FALLBACKS = {
-    "bwa": "bwa",
-    "samtools": "samtools",
-}
-
 
 def repo_root() -> Path:
     return Path(__file__).resolve().parents[2]
-
-
-def bundled_tool_path(name: str) -> Path | None:
-    legacy_name = LEGACY_TOOL_FALLBACKS.get(name)
-    if legacy_name is None:
-        return None
-    candidate = repo_root() / "bin" / legacy_name
-    if candidate.exists():
-        return candidate
-    return None
 
 
 def is_runnable_binary(path: str) -> bool:
@@ -72,10 +57,6 @@ def resolve_tool(name: str) -> tuple[str | None, str | None]:
     system_path = shutil.which(name)
     if system_path and is_runnable_binary(system_path):
         return system_path, "PATH"
-
-    bundled = bundled_tool_path(name)
-    if bundled is not None and is_runnable_binary(str(bundled)):
-        return str(bundled), "bundled"
 
     return None, None
 
