@@ -144,11 +144,6 @@ def build_tools_parser(subparsers) -> None:
     check_parser.set_defaults(handler=handle_tools)
 
     install_parser = tools_subparsers.add_parser("install-hint", help="Print recommended pixi/conda install commands")
-    install_parser.add_argument(
-        "--legacy",
-        action="store_true",
-        help="Include the deprecated legacy Perl compatibility packages",
-    )
     install_parser.set_defaults(handler=handle_tools_install_hint)
 
 
@@ -263,7 +258,7 @@ def handle_tools(args) -> int:
 
 
 def handle_tools_install_hint(args) -> int:
-    print(install_hint_text(include_legacy=args.legacy))
+    print(install_hint_text())
     return 0
 
 

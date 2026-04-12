@@ -16,16 +16,18 @@ The v2 branch currently provides:
 - external tool discovery checks
 - a `run` command that can validate inputs, classify samples, and prepare sample working files
 - Python implementations of sample preparation, virus-reference alignment, host subtraction, de novo assembly, aligned contig generation, combined-contig deduplication, and virus identification
-- Python-native `blastn`/`blastx` identification outputs, including raw tables, top-hit tables, contig classification FASTA files, per-sample summary TSV/JSON, HTML summary pages, per-reference detail pages, and undetermined-contig reports
+- Python-native `blastn`/`blastx` identification outputs, including Perl-style contig-classification FASTA files, reference FASTA exports, summary HTML pages, undetermined-contig reports, and compatibility `SAM` / `XLS` outputs
 - a Python-first `run` command for the v2 rewrite line
 
-The default backend on `main` is `python`. The old Perl workflow is no longer runnable through the `virusdetect` CLI on `main`; use the `v1` branch for supported legacy execution. Historical workflow notes are documented in [LEGACY.md](/Users/kentnf/projects/cornell/VirusDetect/LEGACY.md).
+The default backend on `main` is `python`. The old Perl workflow is no longer runnable through the `virusdetect` CLI on `main`; use the `v1` branch for supported legacy execution.
 
 Branch roles:
 
 - `main`: active Python v2 development line
 - `v1`: legacy Perl maintenance line
 - `master`: frozen historical alias of the old v1 state; kept temporarily for compatibility
+
+Historical standalone utilities under `tools/` are kept on `main` for separate upstream/downstream use, but they are not part of the supported Python runtime path.
 
 This is still an alpha release line: the Python pipeline is functional through identification and reporting, but report parity and package-manager distribution are not finished yet.
 
@@ -44,16 +46,17 @@ Implemented in the Python v2 line:
 - Python-native `blastn` and `blastx` identification
 - redundancy pruning and coverage/depth filtering similar to the legacy Perl logic
 - report artifacts:
-  - summary TSV/JSON
+  - Perl-style release output set for `identify_virus`
+  - compatibility `blastn.sam`, `blastx.sam`, `blastn.xls`, and `blastx.xls`
   - reference FASTA export
-  - summary HTML with compact coverage maps
-  - per-reference detail HTML with coordinate coverage maps
-  - undetermined contig HTML reports
+  - summary HTML with compact coverage maps and stable per-reference row anchors
+  - undetermined-contig HTML reports with grouped headers, browser-native tooltips, candidate highlighting, stable anchors, `undetermined.html` as the no-match view, and `undetermined_blast.html` as the match-only view for the current sRNA path
 
 Not yet ported from the legacy Perl workflow:
 
-- `Bio::Graphics` alignment images and detailed graphical layouts
-- siRNA size-distribution tables and highlighting logic
+- exact `Bio::Graphics` parity and detailed historical graphical layout behavior
+- full parity for the historical siRNA tables and highlighting presentation
+- historical per-reference detail HTML pages are not part of the default v2 release output
 - full parity for every historical HTML artifact and formatting detail
 - final publication flow for package-manager distribution and future database refreshes
 
@@ -75,7 +78,7 @@ The `pixi` environment now includes the core command-line tools needed for the c
 - `hisat2`
 - `spades`
 
-Legacy-only extras are no longer installed by default on `main`. If you still need the historical Perl workflow, see [LEGACY.md](/Users/kentnf/projects/cornell/VirusDetect/LEGACY.md) for the extra setup.
+Legacy-only extras are no longer installed on `main`. If you still need the historical Perl workflow, switch to the `v1` branch and manage its dependencies there.
 
 Show the new CLI:
 
@@ -99,7 +102,7 @@ pixi run virusdetect -- tools install-hint
 
 On `main`, `virusdetect tools check` now reports only tools found from the active environment, so missing dependencies fail fast instead of silently falling back to legacy bundled binaries.
 
-If you need the historical Perl dependency set during migration, use `virusdetect tools install-hint --legacy` or the setup notes in [LEGACY.md](/Users/kentnf/projects/cornell/VirusDetect/LEGACY.md).
+If you need the historical Perl dependency set during migration, use the `v1` branch instead of `main`.
 
 Bioconda packaging scaffolding now lives in [BIOCONDA.md](/Users/kentnf/projects/cornell/VirusDetect/BIOCONDA.md) and [recipes/virusdetect/meta.yaml](/Users/kentnf/projects/cornell/VirusDetect/recipes/virusdetect/meta.yaml). The public package is not published there yet, but the repository now carries the recipe and release-asset layout needed for submission.
 
@@ -150,7 +153,7 @@ virusdetect run <reads.fa> --stop-after identify_virus
 virusdetect run test_data --db-path <db_dir> --stop-after identify_virus
 ```
 
-Maintainer example for packaging an external legacy-style database directory as a v2 bundle:
+Maintainer example for packaging an external historical database directory as a v2 bundle:
 
 ```bash
 virusdetect db bundle --path <db_dir> --db-version 2026.04
@@ -166,38 +169,45 @@ When you stop the Python backend after `identify_virus`, the current v2 code wri
 
 ```text
 result_<sample>/
-  <sample>.summary.tsv
-  <sample>.summary.json
+  contig_sequences.fa
+  contig_sequences.blastn.fa
+  contig_sequences.blastx.fa
+  contig_sequences.undetermined.fa
+  blastn.references.fa
+  blastx.references.fa
   blastn.html
   blastx.html
-  undetermined.html
   undetermined_blast.html
-  blastn.reference.fa
-  blastx.reference.fa
-  blastn_references/
-  blastx_references/
+  undetermined.html
+  blastn.sam
+  blastx.sam
+  blastn.xls
+  blastx.xls
 ```
+
+The default Python run also removes the matching `<sample>_temp/` working directory after a successful identify stage unless you pass `--keep-temp`.
 
 The current HTML output provides:
 
-- `blastn.html` and `blastx.html` summarize the final kept references after coverage/depth and redundancy filtering
-- summary pages now include compact per-reference coverage strips so you can see fragmented versus near-complete support at a glance
-- `blastn_references/` and `blastx_references/` contain one detail page per kept reference with coordinate coverage maps, strand-aware hit blocks, and contig tables
+- `blastn.html` and `blastx.html` summarize the final reference groups that remain after coverage/depth and redundancy filtering.
+- Summary pages include compact per-reference coverage strips and stable row anchors.
 - `undetermined.html` separates undetermined contigs into:
-  - contigs with virus-database hits that were not retained in the final sets
-  - contigs with no retained virus-database hits
-- `undetermined_blast.html` is the hits-only view of the same undetermined set
+  - contigs with virus-database matches that were not kept in the final sets
+  - contigs with no virus-database matches
+- For small-RNA runs, undetermined reports include read-length columns (`18` to `33`), `21-22 nt` enrichment highlighting, candidate-focus sections, and stable anchors.
+- `undetermined_blast.html` is the match-only view of the same undetermined set.
 
 What is still missing from the Perl workflow:
 
 - graphical alignment views from the legacy `Bio::Graphics` reports
-- full siRNA size-distribution reporting
+- full legacy-format siRNA size-distribution reporting
 - complete feature parity for every legacy reporting artifact
 
 Example smoke test for the current Python path:
 
 ```bash
-pixi run virusdetect -- run test_data --db-path <db_dir> --stop-after identify_virus -o vd_identify_py
+export VIRUSDETECT_SMOKE_DB_PATH=/path/to/database
+pixi run smoke-identify
 ```
 
 For local maintainer tasks, `pixi run package-db` and `pixi run smoke-identify` now require explicit `VIRUSDETECT_PACKAGE_DB_PATH` and `VIRUSDETECT_SMOKE_DB_PATH` environment variables so they no longer depend on the repository `databases/` directory.
@@ -207,12 +217,10 @@ See [RELEASE.md](/Users/kentnf/projects/cornell/VirusDetect/RELEASE.md) for the 
 
 Representative outputs from that smoke test include:
 
-- `vd_identify_py/result_test_data/blastn.html`
-- `vd_identify_py/result_test_data/blastx.html`
-- `vd_identify_py/result_test_data/blastn_references/AB083196.html`
-- `vd_identify_py/result_test_data/blastx_references/AEV92950.1.html`
-- `vd_identify_py/result_test_data/undetermined.html`
-- `vd_identify_py/result_test_data/undetermined_blast.html`
+- `vd_identify_release/result_test_data/blastn.html`
+- `vd_identify_release/result_test_data/blastx.html`
+- `vd_identify_release/result_test_data/undetermined.html`
+- `vd_identify_release/result_test_data/undetermined_blast.html`
 
 ## Repository Layout
 
@@ -223,4 +231,4 @@ tests/             Unit tests for the Python rewrite line
 
 ## Legacy Usage
 
-Legacy compatibility notes and historical Perl entrypoints now live in [LEGACY.md](/Users/kentnf/projects/cornell/VirusDetect/LEGACY.md).
+Legacy compatibility notes and historical Perl entrypoints now live on the `v1` branch.

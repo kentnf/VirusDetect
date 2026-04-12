@@ -4,6 +4,7 @@ import csv
 import gzip
 import html
 import json
+import shutil
 import subprocess
 from collections import defaultdict
 from dataclasses import asdict, dataclass
@@ -13,7 +14,7 @@ from virusdetect.db import resolve_data_path, resolve_reference_path, resolve_se
 from virusdetect.fasta import FastaRecord, read_fasta_records, write_fasta_records
 from virusdetect.runtime import tool_path_map
 from virusdetect.sample import count_sequences
-from virusdetect.sam import expand_xa_hits
+from virusdetect.sam import expand_xa_hits, reverse_complement
 
 BLAST_OUTFMT_FIELDS = (
     "qseqid",
@@ -29,10 +30,13 @@ BLAST_OUTFMT_FIELDS = (
     "sstart",
     "send",
     "qcovs",
+    "qseq",
+    "sseq",
 )
 BLASTN_MIN_IDENTITY = 60.0
 BLASTN_MIN_QUERY_COVERAGE = 50.0
 BLASTX_MIN_QUERY_COVERAGE = 60.0
+ALIGNMENT_WRAP_WIDTH = 95
 
 
 @dataclass(frozen=True)
@@ -62,6 +66,8 @@ class BlastHit:
     hit_start: int
     hit_end: int
     query_coverage: float
+    query_sequence: str = ""
+    hit_sequence: str = ""
 
 
 @dataclass(frozen=True)
@@ -265,6 +271,57 @@ def build_bwa_samse_command(reference_path: str, sai_path: str, sample_path: str
     ]
 
 
+def collect_contig_read_length_stats(sam_path: Path) -> dict[str, dict[int, int]]:
+    stats: dict[str, dict[int, int]] = defaultdict(dict)
+    with sam_path.open("r", encoding="utf-8") as handle:
+        for raw_line in handle:
+            if not raw_line or raw_line.startswith("@"):
+                continue
+            fields = raw_line.rstrip("\n").split("\t")
+            if len(fields) < 11:
+                continue
+            try:
+                flag = int(fields[1])
+            except ValueError:
+                continue
+            contig_id = fields[2]
+            sequence = fields[9]
+            if contig_id == "*" or flag & 0x4 or sequence == "*":
+                continue
+            read_length = len(sequence)
+            stats.setdefault(contig_id, {})
+            stats[contig_id][read_length] = stats[contig_id].get(read_length, 0) + 1
+    return {contig_id: dict(sorted(length_counts.items())) for contig_id, length_counts in stats.items()}
+
+
+def cleanup_intermediate_files(paths: list[Path], keep_files: bool = False) -> None:
+    if keep_files:
+        return
+
+    for path in paths:
+        try:
+            path.unlink()
+        except FileNotFoundError:
+            continue
+
+
+def cleanup_result_dir(output_dir: Path, keep_names: set[str]) -> None:
+    for path in output_dir.iterdir():
+        if path.name in keep_names:
+            continue
+        if path.is_dir():
+            shutil.rmtree(path, ignore_errors=True)
+        else:
+            try:
+                path.unlink()
+            except FileNotFoundError:
+                continue
+
+
+def result_file(path_dir: Path, name: str) -> Path:
+    return path_dir / name
+
+
 def compute_contig_depths(
     sample_path: Path,
     contig_path: Path,
@@ -272,11 +329,11 @@ def compute_contig_depths(
     result_dir: Path,
     args,
     tool_paths: dict[str, str],
-) -> tuple[dict[str, ContigDepth], Path]:
-    depth_path = result_dir / f"{sample_path.name}.contig_depth.tsv"
+) -> tuple[dict[str, ContigDepth], Path, dict[str, dict[int, int]]]:
+    depth_path = result_file(result_dir, "contig_depth.tsv")
     if not contig_records:
         write_contig_depth_tsv(depth_path, {})
-        return {}, depth_path
+        return {}, depth_path, {}
 
     bwa = tool_paths.get("bwa")
     samtools = tool_paths.get("samtools")
@@ -287,12 +344,12 @@ def compute_contig_depths(
     ensure_bwa_index(reference_path, {"bwa": bwa}, debug=args.debug)
     ensure_fasta_index(reference_path, {"samtools": samtools}, debug=args.debug)
 
-    sai_path = result_dir / f"{sample_path.name}.contig_depth.bwa.sai"
-    sam_path = result_dir / f"{sample_path.name}.contig_depth.sam"
-    bam_path = result_dir / f"{sample_path.name}.contig_depth.bam"
-    sorted_prefix = result_dir / f"{sample_path.name}.contig_depth.sorted"
-    sorted_bam_path = result_dir / f"{sample_path.name}.contig_depth.sorted.bam"
-    raw_depth_path = result_dir / f"{sample_path.name}.contig_depth.pileup"
+    sai_path = result_file(result_dir, "contig_depth.bwa.sai")
+    sam_path = result_file(result_dir, "contig_depth.sam")
+    bam_path = result_file(result_dir, "contig_depth.bam")
+    sorted_prefix = result_file(result_dir, "contig_depth.sorted")
+    sorted_bam_path = result_file(result_dir, "contig_depth.sorted.bam")
+    raw_depth_path = result_file(result_dir, "contig_depth.pileup")
 
     align_command = build_bwa_align_command(reference_path, str(sample_path), args.threads)
     align_command[0] = bwa
@@ -302,6 +359,7 @@ def compute_contig_depths(
     samse_command[0] = bwa
     run_command_to_file(samse_command, sam_path, debug=args.debug)
     expand_xa_hits(sam_path)
+    read_length_stats = collect_contig_read_length_stats(sam_path)
 
     view_command = [samtools, "view", "-bt", f"{reference_path}.fai", str(sam_path)]
     run_command_to_file(view_command, bam_path, binary=True, debug=args.debug)
@@ -340,7 +398,17 @@ def compute_contig_depths(
         )
 
     write_contig_depth_tsv(depth_path, contig_depths)
-    return contig_depths, depth_path
+    cleanup_intermediate_files(
+        [
+            sai_path,
+            sam_path,
+            bam_path,
+            sorted_bam_path,
+            raw_depth_path,
+        ],
+        keep_files=args.debug,
+    )
+    return contig_depths, depth_path, read_length_stats
 
 
 def run_blastn(
@@ -454,6 +522,8 @@ def parse_blast_hits(
                     hit_start=int(row[10]),
                     hit_end=int(row[11]),
                     query_coverage=float(row[12]),
+                    query_sequence=row[13] if len(row) > 13 else "",
+                    hit_sequence=row[14] if len(row) > 14 else "",
                 )
             )
 
@@ -553,6 +623,8 @@ def write_hit_table(path: Path, hits: list[BlastHit]) -> None:
         "hit_start",
         "hit_end",
         "query_coverage",
+        "query_sequence",
+        "hit_sequence",
     ]
     with path.open("w", encoding="utf-8", newline="") as handle:
         writer = csv.DictWriter(handle, field_names, delimiter="\t")
@@ -561,47 +633,127 @@ def write_hit_table(path: Path, hits: list[BlastHit]) -> None:
             writer.writerow(asdict(hit))
 
 
-def write_legacy_style_table(path: Path, hits: list[BlastHit], records_by_id: dict[str, FastaRecord]) -> None:
-    field_names = [
-        "Contig_ID",
-        "Contig_Seq",
-        "Contig_Len",
-        "Hit_ID",
-        "Reference_ID",
-        "Hit_Len",
-        "Genus",
-        "Description",
-        "Contig_start",
-        "Contig_end",
-        "Hit_start",
-        "Hit_end",
-        "Hsp_identity",
-        "E_value",
-        "Query_coverage",
-    ]
+def compute_alignment_identity_text(hit: BlastHit) -> str:
+    query_sequence = hit.query_sequence.replace(" ", "")
+    hit_sequence = hit.hit_sequence.replace(" ", "")
+    if not query_sequence or not hit_sequence:
+        matched = int(round(hit.alignment_length * (hit.percent_identity / 100.0)))
+        return f"{matched}/{hit.alignment_length}({hit.percent_identity:.0f}%)"
+
+    matched = 0
+    aligned_positions = 0
+    for query_char, hit_char in zip(query_sequence, hit_sequence):
+        if query_char == "-" and hit_char == "-":
+            continue
+        aligned_positions += 1
+        if query_char != "-" and hit_char != "-" and query_char.upper() == hit_char.upper():
+            matched += 1
+
+    if aligned_positions == 0:
+        aligned_positions = hit.alignment_length
+    percent = (100.0 * matched / aligned_positions) if aligned_positions else 0.0
+    return f"{matched}/{aligned_positions}({percent:.0f}%)"
+
+
+def write_legacy_alignment_table(path: Path, hits: list[BlastHit], records_by_id: dict[str, FastaRecord]) -> None:
     with path.open("w", encoding="utf-8", newline="") as handle:
-        writer = csv.DictWriter(handle, field_names, delimiter="\t")
-        writer.writeheader()
-        for hit in hits:
+        handle.write(
+            "#Contig_ID\tContig_Seq\tContig_Len\tHit_ID\tHit_Len\tGenus\tDescription\t"
+            "Contig_start\tContig_end\tHit_start\tHit_end\tHsp_identity\tE_value\tHsp_strand\n"
+        )
+        for hit in sorted(hits, key=lambda item: (item.contig_id, item.hit_id, min(item.hit_start, item.hit_end), item.query_start)):
             record = records_by_id.get(hit.contig_id)
-            writer.writerow(
-                {
-                    "Contig_ID": hit.contig_id,
-                    "Contig_Seq": record.sequence if record else "",
-                    "Contig_Len": hit.contig_length,
-                    "Hit_ID": hit.hit_id,
-                    "Reference_ID": hit.reference_id,
-                    "Hit_Len": hit.hit_length,
-                    "Genus": hit.genus,
-                    "Description": hit.description,
-                    "Contig_start": hit.query_start,
-                    "Contig_end": hit.query_end,
-                    "Hit_start": hit.hit_start,
-                    "Hit_end": hit.hit_end,
-                    "Hsp_identity": f"{hit.percent_identity:.2f}",
-                    "E_value": f"{hit.evalue:.6g}",
-                    "Query_coverage": f"{hit.query_coverage:.2f}",
-                }
+            contig_sequence = record.sequence if record is not None else ""
+            strand = "-1" if hit.hit_start > hit.hit_end else "1"
+            handle.write(
+                "\t".join(
+                    [
+                        hit.contig_id,
+                        contig_sequence,
+                        str(hit.contig_length),
+                        hit.hit_id,
+                        str(hit.hit_length),
+                        hit.genus,
+                        hit.description,
+                        str(hit.query_start),
+                        str(hit.query_end),
+                        str(hit.hit_start),
+                        str(hit.hit_end),
+                        compute_alignment_identity_text(hit),
+                        format(hit.evalue, ".6g"),
+                        strand,
+                    ]
+                )
+                + "\n"
+            )
+
+
+def cigar_from_alignment(query_sequence: str, hit_sequence: str) -> str:
+    operations: list[tuple[str, int]] = []
+    for query_char, hit_char in zip(query_sequence, hit_sequence):
+        if query_char == "-" and hit_char == "-":
+            continue
+        if query_char == "-":
+            op = "D"
+        elif hit_char == "-":
+            op = "I"
+        else:
+            op = "M"
+        if operations and operations[-1][0] == op:
+            operations[-1] = (op, operations[-1][1] + 1)
+        else:
+            operations.append((op, 1))
+    return "".join(f"{length}{op}" for op, length in operations) or f"{len(query_sequence.replace('-', ''))}M"
+
+
+def format_sam_query_sequence(hit: BlastHit) -> str:
+    sequence = hit.query_sequence.replace("-", "")
+    if hit.hit_start > hit.hit_end:
+        return reverse_complement(sequence)
+    return sequence
+
+
+def write_legacy_alignment_sam(path: Path, hits: list[BlastHit]) -> None:
+    reference_lengths: dict[str, int] = {}
+    for hit in hits:
+        reference_lengths.setdefault(hit.hit_id, hit.hit_length)
+
+    with path.open("w", encoding="utf-8", newline="") as handle:
+        for hit_id in sorted(reference_lengths):
+            handle.write(f"@SQ\tSN:{hit_id}\tLN:{reference_lengths[hit_id]}\n")
+
+        for hit in sorted(hits, key=lambda item: (item.contig_id, item.hit_id, min(item.hit_start, item.hit_end), item.query_start)):
+            flag = "16" if hit.hit_start > hit.hit_end else "0"
+            query_left_clip = max(0, min(hit.query_start, hit.query_end) - 1)
+            query_right_clip = max(0, hit.contig_length - max(hit.query_start, hit.query_end))
+            cigar_tokens: list[str] = []
+            if query_left_clip:
+                cigar_tokens.append(f"{query_left_clip}H")
+            cigar_tokens.append(cigar_from_alignment(hit.query_sequence, hit.hit_sequence))
+            if query_right_clip:
+                cigar_tokens.append(f"{query_right_clip}H")
+            if hit.hit_start > hit.hit_end:
+                cigar_tokens = list(reversed(cigar_tokens))
+
+            handle.write(
+                "\t".join(
+                    [
+                        hit.contig_id,
+                        flag,
+                        hit.hit_id,
+                        str(min(hit.hit_start, hit.hit_end)),
+                        "255",
+                        "".join(cigar_tokens),
+                        "*",
+                        "0",
+                        "0",
+                        format_sam_query_sequence(hit) or "*",
+                        "*",
+                        f"AS:i:{int(round(hit.bit_score))}",
+                        f"EV:Z:{format(hit.evalue, '.6g')}",
+                    ]
+                )
+                + "\n"
             )
 
 
@@ -857,9 +1009,59 @@ def describe_hit_strand(hit: BlastHit) -> str:
     return "+" if hit.hit_end >= hit.hit_start else "-"
 
 
+def identity_color(percent_identity: float) -> str:
+    clamped = max(0.0, min(100.0, percent_identity))
+    if clamped >= 97.0:
+        return "#0f766e"
+    if clamped >= 90.0:
+        return "#2563eb"
+    if clamped >= 75.0:
+        return "#d97706"
+    return "#b91c1c"
+
+
+def resolve_ncbi_link(analysis: str, group_id: str, reference_id: str) -> tuple[str, str, str]:
+    if analysis == "blastx":
+        accession = group_id
+        return accession, f"https://www.ncbi.nlm.nih.gov/protein/{html.escape(accession)}", "Protein ID"
+    accession = reference_id
+    return accession, f"https://www.ncbi.nlm.nih.gov/nuccore/{html.escape(accession)}", "Reference ID"
+
+
+def sort_hits_by_reference(hits: list[BlastHit]) -> list[BlastHit]:
+    return sorted(hits, key=lambda item: (hit_reference_interval(item)[0], hit_reference_interval(item)[1], item.contig_id))
+
+
+def group_hits_for_reference_panel(hits: list[BlastHit]) -> list[tuple[str, list[BlastHit]]]:
+    grouped_hits: dict[str, list[BlastHit]] = defaultdict(list)
+    for hit in sort_hits_by_reference(hits):
+        grouped_hits[hit.contig_id].append(hit)
+    return sorted(
+        grouped_hits.items(),
+        key=lambda item: (
+            min(hit_reference_interval(hit)[0] for hit in item[1]),
+            min(hit_reference_interval(hit)[1] for hit in item[1]),
+            item[0],
+        ),
+    )
+
+
+def describe_panel_track_meta(hits: list[BlastHit]) -> str:
+    hsp_count = len(hits)
+    strand_values = sorted({describe_hit_strand(hit) for hit in hits})
+    strand_summary = strand_values[0] if len(strand_values) == 1 else "mixed"
+    identity_values = [hit.percent_identity for hit in hits]
+    if min(identity_values) == max(identity_values):
+        identity_summary = f"{format_report_float(identity_values[0], 1)}%"
+    else:
+        identity_summary = f"{format_report_float(min(identity_values), 1)}-{format_report_float(max(identity_values), 1)}%"
+    hsp_label = "Alignment" if hsp_count == 1 else "Alignments"
+    return f"{hsp_count} {hsp_label} / {strand_summary} / {identity_summary}"
+
+
 def render_coverage_blocks(reference_length: int, hits: list[BlastHit]) -> str:
     blocks: list[str] = []
-    for hit in sorted(hits, key=lambda item: (hit_reference_interval(item)[0], hit_reference_interval(item)[1], item.contig_id)):
+    for hit in sort_hits_by_reference(hits):
         ref_start, ref_end = hit_reference_interval(hit)
         left = ((ref_start - 1) / reference_length) * 100
         width = max(((ref_end - ref_start + 1) / reference_length) * 100, 0.35)
@@ -875,16 +1077,96 @@ def render_coverage_blocks(reference_length: int, hits: list[BlastHit]) -> str:
     return "".join(blocks)
 
 
+def render_reference_track_panel(
+    analysis: str,
+    group_id: str,
+    reference_id: str,
+    reference_length: int,
+    hits: list[BlastHit],
+    anchor_ids: dict[BlastHit, str] | None = None,
+) -> str:
+    if reference_length <= 0 or not hits:
+        return ""
+
+    grouped_tracks = group_hits_for_reference_panel(hits)
+    label_width = 140
+    track_width = 640
+    row_height = 26
+    top_padding = 34
+    bottom_padding = 18
+    svg_width = label_width + track_width + 36
+    svg_height = top_padding + bottom_padding + (len(grouped_tracks) * row_height)
+    axis_y = 16
+    track_left = label_width
+    track_right = label_width + track_width
+    tick_values = sorted({1, max(reference_length // 4, 1), max(reference_length // 2, 1), max((reference_length * 3) // 4, 1), reference_length})
+    link_accession, ncbi_url, link_label = resolve_ncbi_link(analysis, group_id, reference_id)
+
+    parts = [
+        "<div class=\"section\" id=\"coverage-map\">",
+        "<h2>Reference Coverage Map</h2>",
+        "<p class=\"muted\">Reference map with contig tracks, identity-colored segments, and a direct NCBI link for the reference accession.</p>",
+        f"<p>{html.escape(link_label)}: <a href=\"{ncbi_url}\" target=\"_blank\" rel=\"noreferrer\"><code>{html.escape(link_accession)}</code></a></p>",
+        f"<svg class=\"reference-panel\" viewBox=\"0 0 {svg_width} {svg_height}\" role=\"img\" aria-label=\"Reference coverage panel for {html.escape(group_id)}\">",
+        f"<line x1=\"{track_left}\" y1=\"{axis_y}\" x2=\"{track_right}\" y2=\"{axis_y}\" class=\"panel-axis\" />",
+    ]
+
+    for tick_value in tick_values:
+        x = track_left + ((tick_value - 1) / reference_length) * track_width
+        parts.append(f"<line x1=\"{x:.2f}\" y1=\"{axis_y - 5}\" x2=\"{x:.2f}\" y2=\"{axis_y + 5}\" class=\"panel-tick\" />")
+        parts.append(f"<text x=\"{x:.2f}\" y=\"10\" text-anchor=\"middle\" class=\"panel-axis-label\">{tick_value}</text>")
+
+    for index, (contig_id, contig_hits) in enumerate(grouped_tracks):
+        y_center = top_padding + (index * row_height)
+        parts.extend(
+            [
+                f"<text x=\"{label_width - 8}\" y=\"{y_center + 4}\" text-anchor=\"end\" class=\"panel-label\">{html.escape(contig_id)}</text>",
+                f"<line x1=\"{track_left}\" y1=\"{y_center}\" x2=\"{track_right}\" y2=\"{y_center}\" class=\"panel-guide\" />",
+            ]
+        )
+        for hit in contig_hits:
+            ref_start, ref_end = hit_reference_interval(hit)
+            rect_x = track_left + ((ref_start - 1) / reference_length) * track_width
+            rect_width = max(((ref_end - ref_start + 1) / reference_length) * track_width, 3.0)
+            color = identity_color(hit.percent_identity)
+            anchor = anchor_ids.get(hit) if anchor_ids else None
+            title = (
+                f"{hit.contig_id}: {ref_start}-{ref_end} "
+                f"({describe_hit_strand(hit)} strand, {format_report_float(hit.percent_identity, 2)}% identity, "
+                f"E-value {hit.evalue:.6g})"
+            )
+            if anchor:
+                parts.append(f"<a href=\"#{html.escape(anchor)}\">")
+            parts.append(
+                f"<rect x=\"{rect_x:.2f}\" y=\"{y_center - 7}\" width=\"{rect_width:.2f}\" height=\"14\" rx=\"7\" ry=\"7\" fill=\"{color}\" class=\"panel-segment\">"
+                f"<title>{html.escape(title)}</title>"
+                "</rect>"
+            )
+            if anchor:
+                parts.append("</a>")
+        parts.append(
+            f"<text x=\"{track_right + 10}\" y=\"{y_center + 4}\" class=\"panel-meta\">{html.escape(describe_panel_track_meta(contig_hits))}</text>"
+        )
+
+    parts.extend(
+        [
+            "</svg>",
+            "<p class=\"muted\">Track color reflects identity: teal `>=97%`, blue `>=90%`, orange `>=75%`, red below that.</p>",
+            "</div>",
+        ]
+    )
+    return "".join(parts)
+
+
 def render_reference_coverage_map(reference_length: int, hits: list[BlastHit]) -> str:
     if reference_length <= 0 or not hits:
         return "<p class=\"muted\">Reference coverage map is unavailable for this reference.</p>"
 
     return (
         "<div class=\"section\">"
-        "<h2>Reference Coverage Map</h2>"
         f"<div class=\"coverage-axis\"><span>1</span><span>{reference_length}</span></div>"
         f"<div class=\"coverage-track\">{render_coverage_blocks(reference_length, hits)}</div>"
-        "<p class=\"muted\">Each block shows one contig aligned on the reference coordinate axis. Blue indicates forward strand; orange indicates reverse strand.</p>"
+        "<p class=\"muted\">Compact overview: each block shows one contig aligned on the reference coordinate axis. Blue indicates forward strand; orange indicates reverse strand.</p>"
         "</div>"
     )
 
@@ -921,12 +1203,38 @@ def build_html_document(title: str, body: str) -> str:
         "    code { font-family: Menlo, Consolas, monospace; }\n"
         "    .muted { color: #52606d; }\n"
         "    .section { margin-top: 20px; }\n"
+        "    .section-nav { margin: 16px 0 20px; font-size: 14px; }\n"
+        "    .section-nav a { margin-right: 14px; }\n"
         "    .coverage-axis { display: flex; justify-content: space-between; font-size: 12px; color: #52606d; margin: 6px 0; }\n"
         "    .coverage-track { position: relative; height: 20px; border-radius: 999px; background: #d9e2ec; overflow: hidden; }\n"
         "    .coverage-track-compact { min-width: 180px; height: 14px; }\n"
         "    .coverage-block { position: absolute; top: 0; height: 100%; border-radius: 999px; opacity: 0.9; }\n"
         "    .coverage-block.forward { background: #2f6fed; }\n"
         "    .coverage-block.reverse { background: #d97706; }\n"
+        "    .reference-panel { width: 100%; max-width: 860px; height: auto; border: 1px solid #d9e2ec; border-radius: 8px; background: #ffffff; }\n"
+        "    .panel-axis, .panel-guide, .panel-tick { stroke: #9fb3c8; stroke-width: 1; }\n"
+        "    .panel-guide { stroke-dasharray: 3 3; }\n"
+        "    .panel-axis-label, .panel-label, .panel-meta { font-size: 11px; fill: #334e68; font-family: Menlo, Consolas, monospace; }\n"
+        "    .panel-segment { opacity: 0.95; }\n"
+        "    .alignment-block { margin-top: 16px; padding: 12px; border: 1px solid #d9e2ec; border-radius: 8px; background: #f8fbff; }\n"
+        "    .alignment-block table { margin-bottom: 12px; font-size: 13px; }\n"
+        "    .alignment-summary { margin: 8px 0; font-size: 13px; line-height: 1.6; }\n"
+        "    .alignment-summary-label { font-weight: 600; color: #243b53; margin-right: 8px; }\n"
+        "    .alignment-summary-item { display: inline-block; margin-right: 10px; color: #334e68; }\n"
+        "    .alignment-segment { margin-top: 14px; padding-top: 14px; border-top: 1px dashed #bcccdc; }\n"
+        "    .alignment-segment:first-of-type { margin-top: 0; padding-top: 0; border-top: 0; }\n"
+        "    .alignment-header { margin: 8px 0 4px; font-size: 13px; }\n"
+        "    .alignment-metrics { margin: 0 0 6px; font-size: 13px; line-height: 1.6; }\n"
+        "    .alignment-metric { display: inline-block; margin-right: 10px; }\n"
+        "    .alignment-links { margin: 6px 0 10px; font-size: 13px; }\n"
+        "    .alignment-text { overflow-x: auto; padding: 12px; border-radius: 6px; background: #102a43; color: #f0f4f8; font-family: Menlo, Consolas, monospace; font-size: 13px; }\n"
+        "    .alignment-line { display: block; padding: 2px 8px; border-radius: 2px; white-space: pre; background: #99ffff; color: #102a43; }\n"
+        "    .alignment-line + .alignment-line { margin-top: 2px; }\n"
+        "    .alignment-spacer { height: 10px; }\n"
+        "    .candidate-row td { background: #dcfce7; }\n"
+        "    .candidate-flag { display: inline-block; min-width: 44px; padding: 2px 8px; border-radius: 999px; font-size: 12px; font-weight: 600; text-align: center; }\n"
+        "    .candidate-yes { background: #15803d; color: #ffffff; }\n"
+        "    .candidate-no { background: #d9e2ec; color: #334e68; }\n"
         "  </style>\n"
         "</head>\n"
         "<body>\n"
@@ -936,12 +1244,760 @@ def build_html_document(title: str, body: str) -> str:
     )
 
 
-def render_html_table(headers: list[str], rows: list[list[str]]) -> str:
+def render_html_table(headers: list[str], rows: list[list[str]], row_classes: list[str] | None = None) -> str:
     header_html = "".join(f"<th>{html.escape(header)}</th>" for header in headers)
     body_rows = []
-    for row in rows:
-        body_rows.append("<tr>" + "".join(f"<td>{cell}</td>" for cell in row) + "</tr>")
+    for index, row in enumerate(rows):
+        row_class = ""
+        if row_classes is not None and index < len(row_classes) and row_classes[index]:
+            row_class = f' class="{html.escape(row_classes[index])}"'
+        body_rows.append("<tr" + row_class + ">" + "".join(f"<td>{cell}</td>" for cell in row) + "</tr>")
     return "<table>\n<thead><tr>" + header_html + "</tr></thead>\n<tbody>\n" + "\n".join(body_rows) + "\n</tbody>\n</table>"
+
+
+def render_undetermined_table(
+    headers: list[str],
+    rows: list[list[str]],
+    row_classes: list[str] | None = None,
+    row_ids: list[str] | None = None,
+    show_sirna_table: bool = False,
+    include_hit_columns: bool = False,
+) -> str:
+    header_tooltips = {
+        "ID": "Contig identifier reported in this analysis.",
+        "Contig ID": "Contig identifier reported in this analysis.",
+        "Length": "Contig length in bases for this undetermined sequence.",
+        "Covered Bases": "Number of contig bases supported by mapped reads.",
+        "Contig Coverage": "Percent of the contig span covered by mapped reads.",
+        "21-22 (%)": "Percent of 18-33 nt reads assigned to this contig that fall in the 21-22 nt range.",
+        "Candidate": "Candidate flag based on the configured 21-22 nt enrichment threshold.",
+        "Depth": "Average read depth across the covered contig span.",
+        "Mean Depth": "Average read depth across the covered contig span.",
+        "Depth (Norm)": "Depth normalized per million input reads for this sample.",
+        "Acc#": "Underlying nucleotide reference accession associated with the selected virus-database match.",
+        "Match ID": "Primary virus-database match identifier for this undetermined contig.",
+        "Best Hit": "Selected virus-database match for this undetermined contig.",
+        "Reference ID": "Underlying nucleotide reference accession associated with the selected virus-database match.",
+        "Genus": "Reference genus annotation from the database metadata.",
+        "BLAST": "BLAST program used for this selected match.",
+        "Analysis": "BLAST program used for this selected match.",
+        "E value": "Expectation value reported for this selected match.",
+        "E-value": "Expectation value reported for this selected match.",
+        "Identity": "Percent identity reported for this selected match.",
+        "Query Coverage": "Percent of the contig query covered by this selected match.",
+        "Description": "Reference description from the database metadata.",
+    }
+    for length in range(18, 34):
+        header_tooltips[str(length)] = (
+            f"Number of small-RNA reads of length {length} nt assigned to this undetermined contig."
+        )
+
+    body_rows = []
+    for index, row in enumerate(rows):
+        row_attributes: list[str] = []
+        if row_classes is not None and index < len(row_classes) and row_classes[index]:
+            row_attributes.append(f'class="{html.escape(row_classes[index])}"')
+        if row_ids is not None and index < len(row_ids) and row_ids[index]:
+            row_attributes.append(f'id="{html.escape(row_ids[index])}"')
+        row_attribute_text = (" " + " ".join(row_attributes)) if row_attributes else ""
+        body_rows.append("<tr" + row_attribute_text + ">" + "".join(f"<td>{cell}</td>" for cell in row) + "</tr>")
+
+    has_coverage_columns = "Covered Bases" in headers and "Contig Coverage" in headers
+    group_headers = [
+        (
+            "<th colspan=\"2\" title=\"Contig identifier and assembled length for this undetermined sequence.\">"
+            "Contig</th>"
+        )
+    ]
+    if has_coverage_columns:
+        group_headers.append(
+            (
+                "<th colspan=\"2\" title=\"Read-supported coverage metrics for the undetermined contig.\">"
+                "Coverage</th>"
+            )
+        )
+    if show_sirna_table:
+        group_headers.append(
+            (
+                "<th colspan=\"17\" title=\"Per-contig read counts across the historical 18-33 nt small-RNA size bins, plus 21-22 nt enrichment.\">"
+                "siRNA size distribution</th>"
+            )
+        )
+        group_headers.append(
+            "<th colspan=\"1\" title=\"Candidate flag driven by the configured 21-22 nt enrichment threshold.\">Candidate</th>"
+        )
+        group_headers.append(
+            "<th colspan=\"2\" title=\"Read-depth metrics for the assembled undetermined contig.\">Depth</th>"
+        )
+    else:
+        group_headers.append(
+            "<th colspan=\"2\" title=\"Read-depth metrics for the assembled undetermined contig.\">Depth</th>"
+        )
+    if include_hit_columns:
+        group_headers.append(
+            "<th colspan=\"5\" title=\"Summary columns for the virus-database match on this undetermined contig.\">"
+            "Virus-database match</th>"
+        )
+        group_headers.append(
+            "<th colspan=\"3\" title=\"Additional identifiers and alignment metrics for this virus-database match.\">"
+            "Match metrics</th>"
+        )
+
+    header_row_one = "<tr>" + "".join(group_headers) + "</tr>"
+    header_row_two = (
+        "<tr>"
+        + "".join(
+            (
+                f"<th title=\"{html.escape(header_tooltips[header])}\">{html.escape(header)}</th>"
+                if header in header_tooltips
+                else f"<th>{html.escape(header)}</th>"
+            )
+            for header in headers
+        )
+        + "</tr>"
+    )
+    return "<table>\n<thead>" + header_row_one + header_row_two + "</thead>\n<tbody>\n" + "\n".join(body_rows) + "\n</tbody>\n</table>"
+
+
+def build_summary_row_id(group_id: str) -> str:
+    sanitized = "".join(character if character.isalnum() else "-" for character in group_id).strip("-")
+    return f"summary-row-{sanitized or 'item'}"
+
+
+def build_reference_target_map(*analysis_rows: tuple[str, list[dict[str, object]]]) -> dict[tuple[str, str], dict[str, str]]:
+    targets: dict[tuple[str, str], dict[str, str]] = {}
+    for analysis, rows in analysis_rows:
+        for row in rows:
+            if not row.get("passes_filters"):
+                continue
+            group_id = str(row["group_id"])
+            targets[(analysis, group_id)] = {
+                "summary_href": f"{analysis}.html#{build_summary_row_id(group_id)}",
+            }
+    return targets
+
+
+def build_undetermined_row_id(prefix: str, contig_id: str) -> str:
+    sanitized = "".join(character if character.isalnum() else "-" for character in contig_id).strip("-")
+    return f"undetermined-{prefix}-row-{sanitized or 'item'}"
+
+
+def build_undetermined_contig_cell(contig_id: str, row_id: str | None = None) -> str:
+    contig_label = f"<code>{html.escape(contig_id)}</code>"
+    if row_id is None:
+        return contig_label
+    return f"<a href=\"#{html.escape(row_id)}\">{contig_label}</a>"
+
+
+def render_reference_summary_table(
+    headers: list[str],
+    rows: list[list[str]],
+    row_ids: list[str] | None = None,
+) -> str:
+    header_tooltips = {
+        "Reference": "Reference accession or grouped identifier for this report row.",
+        "Reference ID": "Underlying nucleotide reference accession associated with this reference group.",
+        "Length": "Reference sequence length in bases or amino acids for this group.",
+        "Coverage": "Covered bases and percentage of the reference span supported by grouped contigs.",
+        "Map": "Compact coordinate strip showing where grouped contigs align on the reference axis.",
+        "#Contig": "Number of contigs assigned to this reference group.",
+        "Depth": "Average depth across the covered reference span.",
+        "Depth (Norm)": "Depth normalized per million input reads for this sample.",
+        "%Identity": "Mean percent identity across contig alignments for this reference group.",
+        "%Iden Max": "Maximum percent identity among contig alignments for this reference group.",
+        "%Iden Min": "Minimum percent identity among contig alignments for this reference group.",
+        "Genus": "Reference genus annotation from the database metadata.",
+        "Description": "Reference description from the database metadata.",
+    }
+    header_row_one = (
+        "<tr>"
+        "<th colspan=\"2\">Reference</th>"
+        "<th colspan=\"6\">Coverage</th>"
+        "<th colspan=\"3\">Identity</th>"
+        "<th colspan=\"2\">Annotation</th>"
+        "</tr>"
+    )
+    header_row_two = (
+        "<tr>"
+        + "".join(
+            (
+                f"<th title=\"{html.escape(header_tooltips[header])}\">{html.escape(header)}</th>"
+                if header in header_tooltips
+                else f"<th>{html.escape(header)}</th>"
+            )
+            for header in headers
+        )
+        + "</tr>"
+    )
+    body_rows = []
+    for index, row in enumerate(rows):
+        row_id = ""
+        if row_ids is not None and index < len(row_ids):
+            row_id = f' id="{html.escape(row_ids[index])}"'
+        body_rows.append("<tr" + row_id + ">" + "".join(f"<td>{cell}</td>" for cell in row) + "</tr>")
+    return "<table>\n<thead>" + header_row_one + header_row_two + "</thead>\n<tbody>\n" + "\n".join(body_rows) + "\n</tbody>\n</table>"
+
+
+def render_reference_detail_hits_table(
+    headers: list[str],
+    rows: list[list[str]],
+    row_ids: list[str] | None = None,
+) -> str:
+    header_tooltips = {
+        "Order": "Stable order of alignments on this reference detail page.",
+        "Contig ID": "Contig identifier reported in this analysis.",
+        "Contig Length": "Contig length in bases or amino acids for this alignment.",
+        "Query Start": "Start coordinate of the aligned segment on the contig sequence.",
+        "Query End": "End coordinate of the aligned segment on the contig sequence.",
+        "Reference Start": "Start coordinate of the aligned segment on the reference sequence.",
+        "Reference End": "End coordinate of the aligned segment on the reference sequence.",
+        "Strand": "Reference orientation for this alignment.",
+        "Identity": "Percent identity reported for this alignment.",
+        "E-value": "Expectation value reported for this alignment.",
+        "Query Coverage": "Percent of the contig query covered by this alignment.",
+        "Description": "Reference description from the database metadata.",
+    }
+    header_row_one = (
+        "<tr>"
+        "<th colspan=\"3\">Contig</th>"
+        "<th colspan=\"5\">Alignment Coordinates</th>"
+        "<th colspan=\"3\">Metrics</th>"
+        "<th colspan=\"1\">Annotation</th>"
+        "</tr>"
+    )
+    header_row_two = (
+        "<tr>"
+        + "".join(
+            (
+                f"<th title=\"{html.escape(header_tooltips[header])}\">{html.escape(header)}</th>"
+                if header in header_tooltips
+                else f"<th>{html.escape(header)}</th>"
+            )
+            for header in headers
+        )
+        + "</tr>"
+    )
+    body_rows = []
+    for index, row in enumerate(rows):
+        row_id = ""
+        if row_ids is not None and index < len(row_ids):
+            row_id = f' id="{html.escape(row_ids[index])}"'
+        body_rows.append("<tr" + row_id + ">" + "".join(f"<td>{cell}</td>" for cell in row) + "</tr>")
+    return "<table>\n<thead>" + header_row_one + header_row_two + "</thead>\n<tbody>\n" + "\n".join(body_rows) + "\n</tbody>\n</table>"
+
+
+def render_alignment_block_hits_table(rows: list[list[str]], row_ids: list[str]) -> str:
+    headers = [
+        "Order",
+        "Query ID",
+        "Query Start",
+        "Query End",
+        "Reference Start",
+        "Reference End",
+        "Identity",
+        "E-value",
+        "Alignment Length",
+        "Bit Score",
+        "Query Coverage",
+        "Strand",
+    ]
+    header_tooltips = {
+        "Order": "Stable order of alignments within this contig block.",
+        "Query ID": "Contig identifier for this alignment row.",
+        "Query Start": "Start coordinate of the aligned segment on the contig sequence.",
+        "Query End": "End coordinate of the aligned segment on the contig sequence.",
+        "Reference Start": "Start coordinate of the aligned segment on the reference sequence.",
+        "Reference End": "End coordinate of the aligned segment on the reference sequence.",
+        "Identity": "Percent identity reported for this alignment.",
+        "E-value": "Expectation value reported for this alignment.",
+        "Alignment Length": "Aligned length for this contig/reference segment.",
+        "Bit Score": "Bit score for this alignment.",
+        "Query Coverage": "Percent of the contig query covered by this alignment.",
+        "Strand": "Reference orientation for this alignment.",
+    }
+    header_row_one = (
+        "<tr>"
+        "<th colspan=\"1\">Navigation</th>"
+        "<th colspan=\"3\">Query</th>"
+        "<th colspan=\"2\">Reference</th>"
+        "<th colspan=\"6\">Metrics</th>"
+        "</tr>"
+    )
+    header_row_two = (
+        "<tr>"
+        + "".join(
+            f"<th title=\"{html.escape(header_tooltips[header])}\">{html.escape(header)}</th>"
+            for header in headers
+        )
+        + "</tr>"
+    )
+    body_rows = []
+    for index, row in enumerate(rows):
+        row_id = f' id="{html.escape(row_ids[index])}"' if index < len(row_ids) else ""
+        body_rows.append("<tr" + row_id + ">" + "".join(f"<td>{cell}</td>" for cell in row) + "</tr>")
+    return "<table>\n<thead>" + header_row_one + header_row_two + "</thead>\n<tbody>\n" + "\n".join(body_rows) + "\n</tbody>\n</table>"
+
+
+def render_alignment_block_index_table(rows: list[list[str]], row_ids: list[str] | None = None) -> str:
+    headers = ["Contig", "Alignments", "Order", "Reference Span", "Identity Range", "Links"]
+    header_tooltips = {
+        "Contig": "Contig identifier for this contig block.",
+        "Alignments": "Number of alignments grouped into this contig block.",
+        "Order": "Stable order range covered by this contig block.",
+        "Reference Span": "Reference span covered by this contig block.",
+        "Identity Range": "Percent-identity range across the alignments in this contig block.",
+        "Links": "Quick jumps to this contig block, its first or last alignment, and the matching contig row.",
+    }
+    header_row_one = (
+        "<tr>"
+        "<th colspan=\"1\" title=\"Anchor for each contig block listed in this index.\">Contig Block</th>"
+        "<th colspan=\"3\" title=\"Alignment count, stable order range, and covered reference span for this contig block.\">Block Summary</th>"
+        "<th colspan=\"1\" title=\"Percent-identity range across the alignments in this contig block.\">Identity</th>"
+        "<th colspan=\"1\" title=\"Direct jumps to this contig block, its alignments, and the matching contig row.\">Navigation</th>"
+        "</tr>"
+    )
+    header_row_two = (
+        "<tr>"
+        + "".join(
+            f"<th title=\"{html.escape(header_tooltips[header])}\">{html.escape(header)}</th>"
+            for header in headers
+        )
+        + "</tr>"
+    )
+    body_rows = []
+    for index, row in enumerate(rows):
+        row_id = ""
+        if row_ids is not None and index < len(row_ids):
+            row_id = f' id="{html.escape(row_ids[index])}"'
+        body_rows.append("<tr" + row_id + ">" + "".join(f"<td>{cell}</td>" for cell in row) + "</tr>")
+    return "<table>\n<thead>" + header_row_one + header_row_two + "</thead>\n<tbody>\n" + "\n".join(body_rows) + "\n</tbody>\n</table>"
+
+
+def build_alignment_midline(query_sequence: str, hit_sequence: str) -> str:
+    midline: list[str] = []
+    for query_char, hit_char in zip(query_sequence, hit_sequence):
+        if query_char == hit_char and query_char != "-":
+            midline.append("|")
+        elif query_char == "-" or hit_char == "-":
+            midline.append(" ")
+        else:
+            midline.append(".")
+    return "".join(midline)
+
+
+def split_alignment_segments(text: str, width: int = ALIGNMENT_WRAP_WIDTH) -> list[str]:
+    if not text:
+        return []
+    return [text[index : index + width] for index in range(0, len(text), width)]
+
+
+def consume_alignment_coordinates(segment: str, current: int, step: int) -> tuple[int, int, int]:
+    non_gap_count = sum(1 for char in segment if char != "-")
+    if non_gap_count <= 0:
+        return current, current, current
+    end = current + (step * (non_gap_count - 1))
+    next_value = end + step
+    return current, end, next_value
+
+
+def format_alignment_line(label: str, start: int, segment: str, end: int, coordinate_width: int) -> str:
+    return f"{label:<5} {start:>{coordinate_width}} {segment} {end:>{coordinate_width}}"
+
+
+def format_alignment_midline(segment: str, coordinate_width: int) -> str:
+    return f"{'Match':<5} {'':>{coordinate_width}} {segment}"
+
+
+def render_alignment_text(hit: BlastHit) -> str:
+    query_sequence = hit.query_sequence.strip()
+    hit_sequence = hit.hit_sequence.strip()
+    if not query_sequence or not hit_sequence:
+        return ""
+
+    midline = build_alignment_midline(query_sequence, hit_sequence)
+    query_segments = split_alignment_segments(query_sequence)
+    midline_segments = split_alignment_segments(midline)
+    hit_segments = split_alignment_segments(hit_sequence)
+    query_step = 1 if hit.query_end >= hit.query_start else -1
+    hit_step = 1 if hit.hit_end >= hit.hit_start else -1
+    coordinate_width = max(
+        len(str(value))
+        for value in (
+            hit.query_start,
+            hit.query_end,
+            hit.hit_start,
+            hit.hit_end,
+        )
+    )
+    query_position = hit.query_start
+    hit_position = hit.hit_start
+    lines: list[str] = []
+    for index, query_segment in enumerate(query_segments):
+        if index:
+            lines.append("")
+        hit_segment = hit_segments[index]
+        query_start, query_end, query_position = consume_alignment_coordinates(query_segment, query_position, query_step)
+        hit_start, hit_end, hit_position = consume_alignment_coordinates(hit_segment, hit_position, hit_step)
+        lines.append(format_alignment_line("Query", query_start, query_segment, query_end, coordinate_width))
+        lines.append(format_alignment_midline(midline_segments[index], coordinate_width))
+        lines.append(format_alignment_line("Hit", hit_start, hit_segment, hit_end, coordinate_width))
+    return "\n".join(lines)
+
+
+def render_alignment_text_html(hit: BlastHit) -> str:
+    alignment_text = render_alignment_text(hit)
+    if not alignment_text:
+        return ""
+
+    html_lines: list[str] = []
+    for line in alignment_text.splitlines():
+        if not line:
+            html_lines.append("<div class=\"alignment-spacer\"></div>")
+            continue
+        label = line.split(None, 1)[0].lower()
+        html_lines.append(
+            "<div "
+            f"class=\"alignment-line alignment-line-{html.escape(label)}\">"
+            f"{html.escape(line)}"
+            "</div>"
+        )
+    return "<div class=\"alignment-text\">" + "".join(html_lines) + "</div>"
+
+
+def build_alignment_anchor_ids(hits: list[BlastHit]) -> tuple[dict[BlastHit, str], dict[str, str]]:
+    hit_anchor_ids: dict[BlastHit, str] = {}
+    contig_anchor_ids: dict[str, str] = {}
+    next_hit_index = 1
+    next_contig_index = 1
+    for hit in hits:
+        hit_anchor_ids[hit] = f"alignment-hit-{next_hit_index}"
+        next_hit_index += 1
+        if hit.contig_id not in contig_anchor_ids:
+            contig_anchor_ids[hit.contig_id] = f"alignment-group-{next_contig_index}"
+            next_contig_index += 1
+    return hit_anchor_ids, contig_anchor_ids
+
+
+def order_alignment_block_contigs(hits: list[BlastHit]) -> tuple[dict[str, list[BlastHit]], list[str]]:
+    grouped_hits: dict[str, list[BlastHit]] = defaultdict(list)
+    for hit in hits:
+        grouped_hits[hit.contig_id].append(hit)
+    ordered_contigs = sorted(
+        grouped_hits,
+        key=lambda contig_id: (
+            min(hit_reference_interval(hit)[0] for hit in grouped_hits[contig_id]),
+            min(hit_reference_interval(hit)[1] for hit in grouped_hits[contig_id]),
+            contig_id,
+        ),
+    )
+    return grouped_hits, ordered_contigs
+
+
+def build_alignment_index_row_ids(hits: list[BlastHit]) -> dict[str, str]:
+    _, ordered_contigs = order_alignment_block_contigs(hits)
+    return {
+        contig_id: f"alignment-index-row-{index}"
+        for index, contig_id in enumerate(ordered_contigs, start=1)
+    }
+
+
+def render_alignment_block_index(
+    hits: list[BlastHit],
+    contig_anchor_ids: dict[str, str],
+    hit_anchor_ids: dict[BlastHit, str],
+    detail_hit_row_ids: dict[BlastHit, str],
+    index_row_ids: dict[str, str],
+) -> str:
+    grouped_hits, ordered_contigs = order_alignment_block_contigs(hits)
+    if not ordered_contigs:
+        return ""
+
+    rows: list[list[str]] = []
+    order_start = 1
+    for contig_id in ordered_contigs:
+        contig_hits = grouped_hits[contig_id]
+        reference_starts = [hit_reference_interval(hit)[0] for hit in contig_hits]
+        reference_ends = [hit_reference_interval(hit)[1] for hit in contig_hits]
+        identity_values = [hit.percent_identity for hit in contig_hits]
+        order_end = order_start + len(contig_hits) - 1
+        first_hit = contig_hits[0]
+        last_hit = contig_hits[-1]
+        order_label = (
+            f"<a href=\"#{html.escape(detail_hit_row_ids[contig_hits[0]])}\">{html.escape(str(order_start))}</a>"
+            if order_start == order_end
+            else (
+                f"<a href=\"#{html.escape(detail_hit_row_ids[contig_hits[0]])}\">{html.escape(str(order_start))}</a>-"
+                f"<a href=\"#{html.escape(detail_hit_row_ids[contig_hits[-1]])}\">{html.escape(str(order_end))}</a>"
+            )
+        )
+        rows.append(
+            [
+                f"<a href=\"#{html.escape(contig_anchor_ids[contig_id])}\"><code>{html.escape(contig_id)}</code></a>",
+                (
+                    f"<a href=\"#{html.escape(contig_anchor_ids[contig_id])}\">"
+                    f"{html.escape(str(len(contig_hits)))}"
+                    "</a>"
+                ),
+                order_label,
+                (
+                    f"<a href=\"#{html.escape(contig_anchor_ids[contig_id])}\">"
+                    f"{html.escape(str(min(reference_starts)))}-{html.escape(str(max(reference_ends)))}"
+                    "</a>"
+                ),
+                (
+                    (
+                        f"<a href=\"#{html.escape(hit_anchor_ids[first_hit])}-text\">"
+                        f"{html.escape(format_report_float(identity_values[0], 2))}%"
+                        "</a>"
+                    )
+                    if min(identity_values) == max(identity_values)
+                    else (
+                        f"<a href=\"#{html.escape(hit_anchor_ids[first_hit])}-text\">"
+                        f"{html.escape(format_report_float(min(identity_values), 2))}-"
+                        f"{html.escape(format_report_float(max(identity_values), 2))}%"
+                        "</a>"
+                    )
+                ),
+                (
+                    (
+                        f"<a href=\"#{html.escape(contig_anchor_ids[contig_id])}\">Contig Block</a> | "
+                        f"<a href=\"#{html.escape(hit_anchor_ids[first_hit])}-text\">Alignment</a> | "
+                        f"<a href=\"#{html.escape(detail_hit_row_ids[first_hit])}\">Contig Row</a>"
+                    )
+                    if len(contig_hits) == 1
+                    else (
+                        f"<a href=\"#{html.escape(contig_anchor_ids[contig_id])}\">Contig Block</a> | "
+                        f"<a href=\"#{html.escape(hit_anchor_ids[first_hit])}-text\">First Alignment</a> | "
+                        f"<a href=\"#{html.escape(hit_anchor_ids[last_hit])}-text\">Last Alignment</a> | "
+                        f"<a href=\"#{html.escape(detail_hit_row_ids[first_hit])}\">Contig Row</a>"
+                    )
+                ),
+            ]
+        )
+        order_start = order_end + 1
+
+    return render_alignment_block_index_table(rows, [index_row_ids[contig_id] for contig_id in ordered_contigs])
+
+
+def render_alignment_block(
+    contig_id: str,
+    hits: list[BlastHit],
+    order_start: int,
+    block_anchor_id: str,
+    index_row_anchor_id: str,
+    hit_anchor_ids: dict[BlastHit, str],
+    detail_hit_row_ids: dict[BlastHit, str],
+    previous_block_anchor_id: str | None = None,
+    next_block_anchor_id: str | None = None,
+) -> str:
+    header_rows: list[list[str]] = []
+    header_row_ids: list[str] = []
+    alignment_sections: list[str] = []
+    reference_starts: list[int] = []
+    reference_ends: list[int] = []
+    identity_values: list[float] = []
+    query_coverage_values: list[float] = []
+    contig_length = hits[0].contig_length if hits else 0
+    for offset, hit in enumerate(hits):
+        alignment_html = render_alignment_text_html(hit)
+        if not alignment_html:
+            continue
+        ref_start, ref_end = hit_reference_interval(hit)
+        reference_starts.append(ref_start)
+        reference_ends.append(ref_end)
+        identity_values.append(hit.percent_identity)
+        query_coverage_values.append(hit.query_coverage)
+        detail_row_anchor = detail_hit_row_ids[hit]
+        text_anchor = f"{hit_anchor_ids[hit]}-text"
+        header_rows.append(
+            [
+                f"<a href=\"#{html.escape(detail_row_anchor)}\">{html.escape(str(order_start + offset))}</a>",
+                f"<a href=\"#{html.escape(text_anchor)}\"><code>{html.escape(hit.contig_id)}</code></a>",
+                f"<a href=\"#{html.escape(text_anchor)}\">{html.escape(str(hit.query_start))}</a>",
+                f"<a href=\"#{html.escape(text_anchor)}\">{html.escape(str(hit.query_end))}</a>",
+                f"<a href=\"#{html.escape(text_anchor)}\">{html.escape(str(ref_start))}</a>",
+                f"<a href=\"#{html.escape(text_anchor)}\">{html.escape(str(ref_end))}</a>",
+                f"<a href=\"#{html.escape(text_anchor)}\">{html.escape(format_report_float(hit.percent_identity, 2))}</a>",
+                f"<a href=\"#{html.escape(text_anchor)}\">{html.escape(f'{hit.evalue:.6g}')}</a>",
+                f"<a href=\"#{html.escape(text_anchor)}\">{html.escape(str(hit.alignment_length))}</a>",
+                f"<a href=\"#{html.escape(text_anchor)}\">{html.escape(format_report_float(hit.bit_score, 1))}</a>",
+                f"<a href=\"#{html.escape(text_anchor)}\">{html.escape(format_report_float(hit.query_coverage, 2))}</a>",
+                f"<a href=\"#{html.escape(text_anchor)}\">{html.escape(describe_hit_strand(hit))}</a>",
+            ]
+        )
+        header_row_ids.append(hit_anchor_ids[hit])
+        segment_title_html = ""
+        if len(hits) > 1:
+            segment_title_html = (
+                "<p>"
+                f"<strong>Alignment Segment {html.escape(str(offset + 1))}</strong> "
+                f"<span class=\"muted\">(Order <a href=\"#{html.escape(detail_row_anchor)}\">{html.escape(str(order_start + offset))}</a>)</span>"
+                "</p>"
+            )
+        alignment_header_html = (
+            "<p class=\"alignment-header\">"
+            "<strong>Alignment:</strong> "
+            f"<span class=\"muted\">Query {html.escape(str(hit.query_start))}-{html.escape(str(hit.query_end))} | "
+            f"Reference {html.escape(str(ref_start))}-{html.escape(str(ref_end))} | "
+            f"Strand {html.escape(describe_hit_strand(hit))}</span>"
+            "</p>"
+        )
+        alignment_metrics_html = (
+            "<p class=\"alignment-metrics muted\">"
+            "<strong>Metrics:</strong> "
+            f"<span class=\"alignment-metric\"><strong>Identity:</strong> {html.escape(format_report_float(hit.percent_identity, 2))}%</span>"
+            f"<span class=\"alignment-metric\"><strong>E-value:</strong> {html.escape(f'{hit.evalue:.6g}')}</span>"
+            f"<span class=\"alignment-metric\"><strong>Bit Score:</strong> {html.escape(format_report_float(hit.bit_score, 1))}</span>"
+            f"<span class=\"alignment-metric\"><strong>Alignment Length:</strong> {html.escape(str(hit.alignment_length))}</span>"
+            "</p>"
+        )
+        sibling_links: list[str] = []
+        if len(hits) > 1:
+            if offset > 0:
+                previous_anchor = f"{hit_anchor_ids[hits[offset - 1]]}-text"
+                sibling_links.append(f"<a href=\"#{html.escape(previous_anchor)}\">Previous Segment</a>")
+            if offset < len(hits) - 1:
+                next_anchor = f"{hit_anchor_ids[hits[offset + 1]]}-text"
+                sibling_links.append(f"<a href=\"#{html.escape(next_anchor)}\">Next Segment</a>")
+        alignment_sections.append(
+            (
+                f"<div class=\"alignment-segment\" id=\"{html.escape(hit_anchor_ids[hit])}-text\">"
+                + segment_title_html
+                + alignment_header_html
+                + alignment_metrics_html
+                + "<p class=\"alignment-links muted\">"
+                + f"<a href=\"#{html.escape(detail_row_anchor)}\">Contig Hit Row</a> | "
+                + f"<a href=\"#{html.escape(hit_anchor_ids[hit])}\">Block Row</a> | "
+                + (" | ".join(sibling_links) + " | " if sibling_links else "")
+                + f"<a href=\"#{html.escape(index_row_anchor_id)}\">Index Entry</a> | "
+                + "<a href=\"#alignment-index\">Alignment Index</a> | "
+                + "<a href=\"#coverage-map\">Coverage Map</a> | "
+                + "<a href=\"#detail-top\">Top</a>"
+                + "</p>"
+                + f"{alignment_html}"
+                + "</div>"
+            )
+        )
+
+    if not header_rows or not alignment_sections:
+        return ""
+
+    first_alignment_text_anchor = f"{header_row_ids[0]}-text"
+    order_end = order_start + len(header_rows) - 1
+    order_range_value = (
+        f"<a href=\"#{html.escape(detail_hit_row_ids[hits[0]])}\">{html.escape(str(order_start))}</a>"
+        if order_start == order_end
+        else (
+            f"<a href=\"#{html.escape(detail_hit_row_ids[hits[0]])}\">{html.escape(str(order_start))}</a>-"
+            f"<a href=\"#{html.escape(detail_hit_row_ids[hits[-1]])}\">{html.escape(str(order_end))}</a>"
+        )
+    )
+    metadata_items = [
+        ("Contig Length", html.escape(str(contig_length))),
+        ("Alignments", html.escape(str(len(header_rows)))),
+        ("Order Range", order_range_value),
+        (
+            "Reference Span",
+            f"{html.escape(str(min(reference_starts)))}-{html.escape(str(max(reference_ends)))}",
+        ),
+        (
+            "Identity Range",
+            f"{html.escape(format_report_float(min(identity_values), 2))}-"
+            f"{html.escape(format_report_float(max(identity_values), 2))}%",
+        ),
+        (
+            "Query Coverage Range",
+            f"{html.escape(format_report_float(min(query_coverage_values), 2))}-"
+            f"{html.escape(format_report_float(max(query_coverage_values), 2))}%",
+        ),
+    ]
+    metadata_html = (
+        "<p class=\"alignment-summary\">"
+        "<span class=\"alignment-summary-label\">Summary:</span>"
+        + "".join(
+            (
+                "<span class=\"alignment-summary-item\">"
+                f"<strong>{label}:</strong> {value}"
+                "</span>"
+            )
+            for label, value in metadata_items
+        )
+        + "</p>"
+    )
+
+    block_links = [
+        "<a href=\"#coverage-map\">Coverage Map</a>",
+        "<a href=\"#hit-table\">Contig Hits</a>",
+        f"<a href=\"#{html.escape(index_row_anchor_id)}\">Index Entry</a>",
+        "<a href=\"#alignment-index\">Alignment Index</a>",
+    ]
+    if previous_block_anchor_id is not None:
+        block_links.append(f"<a href=\"#{html.escape(previous_block_anchor_id)}\">Previous Contig Block</a>")
+    if next_block_anchor_id is not None:
+        block_links.append(f"<a href=\"#{html.escape(next_block_anchor_id)}\">Next Contig Block</a>")
+    block_links.append("<a href=\"#detail-top\">Top</a>")
+
+    return (
+        f"<div class=\"alignment-block\" id=\"{html.escape(block_anchor_id)}\">"
+        f"<p><strong><a href=\"#{html.escape(first_alignment_text_anchor)}\">{html.escape(contig_id)}</a></strong> "
+        "<span class=\"muted\">("
+        + " | ".join(block_links)
+        + ")</span></p>"
+        f"{metadata_html}"
+        "<p class=\"muted\">Retained alignments for this contig.</p>"
+        + render_alignment_block_hits_table(header_rows, header_row_ids)
+        + "".join(alignment_sections)
+        + "</div>"
+    )
+
+
+def render_alignment_blocks(
+    hits: list[BlastHit],
+    hit_anchor_ids: dict[BlastHit, str],
+    contig_anchor_ids: dict[str, str],
+    detail_hit_row_ids: dict[BlastHit, str],
+    index_row_ids: dict[str, str],
+) -> str:
+    grouped_hits, ordered_contigs = order_alignment_block_contigs(hits)
+    blocks: list[str] = []
+    order_start = 1
+    for contig_index, contig_id in enumerate(ordered_contigs):
+        contig_hits = grouped_hits[contig_id]
+        previous_block_anchor_id = (
+            contig_anchor_ids[ordered_contigs[contig_index - 1]]
+            if contig_index > 0
+            else None
+        )
+        next_block_anchor_id = (
+            contig_anchor_ids[ordered_contigs[contig_index + 1]]
+            if contig_index < len(ordered_contigs) - 1
+            else None
+        )
+        block = render_alignment_block(
+            contig_id,
+            contig_hits,
+            order_start,
+            contig_anchor_ids[contig_id],
+            index_row_ids[contig_id],
+            hit_anchor_ids,
+            detail_hit_row_ids,
+            previous_block_anchor_id=previous_block_anchor_id,
+            next_block_anchor_id=next_block_anchor_id,
+        )
+        if block:
+            blocks.append(block)
+            order_start += len(contig_hits)
+    blocks = [block for block in blocks if block]
+    if not blocks:
+        return ""
+
+    return (
+        "<div class=\"section\" id=\"alignment-blocks\">"
+        "<h2>Detailed Alignments</h2>"
+        "<p class=\"muted\">Alignment text for each contig segment is shown below.</p>"
+        + "".join(blocks)
+        + "</div>"
+    )
 
 
 def build_reference_report_html(
@@ -961,9 +2017,10 @@ def build_reference_report_html(
     for hit in final_hits:
         grouped_hits[hit_group_id(hit)].append(hit)
     body_parts = [
-        f"<h1>{html.escape(title)}</h1>",
-        "<p class=\"muted\">Minimal Python-native summary report. Detailed per-reference graphics from the Perl workflow are not yet ported.</p>",
+        f"<h1 id=\"detail-top\">{html.escape(title)}</h1>",
+        "<p class=\"muted\">Summary report with grouped coverage and identity metrics for retained references.</p>",
         f"<p>Reference FASTA: <code>{html.escape(reference_fasta_name)}</code></p>",
+        "<p class=\"section-nav\"><a href=\"#hit-table\">Reference Table</a> | <a href=\"#detail-top\">Top</a></p>",
     ]
 
     if not kept_rows:
@@ -986,33 +2043,62 @@ def build_reference_report_html(
         "Description",
     ]
     rows: list[list[str]] = []
+    row_ids: list[str] = []
     for row in kept_rows:
         group_id = str(row["group_id"])
+        row_ids.append(build_summary_row_id(group_id))
         stats = identity_stats.get(group_id, {})
         group_hits = grouped_hits.get(group_id, [])
+        detail_href = f"{html.escape(detail_dir_name)}/{html.escape(group_id)}.html" if detail_dir_name else ""
+        coverage_text = html.escape(f"{row['covered_bases']} ({float(row['reference_coverage']) * 100:.1f}%)")
+        contig_count_text = html.escape(str(row["contig_count"]))
+        description_text = html.escape(str(row["description"]))
+        reference_id_text = html.escape(str(row["reference_id"]))
+        group_id_text = html.escape(group_id)
         rows.append(
             [
                 (
-                    f"<a href=\"{html.escape(detail_dir_name)}/{html.escape(group_id)}.html\"><code>{html.escape(group_id)}</code></a>"
+                    f"<a href=\"{detail_href}\"><code>{group_id_text}</code></a>"
                     if detail_dir_name
-                    else f"<code>{html.escape(group_id)}</code>"
+                    else f"<code>{group_id_text}</code>"
                 ),
-                f"<code>{html.escape(str(row['reference_id']))}</code>",
+                (
+                    f"<a href=\"{detail_href}\"><code>{reference_id_text}</code></a>"
+                    if detail_dir_name
+                    else f"<code>{reference_id_text}</code>"
+                ),
                 html.escape(str(row["hit_length"])),
-                html.escape(f"{row['covered_bases']} ({float(row['reference_coverage']) * 100:.1f}%)"),
-                render_reference_coverage_strip(int(row["hit_length"]), group_hits),
-                html.escape(str(row["contig_count"])),
+                (
+                    f"<a href=\"{detail_href}\">{coverage_text}</a>"
+                    if detail_dir_name
+                    else coverage_text
+                ),
+                (
+                    f"<a href=\"{detail_href}\">{render_reference_coverage_strip(int(row['hit_length']), group_hits)}</a>"
+                    if detail_dir_name
+                    else render_reference_coverage_strip(int(row["hit_length"]), group_hits)
+                ),
+                (
+                    f"<a href=\"{detail_href}\">{contig_count_text}</a>"
+                    if detail_dir_name
+                    else contig_count_text
+                ),
                 html.escape(format_report_float(float(row["reference_depth"]), 1)),
                 html.escape(format_report_float(float(row["normalized_depth"]), 1)),
                 html.escape(format_report_float(float(stats.get("mean", row["mean_percent_identity"])), 2)),
                 html.escape(format_report_float(float(stats.get("max", row["mean_percent_identity"])), 2)),
                 html.escape(format_report_float(float(stats.get("min", row["mean_percent_identity"])), 2)),
                 html.escape(str(row["genus"])),
-                html.escape(str(row["description"])),
+                (
+                    f"<a href=\"{detail_href}\">{description_text}</a>"
+                    if detail_dir_name
+                    else description_text
+                ),
             ]
         )
 
-    body_parts.append(render_html_table(headers, rows))
+    body_parts.append("<div class=\"section\" id=\"hit-table\"><h2>Reference Table</h2></div>")
+    body_parts.append(render_reference_summary_table(headers, rows, row_ids=row_ids))
     return build_html_document(title, "\n".join(body_parts))
 
 
@@ -1026,35 +2112,56 @@ def build_reference_detail_html(
 ) -> str:
     title = f"{analysis.upper()} Reference Detail: {group_id}"
     ordered_hits = sorted(hits, key=lambda item: (hit_reference_interval(item)[0], hit_reference_interval(item)[1], item.contig_id))
+    hit_anchor_ids, contig_anchor_ids = build_alignment_anchor_ids(ordered_hits)
+    index_row_ids = build_alignment_index_row_ids(ordered_hits)
+    detail_hit_row_ids = {hit: f"hit-row-{index}" for index, hit in enumerate(ordered_hits, start=1)}
     body_parts = [
-        f"<h1>{html.escape(title)}</h1>",
-        f"<p class=\"muted\">Reference detail page for <code>{html.escape(group_id)}</code>.</p>",
+        f"<h1 id=\"detail-top\">{html.escape(title)}</h1>",
+        f"<p class=\"muted\">Retained contig alignments for <code>{html.escape(group_id)}</code>.</p>",
     ]
 
     if summary_row is not None:
         reference_length = int(summary_row.get("hit_length", 0))
+        detail_lines = []
+        if analysis == "blastx":
+            detail_lines.append(f"Protein ID: <code>{html.escape(group_id)}</code>")
+            detail_lines.append(f"Reference ID: <code>{html.escape(reference_id)}</code>")
+        else:
+            detail_lines.append(f"Reference ID: <code>{html.escape(reference_id)}</code>")
+        detail_lines.extend(
+            [
+                f"Reference Length: {html.escape(str(reference_length))}",
+                f"Coverage: {html.escape(str(summary_row['covered_bases']))} bases ({float(summary_row['reference_coverage']) * 100:.1f}%)",
+                f"Contigs: {html.escape(str(summary_row['contig_count']))}",
+                f"Depth: {html.escape(format_report_float(float(summary_row['reference_depth']), 1))}",
+                f"Depth (Norm): {html.escape(format_report_float(float(summary_row['normalized_depth']), 1))}",
+            ]
+        )
+        body_parts.append("<p>" + "<br>".join(detail_lines) + "</p>")
+    if summary_page_name:
+        summary_anchor = ""
+        if summary_row is not None:
+            summary_anchor = "#" + build_summary_row_id(str(summary_row.get("group_id", group_id)))
+        body_parts.append(
+            f"<p><a href=\"../{html.escape(summary_page_name)}{summary_anchor}\">Back to {html.escape(analysis.upper())} summary</a></p>"
+        )
         body_parts.append(
             "<p>"
-            f"Reference ID: <code>{html.escape(reference_id)}</code><br>"
-            f"Reference Length: {html.escape(str(reference_length))}<br>"
-            f"Coverage: {html.escape(str(summary_row['covered_bases']))} bases "
-            f"({float(summary_row['reference_coverage']) * 100:.1f}%)<br>"
-            f"Contigs: {html.escape(str(summary_row['contig_count']))}<br>"
-            f"Depth: {html.escape(format_report_float(float(summary_row['reference_depth']), 1))}<br>"
-            f"Depth (Norm): {html.escape(format_report_float(float(summary_row['normalized_depth']), 1))}"
+            "<a href=\"#coverage-map\">Coverage Map</a> | "
+            "<a href=\"#hit-table\">Contig Hits</a> | "
+            "<a href=\"#alignment-index\">Alignment Index</a> | "
+            "<a href=\"#alignment-blocks\">Detailed Alignments</a>"
             "</p>"
-        )
-    if summary_page_name:
-        body_parts.append(
-            f"<p><a href=\"../{html.escape(summary_page_name)}\">Back to {html.escape(analysis.upper())} summary</a></p>"
         )
 
     if not hits:
-        body_parts.append("<p>No contig hits were recorded for this reference.</p>")
+        body_parts.append("<p>No contig alignments were recorded for this reference.</p>")
         return build_html_document(title, "\n".join(body_parts))
 
     if summary_row is not None:
-        body_parts.append(render_reference_coverage_map(int(summary_row.get("hit_length", 0)), ordered_hits))
+        reference_length = int(summary_row.get("hit_length", 0))
+        body_parts.append(render_reference_track_panel(analysis, group_id, reference_id, reference_length, ordered_hits, hit_anchor_ids))
+        body_parts.append(render_reference_coverage_map(reference_length, ordered_hits))
 
     headers = [
         "Order",
@@ -1062,8 +2169,8 @@ def build_reference_detail_html(
         "Contig Length",
         "Query Start",
         "Query End",
-        "Ref Range",
-        "Ref Span",
+        "Reference Start",
+        "Reference End",
         "Strand",
         "Identity",
         "E-value",
@@ -1075,22 +2182,45 @@ def build_reference_detail_html(
         ref_start, ref_end = hit_reference_interval(hit)
         rows.append(
             [
-                html.escape(str(index)),
-                f"<code>{html.escape(hit.contig_id)}</code>",
-                html.escape(str(hit.contig_length)),
-                html.escape(str(hit.query_start)),
-                html.escape(str(hit.query_end)),
-                html.escape(f"{ref_start}-{ref_end}"),
-                html.escape(str(ref_end - ref_start + 1)),
-                html.escape(describe_hit_strand(hit)),
-                html.escape(format_report_float(hit.percent_identity, 2)),
-                html.escape(f"{hit.evalue:.6g}"),
-                html.escape(format_report_float(hit.query_coverage, 2)),
-                html.escape(hit.description),
+                f"<a href=\"#{html.escape(hit_anchor_ids[hit])}\">{html.escape(str(index))}</a>",
+                f"<a href=\"#{html.escape(hit_anchor_ids[hit])}\"><code>{html.escape(hit.contig_id)}</code></a>",
+                f"<a href=\"#{html.escape(hit_anchor_ids[hit])}-text\">{html.escape(str(hit.contig_length))}</a>",
+                f"<a href=\"#{html.escape(hit_anchor_ids[hit])}-text\">{html.escape(str(hit.query_start))}</a>",
+                f"<a href=\"#{html.escape(hit_anchor_ids[hit])}-text\">{html.escape(str(hit.query_end))}</a>",
+                f"<a href=\"#{html.escape(hit_anchor_ids[hit])}-text\">{html.escape(str(ref_start))}</a>",
+                f"<a href=\"#{html.escape(hit_anchor_ids[hit])}-text\">{html.escape(str(ref_end))}</a>",
+                f"<a href=\"#{html.escape(hit_anchor_ids[hit])}-text\">{html.escape(describe_hit_strand(hit))}</a>",
+                f"<a href=\"#{html.escape(hit_anchor_ids[hit])}-text\">{html.escape(format_report_float(hit.percent_identity, 2))}</a>",
+                f"<a href=\"#{html.escape(hit_anchor_ids[hit])}-text\">{html.escape(f'{hit.evalue:.6g}')}</a>",
+                f"<a href=\"#{html.escape(hit_anchor_ids[hit])}-text\">{html.escape(format_report_float(hit.query_coverage, 2))}</a>",
+                f"<a href=\"#{html.escape(hit_anchor_ids[hit])}\">{html.escape(hit.description)}</a>",
             ]
         )
 
-    body_parts.append(render_html_table(headers, rows))
+    body_parts.append("<div class=\"section\" id=\"hit-table\"><h2>Contig Hits</h2></div>")
+    body_parts.append(render_reference_detail_hits_table(headers, rows, [detail_hit_row_ids[hit] for hit in ordered_hits]))
+    alignment_block_index = render_alignment_block_index(
+        ordered_hits,
+        contig_anchor_ids,
+        hit_anchor_ids,
+        detail_hit_row_ids,
+        index_row_ids,
+    )
+    if alignment_block_index:
+        body_parts.append(
+            "<div class=\"section\" id=\"alignment-index\"><h2>Alignment Index</h2>"
+            "<p class=\"muted\">Quick links into the contig alignments below.</p></div>"
+        )
+        body_parts.append(alignment_block_index)
+    alignment_blocks = render_alignment_blocks(
+        ordered_hits,
+        hit_anchor_ids,
+        contig_anchor_ids,
+        detail_hit_row_ids,
+        index_row_ids,
+    )
+    if alignment_blocks:
+        body_parts.append(alignment_blocks)
     return build_html_document(title, "\n".join(body_parts))
 
 
@@ -1127,93 +2257,319 @@ def build_undetermined_report_html(
     undetermined_records: list[FastaRecord],
     contig_depths: dict[str, ContigDepth],
     best_raw_hits: dict[str, BlastHit],
+    read_length_stats: dict[str, dict[int, int]] | None = None,
+    sirna_percent: float | None = None,
     hits_only: bool = False,
+    reference_targets: dict[tuple[str, str], dict[str, str]] | None = None,
 ) -> str:
+    def build_summary_count_line(label: str, count: int, href: str | None = None) -> str:
+        count_text = html.escape(str(count))
+        if href is not None:
+            count_text = f"<a href=\"{html.escape(href)}\">{count_text}</a>"
+        return f"{html.escape(label)}: {count_text}"
+
     title = "Undetermined Contigs"
     total_count = len(undetermined_records)
     hit_count = sum(1 for record in undetermined_records if record.seq_id in best_raw_hits)
     no_hit_count = total_count - hit_count
+    show_sirna_table = bool(read_length_stats)
+    threshold_note = ""
+    if show_sirna_table and sirna_percent is not None:
+        threshold_note = f" Candidate threshold: >= {format_report_float(sirna_percent * 100, 2)}%."
     body_parts = [
-        f"<h1>{title}</h1>",
-        "<p class=\"muted\">This Python-native summary lists contigs that were not assigned to the final known or novel virus sets. siRNA size-distribution reporting is not yet ported.</p>",
+        f"<h1 id=\"detail-top\">{title}</h1>",
         (
-            f"<p>Total undetermined contigs: {total_count}<br>"
-            f"With virus-database hits: {hit_count}<br>"
-            f"Without virus-database hits: {no_hit_count}</p>"
-            if not hits_only
-            else f"<p>Undetermined contigs with virus-database hits: {hit_count}</p>"
+            "<p class=\"muted\">This summary lists contigs that were not assigned to the final known or novel virus sets. "
+            "Candidate contigs are highlighted in green and marked in the Candidate column."
+            f"{html.escape(threshold_note)}</p>"
+            if show_sirna_table
+            else "<p class=\"muted\">This summary lists contigs that were not assigned to the final known or novel virus sets. siRNA size-distribution columns are not available for this run.</p>"
         ),
     ]
-
-    headers = [
-        "Contig ID",
+    base_headers = [
+        "ID",
         "Length",
         "Covered Bases",
         "Contig Coverage",
-        "Mean Depth",
+    ]
+    if show_sirna_table:
+        base_headers.extend([str(length) for length in range(18, 34)])
+        base_headers.append("21-22 (%)")
+        base_headers.append("Candidate")
+    base_headers.extend(
+        [
+        "Depth",
         "Depth (Norm)",
-        "Best Hit",
-        "Reference ID",
-        "Analysis",
-        "E-value",
+        ]
+    )
+    hit_headers = [
+        *base_headers,
+        "Acc#",
+        "Genus",
+        "Description",
+        "E value",
+        "BLAST",
+        "Match ID",
         "Identity",
         "Query Coverage",
-        "Description",
     ]
-    rows_with_hits: list[list[str]] = []
-    rows_without_hits: list[list[str]] = []
-    sortable_rows_with_hits: list[tuple[tuple[float, int, str], list[str]]] = []
-    sortable_rows_without_hits: list[tuple[tuple[float, int, str], list[str]]] = []
+    sortable_rows_with_hits: list[tuple[tuple[float, int, str], str, list[str], str]] = []
+    sortable_rows_without_hits: list[tuple[tuple[float, int, str], str, list[str], str]] = []
+    candidate_hit_count = 0
+    candidate_no_hit_count = 0
     for record in undetermined_records:
         best_hit = best_raw_hits.get(record.seq_id)
         depth = contig_depths.get(record.seq_id, ContigDepth(record.seq_id, len(record.sequence), 0, 0, 0.0, 0.0))
         contig_length = len(record.sequence)
         contig_coverage = (depth.covered_bases / contig_length) if contig_length else 0.0
-        row = [
+        base_row = [
             f"<code>{html.escape(record.seq_id)}</code>",
             html.escape(str(contig_length)),
             html.escape(str(depth.covered_bases)),
             html.escape(f"{format_report_float(contig_coverage * 100, 1)}%"),
+        ]
+        row_class = ""
+        is_candidate = False
+        if show_sirna_table:
+            length_counts = (read_length_stats or {}).get(record.seq_id, {})
+            total_sirna = sum(length_counts.get(length, 0) for length in range(18, 34))
+            ratio_value = (
+                (length_counts.get(21, 0) + length_counts.get(22, 0)) / total_sirna
+                if total_sirna
+                else None
+            )
+            base_row.extend(html.escape(str(length_counts.get(length, 0))) for length in range(18, 34))
+            base_row.append(
+                html.escape(f"{format_report_float(ratio_value * 100, 2)}%") if ratio_value is not None else "NA"
+            )
+            if ratio_value is not None and sirna_percent is not None and ratio_value >= sirna_percent:
+                is_candidate = True
+                row_class = "candidate-row"
+            base_row.append(
+                "<span class=\"candidate-flag candidate-yes\">Yes</span>"
+                if is_candidate
+                else "<span class=\"candidate-flag candidate-no\">No</span>"
+            )
+        base_row = [
+            *base_row,
             html.escape(format_report_float(depth.mean_depth, 2)),
             html.escape(format_report_float(depth.normalized_depth, 2)),
-            f"<code>{html.escape(best_hit.hit_id)}</code>" if best_hit else "-",
-            f"<code>{html.escape(best_hit.reference_id)}</code>" if best_hit else "-",
-            html.escape(best_hit.analysis) if best_hit else "-",
-            html.escape(f"{best_hit.evalue:.6g}") if best_hit else "-",
-            html.escape(format_report_float(best_hit.percent_identity, 2)) if best_hit else "-",
-            html.escape(format_report_float(best_hit.query_coverage, 2)) if best_hit else "-",
-            html.escape(best_hit.description) if best_hit else "-",
         ]
         sort_key = (-depth.normalized_depth, -contig_length, record.seq_id)
         if best_hit is not None:
-            sortable_rows_with_hits.append((sort_key, row))
+            reference_target = (reference_targets or {}).get((best_hit.analysis, hit_group_id(best_hit)))
+            best_hit_text = f"<code>{html.escape(best_hit.hit_id)}</code>"
+            reference_id_text = f"<code>{html.escape(best_hit.reference_id)}</code>"
+            analysis_text = html.escape(best_hit.analysis)
+            description_text = html.escape(best_hit.description)
+            if reference_target is not None:
+                detail_href = reference_target.get("detail_href")
+                summary_href = reference_target.get("summary_href")
+                if detail_href:
+                    best_hit_text = f"<a href=\"{html.escape(detail_href)}\">{best_hit_text}</a>"
+                    reference_id_text = f"<a href=\"{html.escape(detail_href)}\">{reference_id_text}</a>"
+                    description_text = f"<a href=\"{html.escape(detail_href)}\">{description_text}</a>"
+                if summary_href:
+                    analysis_text = f"<a href=\"{html.escape(summary_href)}\">{analysis_text}</a>"
+            if is_candidate:
+                candidate_hit_count += 1
+            sortable_rows_with_hits.append(
+                (
+                    sort_key,
+                    record.seq_id,
+                    [
+                        *base_row,
+                        reference_id_text,
+                        html.escape(best_hit.genus),
+                        description_text,
+                        html.escape(f"{best_hit.evalue:.6g}"),
+                        analysis_text,
+                        best_hit_text,
+                        html.escape(format_report_float(best_hit.percent_identity, 2)),
+                        html.escape(format_report_float(best_hit.query_coverage, 2)),
+                    ],
+                    row_class,
+                )
+            )
         else:
-            sortable_rows_without_hits.append((sort_key, row))
+            if is_candidate:
+                candidate_no_hit_count += 1
+            sortable_rows_without_hits.append((sort_key, record.seq_id, base_row, row_class))
 
-    rows_with_hits = [row for _, row in sorted(sortable_rows_with_hits)]
-    rows_without_hits = [row for _, row in sorted(sortable_rows_without_hits)]
+    sorted_rows_with_hits = sorted(sortable_rows_with_hits)
+    sorted_rows_without_hits = sorted(sortable_rows_without_hits)
+
+    contig_ids_with_hits = [contig_id for _, contig_id, _, _ in sorted_rows_with_hits]
+    contig_ids_without_hits = [contig_id for _, contig_id, _, _ in sorted_rows_without_hits]
+    row_ids_with_hits = [build_undetermined_row_id("hit", contig_id) for contig_id in contig_ids_with_hits]
+    row_ids_without_hits = [build_undetermined_row_id("no-match", contig_id) for contig_id in contig_ids_without_hits]
+
+    rows_with_hits = []
+    row_classes_with_hits = []
+    for (_, contig_id, row, row_class), row_id in zip(sorted_rows_with_hits, row_ids_with_hits):
+        linked_row = row.copy()
+        linked_row[0] = build_undetermined_contig_cell(contig_id, row_id)
+        rows_with_hits.append(linked_row)
+        row_classes_with_hits.append(row_class)
+
+    rows_without_hits = []
+    row_classes_without_hits = []
+    for (_, contig_id, row, row_class), row_id in zip(sorted_rows_without_hits, row_ids_without_hits):
+        linked_row = row.copy()
+        linked_row[0] = build_undetermined_contig_cell(contig_id, row_id)
+        rows_without_hits.append(linked_row)
+        row_classes_without_hits.append(row_class)
+
+    candidate_hit_indices = [index for index, row_class in enumerate(row_classes_with_hits) if row_class == "candidate-row"]
+    candidate_no_hit_indices = [
+        index for index, row_class in enumerate(row_classes_without_hits) if row_class == "candidate-row"
+    ]
+    candidate_rows_with_hits = []
+    candidate_row_ids_with_hits = []
+    candidate_row_classes_with_hits = []
+    for index in candidate_hit_indices:
+        candidate_row = rows_with_hits[index].copy()
+        candidate_row[0] = build_undetermined_contig_cell(contig_ids_with_hits[index], row_ids_with_hits[index])
+        candidate_rows_with_hits.append(candidate_row)
+        candidate_row_ids_with_hits.append(build_undetermined_row_id("candidate-hit", contig_ids_with_hits[index]))
+        candidate_row_classes_with_hits.append(row_classes_with_hits[index])
+
+    candidate_rows_without_hits = []
+    candidate_row_ids_without_hits = []
+    candidate_row_classes_without_hits = []
+    for index in candidate_no_hit_indices:
+        candidate_row = rows_without_hits[index].copy()
+        candidate_row[0] = build_undetermined_contig_cell(contig_ids_without_hits[index], row_ids_without_hits[index])
+        candidate_rows_without_hits.append(candidate_row)
+        candidate_row_ids_without_hits.append(build_undetermined_row_id("candidate-no-match", contig_ids_without_hits[index]))
+        candidate_row_classes_without_hits.append(row_classes_without_hits[index])
+    candidate_total_count = candidate_hit_count + candidate_no_hit_count
+
+    navigation_links: list[str] = []
+    if hits_only:
+        if show_sirna_table and candidate_rows_with_hits:
+            navigation_links.append("<a href=\"#candidate-table\">Candidate Table</a>")
+        navigation_links.append("<a href=\"#hit-table\">Match Table</a>")
+        navigation_links.append("<a href=\"undetermined.html#no-match-table\">No-Match View</a>")
+    else:
+        if show_sirna_table and candidate_rows_without_hits:
+            navigation_links.append("<a href=\"#candidate-table\">Candidate Table</a>")
+        if no_hit_count:
+            navigation_links.append("<a href=\"#no-match-table\">No-Match Table</a>")
+        if hit_count:
+            navigation_links.append("<a href=\"undetermined_blast.html#hit-table\">Match Table</a>")
+    if navigation_links:
+        navigation_links.append("<a href=\"#detail-top\">Top</a>")
+    if navigation_links:
+        body_parts.append("<p class=\"section-nav\">" + " | ".join(navigation_links) + "</p>")
+
+    if not hits_only:
+        summary_lines = [
+            build_summary_count_line("Total undetermined contigs", total_count),
+            build_summary_count_line(
+                "With virus-database matches",
+                hit_count,
+                "undetermined_blast.html#hit-table" if hit_count else None,
+            ),
+            build_summary_count_line("Without virus-database matches", no_hit_count, "#no-match-table" if no_hit_count else None),
+        ]
+        if show_sirna_table:
+            summary_lines.append(
+                build_summary_count_line("21-22 nt candidate rows", candidate_total_count, "#candidate-table" if candidate_total_count else None)
+            )
+        summary_lines.append("This page shows contigs without virus-database matches; use <code>undetermined_blast.html</code> for contigs with matches.")
+        body_parts.append("<p>" + "<br>".join(summary_lines) + "</p>")
+    else:
+        summary_lines = [build_summary_count_line("Undetermined contigs with virus-database matches", hit_count, "#hit-table" if hit_count else None)]
+        if show_sirna_table:
+            summary_lines.append(
+                build_summary_count_line(
+                    "21-22 nt candidate rows in this view",
+                    candidate_hit_count,
+                    "#candidate-table" if candidate_hit_count else None,
+                )
+            )
+        body_parts.append("<p>" + "<br>".join(summary_lines) + "</p>")
 
     if hits_only:
         if not rows_with_hits:
-            body_parts.append("<p>No undetermined contigs matched this report view.</p>")
+            body_parts.append("<p>No undetermined contigs matched this page.</p>")
             return build_html_document(title, "\n".join(body_parts))
-        body_parts.append("<div class=\"section\"><h2>With Virus-Database Hits</h2></div>")
-        body_parts.append(render_html_table(headers, rows_with_hits))
+        if show_sirna_table and candidate_rows_with_hits:
+            body_parts.append(
+                (
+                    "<div class=\"section\" id=\"candidate-table\"><h2>Candidate Contigs</h2>"
+                    "<p class=\"muted\">Subset of undetermined contigs in this hit view that pass the configured 21-22 nt enrichment threshold. "
+                    "Contig IDs jump to the matching row in the full match table below.</p></div>"
+                )
+            )
+            body_parts.append(
+                render_undetermined_table(
+                    hit_headers,
+                    candidate_rows_with_hits,
+                    candidate_row_classes_with_hits,
+                    candidate_row_ids_with_hits,
+                    show_sirna_table=show_sirna_table,
+                    include_hit_columns=True,
+                )
+            )
+        body_parts.append(
+            (
+                "<div class=\"section\" id=\"hit-table\"><h2>With Virus-Database Matches</h2>"
+                "<p class=\"muted\">Undetermined contigs with virus-database matches.</p></div>"
+            )
+        )
+        body_parts.append(
+            render_undetermined_table(
+                hit_headers,
+                rows_with_hits,
+                row_classes_with_hits,
+                row_ids_with_hits,
+                show_sirna_table=show_sirna_table,
+                include_hit_columns=True,
+            )
+        )
         return build_html_document(title, "\n".join(body_parts))
 
-    if rows_with_hits:
+    if show_sirna_table and candidate_rows_without_hits:
         body_parts.append(
-            "<div class=\"section\"><h2>With Virus-Database Hits</h2><p class=\"muted\">These contigs matched viral references but were not retained in the final known or novel sets.</p></div>"
+            (
+                "<div class=\"section\" id=\"candidate-table\"><h2>Candidate Contigs</h2>"
+                "<p class=\"muted\">Subset of undetermined contigs in this no-match view that pass the configured 21-22 nt enrichment threshold. "
+                "Contig IDs jump to the matching row in the full no-match table below.</p></div>"
+            )
         )
-        body_parts.append(render_html_table(headers, rows_with_hits))
+        body_parts.append(
+            render_undetermined_table(
+                base_headers,
+                candidate_rows_without_hits,
+                candidate_row_classes_without_hits,
+                candidate_row_ids_without_hits,
+                show_sirna_table=show_sirna_table,
+                include_hit_columns=False,
+            )
+        )
+
     if rows_without_hits:
         body_parts.append(
-            "<div class=\"section\"><h2>Without Virus-Database Hits</h2><p class=\"muted\">These contigs remained undetermined with no retained best hit in the virus databases.</p></div>"
+            (
+                "<div class=\"section\" id=\"no-match-table\"><h2>Without Virus-Database Matches</h2>"
+                "<p class=\"muted\">Undetermined contigs without virus-database matches.</p></div>"
+            )
         )
-        body_parts.append(render_html_table(headers, rows_without_hits))
+        body_parts.append(
+            render_undetermined_table(
+                base_headers,
+                rows_without_hits,
+                row_classes_without_hits,
+                row_ids_without_hits,
+                show_sirna_table=show_sirna_table,
+                include_hit_columns=False,
+            )
+        )
 
-    if not rows_with_hits and not rows_without_hits:
-        body_parts.append("<p>No undetermined contigs matched this report view.</p>")
+    if not rows_without_hits:
+        body_parts.append("<p>No undetermined contigs matched this page.</p>")
         return build_html_document(title, "\n".join(body_parts))
 
     return build_html_document(title, "\n".join(body_parts))
@@ -1232,6 +2588,8 @@ def write_marker(path: Path, should_exist: bool) -> None:
 
 def run_python_identifier(args, db_path: str, sample_path: Path, contig_path: Path, output_dir: Path, data_type: str) -> IdentifyResult:
     result_dir = output_dir / f"result_{sample_path.name}"
+    if result_dir.exists():
+        shutil.rmtree(result_dir)
     result_dir.mkdir(parents=True, exist_ok=True)
 
     contig_records = read_fasta_records(contig_path)
@@ -1245,7 +2603,7 @@ def run_python_identifier(args, db_path: str, sample_path: Path, contig_path: Pa
     ensure_blast_db(protein_reference, "prot", tool_paths, debug=args.debug)
 
     annotations, protein_to_reference = load_database_annotations(db_path)
-    contig_depths, contig_depth_tsv = compute_contig_depths(
+    contig_depths, contig_depth_tsv, read_length_stats = compute_contig_depths(
         sample_path,
         contig_path,
         contig_records,
@@ -1255,7 +2613,7 @@ def run_python_identifier(args, db_path: str, sample_path: Path, contig_path: Pa
     )
     library_size = count_sequences(sample_path)
 
-    blastn_output = result_dir / f"{sample_path.name}.blastn.outfmt6.tsv"
+    blastn_output = result_file(result_dir, "blastn.outfmt6.tsv")
     run_blastn(contig_path, nucleotide_reference, blastn_output, args, tool_paths)
     blastn_hits = parse_blast_hits("blastn", blastn_output, annotations, protein_to_reference)
     blastn_candidate_hits = filter_hits(blastn_hits, BLASTN_MIN_IDENTITY, BLASTN_MIN_QUERY_COVERAGE)
@@ -1284,7 +2642,7 @@ def run_python_identifier(args, db_path: str, sample_path: Path, contig_path: Pa
         allowed_group_ids=blastn_allowed_groups,
     )
     blastn_reference_records = filter_reference_records(read_fasta_records(nucleotide_reference), blastn_allowed_groups)
-    blastn_reference_path = result_dir / "blastn.reference.fa"
+    blastn_reference_path = result_dir / "blastn.references.fa"
     write_fasta_records(blastn_reference_path, blastn_reference_records)
 
     known_ids = {hit.contig_id for hit in blastn_final_hits}
@@ -1292,15 +2650,17 @@ def run_python_identifier(args, db_path: str, sample_path: Path, contig_path: Pa
     remaining_records = [record for record in contig_records if record.seq_id not in known_ids]
 
     blastx_hits: list[BlastHit] = []
+    blastx_candidate_hits: list[BlastHit] = []
     blastx_top_hits: list[BlastHit] = []
     blastx_summary_rows: list[dict[str, object]] = []
     blastx_final_hits: list[BlastHit] = []
-    blastx_reference_path = result_dir / "blastx.reference.fa"
+    blastx_allowed_groups: set[str] = set()
+    blastx_reference_path = result_dir / "blastx.references.fa"
     write_fasta_records(blastx_reference_path, [])
-    remaining_path = result_dir / f"{sample_path.name}.undetermined.input.fa"
+    remaining_path = result_file(result_dir, "undetermined.input.fa")
     if remaining_records:
         write_fasta_records(remaining_path, remaining_records)
-        blastx_output = result_dir / f"{sample_path.name}.blastx.outfmt6.tsv"
+        blastx_output = result_file(result_dir, "blastx.outfmt6.tsv")
         effective_exp_valuex = args.exp_valuex if args.exp_valuex is not None else (1e-5 if data_type == "mRNA" else 1e-2)
         run_blastx(remaining_path, protein_reference, blastx_output, args, effective_exp_valuex, tool_paths)
         blastx_hits = parse_blast_hits("blastx", blastx_output, annotations, protein_to_reference)
@@ -1342,19 +2702,27 @@ def run_python_identifier(args, db_path: str, sample_path: Path, contig_path: Pa
     write_fasta_records(result_dir / "contig_sequences.blastx.fa", novel_records)
     write_fasta_records(result_dir / "contig_sequences.undetermined.fa", undetermined_records)
 
-    blastn_raw_tsv = result_dir / f"{sample_path.name}.blastn.raw.tsv"
-    blastn_top_tsv = result_dir / f"{sample_path.name}.blastn.top.tsv"
-    blastx_raw_tsv = result_dir / f"{sample_path.name}.blastx.raw.tsv"
-    blastx_top_tsv = result_dir / f"{sample_path.name}.blastx.top.tsv"
+    blastn_report_hits = [
+        hit for hit in blastn_candidate_hits if hit_group_id(hit) in blastn_allowed_groups and hit.contig_id in known_ids
+    ]
+    blastx_report_hits = [hit for hit in blastx_candidate_hits if hit_group_id(hit) in blastx_allowed_groups]
+    write_legacy_alignment_table(result_file(result_dir, "blastn.xls"), blastn_report_hits, records_by_id)
+    write_legacy_alignment_table(result_file(result_dir, "blastx.xls"), blastx_report_hits, records_by_id)
+    write_legacy_alignment_sam(result_file(result_dir, "blastn.sam"), blastn_report_hits)
+    write_legacy_alignment_sam(result_file(result_dir, "blastx.sam"), blastx_report_hits)
+
+    blastn_raw_tsv = result_file(result_dir, "blastn.raw.tsv")
+    blastn_top_tsv = result_file(result_dir, "blastn.top.tsv")
+    blastx_raw_tsv = result_file(result_dir, "blastx.raw.tsv")
+    blastx_top_tsv = result_file(result_dir, "blastx.top.tsv")
     write_hit_table(blastn_raw_tsv, blastn_hits)
     write_hit_table(blastn_top_tsv, blastn_top_hits)
     write_hit_table(blastx_raw_tsv, blastx_hits)
     write_hit_table(blastx_top_tsv, blastx_top_hits)
-    write_legacy_style_table(result_dir / f"{sample_path.name}.blastn.xls", blastn_final_hits, records_by_id)
-    write_legacy_style_table(result_dir / f"{sample_path.name}.blastx.xls", blastx_final_hits, records_by_id)
-
-    blastn_reference_dir = write_reference_detail_pages(result_dir, "blastn", blastn_summary_rows, blastn_final_hits)
-    blastx_reference_dir = write_reference_detail_pages(result_dir, "blastx", blastx_summary_rows, blastx_final_hits)
+    reference_targets = build_reference_target_map(
+        ("blastn", blastn_summary_rows),
+        ("blastx", blastx_summary_rows),
+    )
 
     blastn_html = result_dir / "blastn.html"
     blastx_html = result_dir / "blastx.html"
@@ -1367,7 +2735,7 @@ def run_python_identifier(args, db_path: str, sample_path: Path, contig_path: Pa
             blastn_summary_rows,
             blastn_final_hits,
             blastn_reference_path.name,
-            blastn_reference_dir,
+            None,
         ),
     )
     write_text_report(
@@ -1377,7 +2745,7 @@ def run_python_identifier(args, db_path: str, sample_path: Path, contig_path: Pa
             blastx_summary_rows,
             blastx_final_hits,
             blastx_reference_path.name,
-            blastx_reference_dir,
+            None,
         ),
     )
     best_undetermined_hits = select_best_raw_hits(
@@ -1385,43 +2753,55 @@ def run_python_identifier(args, db_path: str, sample_path: Path, contig_path: Pa
     )
     write_text_report(
         undetermined_html,
-        build_undetermined_report_html(undetermined_records, contig_depths, best_undetermined_hits, hits_only=False),
+        build_undetermined_report_html(
+            undetermined_records,
+            contig_depths,
+            best_undetermined_hits,
+            read_length_stats=read_length_stats if data_type == "sRNA" else None,
+            sirna_percent=args.siRNA_percent if data_type == "sRNA" else None,
+            hits_only=False,
+            reference_targets=reference_targets,
+        ),
     )
     write_text_report(
         undetermined_blast_html,
-        build_undetermined_report_html(undetermined_records, contig_depths, best_undetermined_hits, hits_only=True),
+        build_undetermined_report_html(
+            undetermined_records,
+            contig_depths,
+            best_undetermined_hits,
+            read_length_stats=read_length_stats if data_type == "sRNA" else None,
+            sirna_percent=args.siRNA_percent if data_type == "sRNA" else None,
+            hits_only=True,
+            reference_targets=reference_targets,
+        ),
     )
 
     summary_rows = blastn_summary_rows + blastx_summary_rows
-    summary_tsv = result_dir / f"{sample_path.name}.summary.tsv"
-    summary_json = result_dir / f"{sample_path.name}.summary.json"
-    write_summary_tsv(summary_tsv, summary_rows)
-    with summary_json.open("w", encoding="utf-8") as handle:
-        json.dump(
-            {
-                "sample": sample_path.name,
-                "contig_source": str(contig_path),
-                "contig_depth_tsv": str(contig_depth_tsv),
-                "blastn_reference_fasta": str(blastn_reference_path),
-                "blastx_reference_fasta": str(blastx_reference_path),
-                "blastn_reference_dir": str(result_dir / blastn_reference_dir),
-                "blastx_reference_dir": str(result_dir / blastx_reference_dir),
-                "blastn_html": str(blastn_html),
-                "blastx_html": str(blastx_html),
-                "undetermined_html": str(undetermined_html),
-                "undetermined_blast_html": str(undetermined_blast_html),
-                "known_contig_count": len(known_records),
-                "novel_contig_count": len(novel_records),
-                "undetermined_contig_count": len(undetermined_records),
-                "summary": summary_rows,
-            },
-            handle,
-            indent=2,
-            sort_keys=True,
-        )
+    summary_tsv = ""
+    summary_json = ""
 
     write_marker(result_dir / "no_virus_detected_by_blastn", len(blastn_final_hits) == 0)
     write_marker(result_dir / "no_virus_detected_by_blastx", len(blastx_final_hits) == 0)
+
+    cleanup_result_dir(
+        result_dir,
+        keep_names={
+            "contig_sequences.fa",
+            "contig_sequences.blastn.fa",
+            "contig_sequences.blastx.fa",
+            "contig_sequences.undetermined.fa",
+            "blastn.references.fa",
+            "blastx.references.fa",
+            "blastn.html",
+            "blastx.html",
+            "undetermined.html",
+            "undetermined_blast.html",
+            "blastn.sam",
+            "blastx.sam",
+            "blastn.xls",
+            "blastx.xls",
+        },
+    )
 
     return IdentifyResult(
         result_dir=str(result_dir),

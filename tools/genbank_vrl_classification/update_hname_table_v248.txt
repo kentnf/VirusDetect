@@ -1,0 +1,1154 @@
+#old name	new name
+15 days old calf	cow
+21 day-old broiler chicken	chicken
+27 wk broiler breeder chicken	chicken
+28 day old broiler chicken	chicken
+34 day-old broiler chicken	chicken
+35 day-old broiler chicken	chicken
+36 day-old broiler chicken	chicken
+37 day-old broiler chicken	chicken
+38 day-old broiler chicken	chicken
+38-day-old broiler chicken	chicken
+3 years old cow	cow
+41 day-old broiler chicken	chicken
+41-day-old broiler chicken	chicken
+43 day-old broiler chicken	chicken
+4 years old cow	cow
+56 day-old broiler chicken	chicken
+61 day-old broiler chicken	chicken
+6 days old calf	cow
+9 days old calf	cow
+Abelmoshus esculentus	Abelmoschus esculentus
+acid lime	lime
+affinis	common carp
+African grey	grey parrot
+Albelmochus esculentus	Abelmoschus esculentus
+Albelmoschus esculentus	Abelmoschus esculentus
+allogynogenetic crucian carp	crucian carp
+allogynogenetic gibel carp	gibel carp
+Althea rosea	Althaea rosea
+ameoba	Amoeba
+anopheline sp	Anopheles
+antelope	Cetartiodactyla
+anti-D-immunoglobulin	
+Arabian horse	horse
+Araucana chicken	chicken
+arrow leaf (Sida rhombiforlia, Malvaceae); weed	Sida rhombifolia
+Ashy-headed sheldgoose	goose
+asymptomatic common carp	common carp
+avian	birds
+banane argente	
+Bandicote indica	Bandicota indica
+bat	bats
+bat BF_258I	bats
+bat BF_506I	bats
+beef cow	cow
+bhendi	kacang bendi
+bing cherry	Prunus avium
+bird	birds
+blackberry	European blackberry
+blackgram	black gram
+black sea turtle	sea turtles
+blood orange	sweet orange
+blueberry	bog blueberry
+blue fox	Canidae
+blue fronted Amazon	blue-fronted amazon
+bottlenose dolphin	marine dolphins
+breeder hens	chicken
+brent-goose	goose
+broiler	chicken
+broiler chicken	chicken
+Broiler chicken	chicken
+buffalo	Bubalus
+bullace plum	plum
+bush viper, ATCC-VR-1409	vipers
+calf	cow
+canine	Canidae
+canine (dog)	Canidae
+canine: female German Shepherd	Canidae
+canine, female Labrador Retriever	Canidae
+canine: female Labrador Retriever	Canidae
+canine; German Shepherd	Canidae
+canine: German Shepherd	Canidae
+canine; German Shepherd, 2 year	Canidae
+canine; Labrador	Canidae
+canine; Labrador, 3 month	Canidae
+canine, male German Shepherd	Canidae
+canine: male German Shepherd	Canidae
+canine; mongrel	Canidae
+canine; non-descript breed	Canidae
+Chamomilla recutita, cultivar Bona	Matricaria chamomilla
+cherry	Prunus avium
+cherry cultivar Bing	Prunus avium
+cherry duck	birds
+cherry tree cultivar Imperiale displaying symptoms of cherry chlorotic rusty spot disease	Prunus avium
+chilli	chilli pepper
+Chinese bulbul	bulbuls
+Chinese mitten-handed crab	Chinese mitten crab
+chronic fatigue syndrome patient	human
+civet	civets
+clementine cv. Comune	Citrus clementina
+clementine cv. Late	Citrus clementina
+clementine cv. Nules	Citrus clementina
+Columbia livia (Feral pigeon)	pigeons
+Columbia livia (pigeon)	pigeons
+commercial broiler	chicken
+commercial broilers	chicken
+cricket	crickets
+culicine sp	mosquitos
+cultivated blackberry	European blackberry
+Curare enamo, ITC559	
+dairy cow	cow
+Denrocalamus bannaenensis	Dendrocalamus
+Digera arvensis	
+dolphin	marine dolphins
+domestic dog	dog
+domestic mink	European mink
+Double Impatiens	Impatiens
+duckling	birds
+etrog citron	citron
+European badger (Meles meles)	Eurasian badger
+European wild boar (Sus scrofa)	pig
+experimentally-infected Ficus carica	Ficus carica
+false pimpernel (Lindernia procumbens, Scrophulariaceae); weed	Lindernia procumbens
+farmed koi	common carp
+farmed white sturgeon	sturgeon
+feline	cat
+female Mandarin duck	birds
+feral pig	pig
+Feral pigeon	pigeons
+Feutrell's Early mandarin	mandarin orange
+fig	common fig
+Foster Pink grapefruit	Vitis vinifera
+Foulah 2	
+fox	Canidae
+game chickens	chicken
+Genova lemon	lemon
+German dog	dog
+German ferret	ferret
+GF-305 peach	peach
+GF-305 peach seedlings	peach
+ghost carp	common carp
+gilthead sea bream	gilthead bream
+glaucus-gull	glaucous gull
+Golden Orf	orfe
+Gonosoma oxycephala	Gonyosoma oxycephalum
+grape cultivar 6-23	Vitis vinifera
+grape cultivar 8612	Vitis vinifera
+grape cultivar 87-1	Vitis vinifera
+grape cultivar Atebage	Vitis vinifera
+grape cultivar Augusta	Vitis vinifera
+grape cultivar Benifuji	Vitis vinifera
+grape cultivar Cabernet Gernischet	Vitis vinifera
+grape cultivar Cabernet Sauvignon	Vitis vinifera
+grape cultivar Cow's Nipple	Vitis vinifera
+grape cultivar Dragon's Eye	Vitis vinifera
+grape cultivar Exotic	Vitis vinifera
+grape cultivar Fenghuang 57	Vitis vinifera
+grape cultivar Fenghuang No.12	Vitis vinifera
+grape cultivar Fenghuang No.4	Vitis vinifera
+grape cultivar Fujiminori	Vitis vinifera
+grape cultivar Gamay	Vitis vinifera
+grape cultivar Gongnian No.1	Vitis vinifera
+grape cultivar Himrod Seedless	Vitis vinifera
+grape cultivar Hongjixin	Vitis vinifera
+grape cultivar Izunishiki	Vitis vinifera
+grape cultivar Jinxiu	Vitis vinifera
+grape cultivar Kyoho	Vitis vinifera
+grape cultivar Manicure Finger	Vitis vinifera
+grape cultivar Merlot	Vitis vinifera
+grape cultivar Moldova	Vitis vinifera
+grape cultivar Muscat	Vitis vinifera
+grape cultivar Muscat x Alicanfe Bouschet	Vitis vinifera
+grape cultivar OlympiaxFredoniar	Vitis vinifera
+grape cultivar Pinot Gris	Vitis vinifera
+grape cultivar Red Glob	Vitis vinifera
+grape cultivar Red Globe	Vitis vinifera
+grape cultivar Red Italy	Vitis vinifera
+grape cultivar Rizamat	Vitis vinifera
+grape cultivar Ruby seedless	Vitis vinifera
+grape cultivar Shuanghong	Vitis vinifera
+grape cultivar Thompson Seedless	Vitis vinifera
+grape cultivar Triumph	Vitis vinifera
+grape cultivar unknown	Vitis vinifera
+grape cultivar Unknown	Vitis vinifera
+grape cultivar White Malaga	Vitis vinifera
+grape cultivar Xinnongle	Vitis vinifera
+grape cultivar Zaokangbao	Vitis vinifera
+grape cultivar Zhaohuang	Vitis vinifera
+grape cultivar Zhouyouhong	Vitis vinifera
+grape cv. Centennial Seedless	Vitis vinifera
+grape, cv. Sultana	Vitis vinifera
+grape fruit	Vitis vinifera
+grapevine	Vitis vinifera
+Grapevine	Vitis vinifera
+grapevine cultivar Black Olympia	Vitis vinifera
+grapevine cultivar Black Seedless	Vitis vinifera
+grapevine cultivar Emperor	Vitis vinifera
+grapevine cultivar Italia-3	Vitis vinifera
+grapevine cultivar Negrita-S2	Vitis vinifera
+grapevine cultivar Pinot Noir	Vitis vinifera
+grapevine cultivar Pinot Noir 23	Vitis vinifera
+grapevine cultivar Primitivo	Vitis vinifera
+grapevine; cultivar: Red Globe	Vitis vinifera
+grapevine cultivar Siar	Vitis vinifera
+grapevine cultivar Sultania Rose	Vitis vinifera
+grapevine; cultivar: Sultanina Bianca	Vitis vinifera
+grapevine cultivar Thomson Seedless	Vitis vinifera
+grapevine cultivar Zaoyu	Vitis vinifera
+grapevine cv. Beniizu	Vitis vinifera
+grapevine cv. Black Olimpia	Vitis vinifera
+grapevine cv. Black Olympia	Vitis vinifera
+grapevine, cv. Chardonnay	Vitis vinifera
+grapevine cv. Concord	Vitis vinifera
+grapevine cv. Guixiangyi	Vitis vinifera
+grapevine cv. Jingchao	Vitis vinifera
+grapevine cv. Jingxiu	Vitis vinifera
+grapevine cv. Kangtai	Vitis vinifera
+grapevine cv. Kyoho	Vitis vinifera
+grapevine cv. Loudu Bailey	Vitis vinifera
+grapevine cv. Lumunage	Vitis vinifera
+grapevine cv. Shiraz clone 99B plant SdP2	Vitis vinifera
+grapevine cv. Takasumi	Vitis vinifera
+grapevine cv. Thompson Seedless	Vitis vinifera
+grapevine cv. Thomson Seedless	Vitis vinifera
+grapevine cv. Zaoyu	Vitis vinifera
+grapevine cv. Zhiyuan 540	Vitis vinifera
+grapevine variety Jingchuan	Vitis vinifera
+grapevine variety Thomson Seedless	Vitis vinifera
+grapevine variety Zaoyu	Vitis vinifera
+greengram	mung bean
+green turtle	sea turtles
+Guinea fowl	fowls
+hog	pig
+horseshoe bat	bats
+hound puppy	dog
+H.sapiens	human
+Hypophthamichthys molitrix	silver carp
+icelandic horse	horse
+interdonato lemon	lemon
+Jatti Khatti rough lemon	lemon
+jujube	Chinese jujube
+juvenile lake sturgeon	sturgeon
+juvenile white sturgeon	sturgeon
+Kelong mekintu, ITC200	
+Kennedya rubicunda	Kennedia rubicunda
+kennelled dog	dog
+Kinnow mandarin	mandarin orange
+kumquat	marumi kumquat
+laboratory mouse	mice
+large cardamom collected	cardamom
+layer chicken	chicken
+layer hens	chicken
+Laying hens	chicken
+lettuce	cultivated lettuce
+macaw	parrots
+Macrobracium rosenbergii	Macrobrachium rosenbergii
+magpie-robin	white-rumped shama
+male Mandarin duck	birds
+Manchurian chipmunk	chipmunks
+mandarin	mandarin orange
+mandarin cv. Parsons Special	mandarin orange
+mandarin hybrids	mandarin orange
+Maoli bronze	
+masked civet	civets
+Mineola tangelo	tangelo
+minneola tangelo	tangelo
+mixed breed canine	Canidae
+mixed culicines	mosquitos
+Moluccan cockatoo	cockatoos
+Moro blood orange	sweet orange
+Moro blood sweet orange	sweet orange
+Mosambi sweet orange	sweet orange
+mosquito	mosquitos
+mosquitoes	mosquitos
+mountain lion	lion
+mulberry	mulberries
+mulberry tree	mulberries
+murcott	mandarin orange
+murine	mice
+nashi cv. Ko Sui on D6-Packham rootstock	pears
+nashi cv. Nijiiseiki	pears
+navel sweet orange cv. Thompson	sweet orange
+neotropical rattlesnake, ATCC-VR-1408	tropical rattlesnake
+newborn piglet	pig
+night-heron	night herons
+oil palm	African oil palm
+olive	olives
+olive cv. Arbequina	olives
+olive cv. GrossDiSpagna	olives
+olive cv. LateBlanquette	olives
+olive cv. Manzanillo	olives
+olive cv. Nevadillo	olives
+olive cv. Sevillano	olives
+olive ridley	Lepidochelys olivacea
+orange	sweet orange
+Orinoco sheldgoose	goose
+ovine	sheep
+oyster	oysters
+Page mandarin	mandarin orange
+palm civet	civets
+palm civet cats	cat
+palmetto bug	Florida woods cockroach
+passionfruit	passion fruit
+peafowl	peafowls
+penaeid shrimp	penaeid shrimps
+Penaeid shrimp	penaeid shrimps
+pepper	peppers
+pheasant	copper pheasant
+pigeon	pigeons
+Pigeonpea	pigeon pea
+Pigeonpea (Cajanus cajan)	pigeon pea
+piglet	pig
+Pisang Abu Perak, ITC056	banana
+Pisang gajih merah, ITC677	banana
+Pisang nangka, ITC1062	banana
+pooled ticks	ticks
+pool of female Psorophora albigenu mosquitoes	mosquitos
+porcine	pig
+Poteau geant, ITC1137	
+poultry	birds
+pug dog	dog
+pullet layers	chicken
+pumpkin	pumpkins
+puppy	dog
+putative fungus	fungi
+quail	birds
+racoon dog	dog
+rasberry cv. Glen Cova	red raspberry
+raspberry	red raspberry
+red blood sweet orange	sweet orange
+red-whiskered bulbul	bulbuls
+robel sweet orange	sweet orange
+roble sweet orange	sweet orange
+rose	Rosa hybrid cultivar
+rose cv. Dr. Merkley	Rosa hybrid cultivar
+Saccari sweet orange	sweet orange
+Salnum lycopersicum	Solanum lycopersicum
+Scotphilus kuhli large intestine	bats
+seabird	birds
+seminole tangelo	tangelo
+sentinal SPF chicken	chicken
+sentinel mice	mice
+sentinel mouse	mice
+Setothosea asigna	range caterpillar
+sheatfish	sheatfishes
+shorebird	shorebirds
+shrimp	Penaeus
+snake	snakes
+snap bean	soybean
+Som, ITC669	
+sparrow	sparrows
+squash	squashes
+steelhead	rainbow trout
+stringbean	French bean
+sunflower	sunflowers
+swan	swans
+sweet corn	corn
+Tasmanian tick	ticks
+Thompson navel tree grafted on Sour orange rootstock in north of Iran	sour orange
+Thompson navel tree grafted on Trifoliate orange rootstock in north of Iran	trifoliate orange
+Thomson navel sweet orange	sweet orange
+three year old male goat	goat
+Tibetan chicken	chicken
+tick	ticks
+Tinocalloides montanus	
+Touch me not (Mimosa sp., Fabaceae); weed	Mimosa
+Trailing Verbena	Verbena
+Trimeresus flavomaculatus	Trimeresurus
+Tuataria (Sphenodon)	Sphenodon
+unvaccinated cat	cat
+unvaccinated dog	dog
+vaal rhebok (Pelea capreolus)	Pelea capreolus
+warmblood horse	horse
+white egg laying chicken	chicken
+white-eye	white-eyes
+white eyed conure	
+whitefly	whiteflies
+whitefly/plant	whiteflies
+wigeon	widgeon
+wild apple (Malus sylvestris) 391	Malus sylvestris
+wild apple (Malus sylvestris) 392	Malus sylvestris
+wild apple (Malus sylvestris) 599	Malus sylvestris
+wild ass	ass
+wild cherry 680 (Prunus avium)	Prunus avium
+wild cherry (Prunus avium) 680	Prunus avium
+wild cherry (Prunus avium) 681	Prunus avium
+wild common carp	common carp
+wild rat	rat
+wild sunflower	sunflowers
+winter barley cultivar Express	barley
+wolf	wolfdog
+Wood pigeon	pigeons
+# patch v205
+Digera arvensis	amaranth
+Wild rose	Rosa
+hybrid snakehead	northern snakehead
+sentinel suckling mice	mice
+unknown bat	bats
+unknown mosquito pool	mosquitos
+unspecified flying fox	flying fox
+white eyed conure	Aratinga leucophthalma
+# patch v206
+Cronobacter sakazakii ATCC BAA 894	Cronobacter sakazakii ATCC BAA-894
+Eurasian jackdaw (Corvus monedula)	jackdaw
+Melospittacus undulatus	Melopsittacus undulatus
+bat colony of Molossus molossus and Tadarida brasiliensis	Molossus molossus
+blue-streaked lory (Eos reticulate)	Eos reticulata
+caique	parrots
+domestic dog; breed: Labrador	dogs
+sea lion	California sea lion
+sulphur-crested cockatoo (Cacatua galerita)	Cacatua galerita
+unidentified Araneae	Araneae
+unidentified Chrysopidae	Chrysopidae
+unidentified Diptera	Diptera
+unidentified Gerridae	Gerridae
+unidentified Hippoboscidae	Hippoboscidae
+unidentified Hippoboscoidea	Hippoboscoidea
+unidentified Phoridae	Phoridae
+unidentified Polydesmidae	Polydesmidae
+unidentified Tabanidae	Tabanidae
+yellow-bibed lory (Lorius chlorocercus)	Lorius lory
+yellow-naped Amazon (Amazona auropalliata)	Amazona auropalliata
+# patch v211
+Bhendi	okra
+Bos_taurus	cow
+Botritys cinerea strain V448	Botrytis cinerea
+Botritys sp. strain V446	Botrytis cinerea
+Chilli	chili pepper
+Himalayan griffon vulture	birds
+Hy-line variety brown chicken	chicken
+Lingnania fujianensis	bamboo
+cockatoo	parrot
+fiddler Crab	Uca mjoebergi
+fiddler crab	Uca mjoebergi
+flowering cherry	sweet cherry
+grapevine; cultivar: Cannonao	Vitis vinifera
+groundnut	peanut
+hamster	Mongolian hamster
+hermit Crab	crustaceans
+hermit crab	crustaceans
+large pool of wild-caught Drosophila (mixed D. ananassae, D. melanogaster, D. malerkotliana, and Scaptodrosophila latifasciaeformis)	Drosophila
+marine snail	gastropods
+mixture of Drosophila melanogaster and D. simulans	Drosophila
+neotropical bat	bats
+raspberry plant	red raspberry
+sandfly	sandflies
+single unknown drosophilid	Drosophila
+single unknown fly	Drosophila
+unknown Araneae,Neoscona nautica	brown sailor spider
+# patch v238
+14-day-old piglet	pigs
+15-day-old piglet	pigs
+26-day-old piglet	pigs
+33-day-old piglet	pigs
+A. flavicollis	Apodemus flavicollis
+Acanthamoeba polyphaga mimivirus	Acanthamoeba polyphaga
+Adoxophyes honmai entomopoxvirus 'L'	smaller tea tortrix
+African grey parrot; female	birds
+African grey parrot; male	birds
+African grey parrot; unknow	birds
+African penguin	birds
+American green winged teal	American green-winged teal
+Aquatic bird	birds
+BHENDI	gumbo
+Backyard poultry	chicken 
+Baer's pochard	ducks
+Bakerara Flying High 'Stars & Bars' (man-made orchid hybrid)	hybrid
+Baladi duck	Anatinae
+Baladi duck; eight months age	Anatinae
+Baladi duck; two months age	Anatinae
+Bat	bats
+Bean	soybean
+Bivalva	Bivalvia
+Bivalva mix Wenzhou	Bivalvia
+Black Duck	Anatinae
+Blechmonas ayalai; isolate B08-376	Blechomonas ayalai Votpka et Sukov 2013
+Blechmonas luni; isolate B09-1006	Blechomonas ayalai Votpka et Sukov 2014
+Blue-headed Pionus; female	Pionus reichenowi
+Bluebird	birds
+Boriler	chicken
+Botritys sp. (strain V446)	Botrytis sp. V446
+Broiler	chicken
+Bucefala clangula; duck	ducks
+Bulbul	bulbuls
+Burmese thamin	deer
+Buzzard	birds
+Canindae Macaw	birds
+Cape blue duiker	Blue duiker
+Cape blue duiker, Persian goitered gazelle	Blue duiker
+Cape blue duiker, Red-flanked duiker	Blue duiker
+Cape gooseberry	Cape-gooseberry
+Cat(Felis Catus)	Felis catus
+Catalina Macaw; female	Scarlet macaw
+Catalina Macaw; male	Scarlet macaw
+Cavendish's dik dik	deer
+Chaereophon aloysiisabaudiae	bats
+Chaliopsis junodi	Chaliopsis junodi nucleopolyhedrovirus
+Channeled applesnail	giant African snail
+Chciken	chicken
+Cherry cultivar 0900 Ziraat	sweet cherry
+Chestnut teal;Anas castanea	chestnut teal
+Chicken-layer	chicken
+Chili	hot pepper
+Chinese land snail	giant African snail
+Chinese native yellow cattle	cattle
+Chinese nightingale	nightingale
+Choristoneura biennis entomopoxvirus	moths
+Chukar	birds
+Citron-crested Cockatoo; male	birds
+Commercial Layer	chicken 
+Conehead cricket	house cricket
+Crow	birds
+Cryprinus carpiod	fish
+Cucims melo	muskmelon
+Desert bighorn, Arabian oryx	Arabian oryx
+Dinnthus caryophyllus	clove pink
+Dolphin	marine dolphins
+Douglas Fir	Douglas-fir
+Duck: mallard	ducks
+Dust in poultry farm	chicken
+Eastern giant eland, Southern gerenuk	gerenuk
+Eastern yellow-backed duiker, North Indian muntjac	muntjak
+Eastern yellow-backed duiker, Zambian sable antelope	deer
+Echinoderm	echinoderms
+Ellipsen waterbuck	waterbuck
+Erocheir sinensis	Chinese mitten crab
+Feline	Felis catus
+Ferruginous Pochard	ducks
+Fiddler crab	Atlantic sand fiddler crab
+Foreign horse	domestic horse
+Franklin seagull; wild bird	Franklin's gull
+Free-living grapevine	wine grape
+Gray teal	grey teal
+Greater white-fronted goose	goose
+Green bean	soybean
+Greenfinch	Vietnamese greenfinch
+Groundnut	peanut
+Guinea Fowl	birds
+Haemophysalis sp. (tick)	mouse tick
+Hamimelon	muskmelon
+Heamaphysalis punctata	mouse tick
+Hipposidero melanopogon	bats
+Home sapiens; male; 1 year	human
+Homo_sapien	human
+Homo_sapiens	human
+Household duck	ducks
+Indian hog deer	deer
+Indian sambar	Sambar
+Indo-Pacific humpback dolphin	marine dolphins
+Jimela topi	topi
+Jimela topi, Slender-horned gazelle	gazelles
+Jinyun Ma duck	ducks
+Korean native chicken	chicken
+Layer	chicken
+Layer chicken	chicken
+Lesser Snow Goose	Snow goose
+Lisianthus	Lisianthius sp.
+Longtail Duck	ducks
+Louisiana patient with hantavirus pulmonary syndrome	human
+Lycopersicum esculentum	tomato
+Lycopersicum escultentum cv. King Kong 2	tomato
+Malayan sambar	sambar
+Mandarin	mandarin orange
+Megavirus vitis isolate vigne	wine grape
+Meleagridis gallopavo	turkey
+Mexican duck;Anas platyrhynchos diazi	Mexican duck
+Miniipterus schreibersii	bats
+Minneola tangelo	tangelo
+Mixed (Rhipicephalus sanguineus, Boophilus sp.)	ticks
+Mixed mosquito pool	mosquitos
+Mont1 megavirus	Megavirus mont1
+Morelia_viridis	green tree python
+Mosquito-Unknown	mosquitos
+Mulard Duck	ducks
+Mulberry	mulberry family
+Mungbean	Mungbean yellow mosaic betasatellite, ICTV accepted 1)
+Mus_musculus	house mouse
+New Mexico human case 10	human
+Northen pintail	northern pintail
+Northern_shoveler	Northern shoveler
+O. niloticus	Oreochromis cf. aureus/niloticus JFDC-2020
+Odocoilus hemionus	mule deer
+Ogol chicken	chicken
+Olive baboons	baboons
+Olygoryzomys nigripes	Black-footed pygmy rice rat
+Orange	Orange
+Orchid sp.	marsh orchid
+Oriental white stork	White stork
+Owl	owls
+PIGEON	birds
+Partridge	birds
+Patient	human
+Penaeid	penaeid shrimps
+Persian goitered gazelle	goitered gazelle
+Persimmon	kaki persimmon
+Phaseolous vulgaris	Phaseolus vulgaris L., 1753
+Pheasant	birds 
+Pigeon	birds 
+Poligonum convolvolus	Fallopia convolvulus (L.)
+Poultry	chicken 
+Psittasine	parrots and others
+Ptunia atkinsiana	Petunia Juss.
+QUAIL	birds 
+Quail	birds 
+Quail; age Adult	birds 
+Range duck	ducks
+Rh. microplus / Am. variegatum	tropical bont tick
+Rieger begonia	Begonia × hiemalis Fotsch, 1933
+Romaine lettuce	Lactuca sativa var. longifolia
+Ross's Goose	Ross' goose
+Rudbechia sp.	coneflowers
+SIV-infected Rhesus monkey	Rhesus monkey
+SIV-infected and immunocompromised Rhesus monkey	Rhesus monkey
+SIV-infected monkey that had SV40 brain disease	Rhesus monkey
+Salivia divinorum	diviner's sage
+Sandpiper	snipes
+Sarkesphorus cristapus	Silvery-cheeked antshrike
+Scoterepens balstoni	Balston's pygmy perch
+Scotomannes kuhlii	bats
+Sesarmid crab	Sesarmidae
+Shearwater	birds 
+Shorebird	birds 
+Shrew	shrews
+Siberian lemmings (Lemmus sibiricus)	brown lemming
+Siberian tiger	Amur tiger
+Softbill	birds 
+Solomons cockatoo; male	Ducorps's cockatoo
+Southern steenbok	steenbok
+Spirurian nematodes	Spirurina
+Spodotpera exempta	Spodoptera exempta (Walker, 1856)
+Squirrel monkey	squirrel monkeys
+Stenocephalomys albipes	White-footed Stenocephalemys
+Stenocephalomys sp.	Stenocephalemys
+Striated Heron	green-backed heron
+Sturnirinae	bats
+Sudan red-fronted gazelle	Red-fronted gazelle
+Sulphur-crested cockatoo; female	birds 
+Sulphur-crested cockatoo; male	birds
+Swan	swans
+TICK-Haemaphysalis longicornis female	longhorned tick
+Teal	ducks
+Tern	mew gull
+Thrush	birds
+Tibetan pigs	pigs
+Tick	ticks
+Tick-Haemaphysalis longicornis,unfeeded female	ticks
+Trilobium uniolae	Tribolium uniolae (L.f.) Renvoize
+Tulip sp.	Tulipa gesneriana L.
+Ture flies	flies
+Umbrella cockatoo; male	birds 
+Umbrella cockatoo; unknow	birds 
+Vaal rhebok	Pelea
+Valeriane locusta	Valerianella locusta (L.) Laterr.
+Weed	Cannabis L., 1753
+Weed (Qatal booti)	Cannabis L., 1754
+Western common chimpanzee	chimpanzee
+Wharf roach	Ligia exotica
+White-bellied Caique; female	birds
+White-bellied Caique; male	birds
+Whooper swans; Cygnus cygnus	common whooper
+Wigeon	Mareca
+Wild Bird	birds 
+Wild bird(Anas platyrhynchos)	birds 
+Wild birds	birds 
+Wild duck	ducks
+Wildboar	Mareca
+Yacon	Smallanthus sonchifolius (Poepp.) H.Rob.
+Yuma myotis	Myotis yumanensis
+Yunling goat	goat
+aquatic bird	birds
+aquatic snail	water snail
+arthropod	arthropods
+arthropod mix Hubei	arthropods
+asinine	ass
+backyard chicken	chicken
+backyard duck	ducks
+backyard poultry	chicken 
+baikai teal	Baikal teal
+balsam	Abies balsamea (L.) Mill.
+bar headed goose	goose
+barnacle	Cirripedia
+barnacle mix Beihai	Cirripedia
+bat ectoparasite	bats
+batflies	wingless bat flies
+bean cultivar Vainita-Larga	soybean
+bewicks swan	swans 
+bird; mixed organ pool of Anas platyrhynchos and Fulica atra	birds
+black bear	bears
+black bellied whistling duck	ducks
+black chicken	chicken
+black duck	ducks
+black duck; age after hatch year	ducks
+black duck; gender F; age Hatch year	ducks
+black duck; gender M; age Adult	ducks
+black duck; gender M; age After hatch year	ducks
+black eyed susan	Rudbeckia hirta
+black goat	goat
+black headed gull	black headed gull
+black-bellied whistling duck; gender Unknown; age Unknown	ducks
+black-crowned night heron	black-crowned night heron
+black-neck crane	birds
+black-tailed gull	birds
+blackberry cv. Apache	mulberry family
+blackcurrant	Ribes nigrum L.
+blackhead gull	gulls
+blue & white flycatcher	Tyrannidae
+blue goose	goose
+blue winged teal	blue-winged teal
+boar	pigs
+boxthorn	Lycium ferocissimum Miers
+breeder chicken	chicken
+breeder duck	ducks
+breeding hens	chicken
+brent goose	birds
+broiler breeders	chicken
+broiler chickens	chicken
+broiler duck	ducks
+brown layer hen	chicken
+brown-head gull	Brown-headed gull
+bumblebee	bees
+butterbur	daisy family
+buttercup	Petasites Mill., 1754
+buzzard	birds
+canine; Canis lupus familiaris	dog
+canine; age 10m	dog
+canine; age 3yr	dog
+canine; gender F; age 2yr	dog
+canine; gender F; age 3yr	dog
+canine; gender F; age 4m	dog
+canine; gender F; age 6m	dog
+canine; gender M	dog
+canine; gender M; age 10m	dog
+canine; gender M; age 10yr	dog
+canine; gender M; age 11yr	dog
+canine; gender M; age 12m	dog
+canine; gender M; age 18m	dog
+canine; gender M; age 2yr	dog
+canine; gender M; age 6m	dog
+canine; gender M; age 6yr	dog
+canine; golden retriever	dog
+cape shoveller	Anas smithii
+cape teal/cape shoveller	Anas smithii
+captive wild boar	pigs
+chick	chicken
+children	human
+chili	hot pepper
+chili (Capsicum annum L.)	hot pepper
+chilli peper	hot pepper
+chilli; Capsicum annum L.	hot pepper
+chuckar	chukar partridge
+chukar	chukar partridge
+chukkar	chukar partridge
+civet cat	civets
+comb duck	ducks
+commercial layer	chicken
+commercial layer chickens	chicken
+commercial layers	chicken
+commom teal	Common teal
+common Ketrel	common Ketrel
+common bean	winged bean
+common beans	winged bean
+common heron	birds
+common redshank	birds
+condor	birds
+crow	birds
+crow; dead bird	birds
+crustacean	crustaceans
+crustacean mix	crustaceans
+crustacean mix Wenling	crustaceans
+cucurbit weed	Cannabis L., 1753
+curlew	curlews
+dark beetle	bark beetles
+domestic Swine	pigs
+domestic bird	birds
+domestic chicken	chicken
+domestic green-winged teal	ducks
+domestic mallard duck	ducks
+domestic poultry	chicken
+domestic swine	pigs
+domesticated duck	ducks
+domesticated quail	Common quail
+dove	Columba
+dragonfly (Odonata: Epiprocta)	dragonflies
+duck: mallard	ducks
+duck;Anas platyrhynchos domesticus	ducks
+eagle	owls
+eagle owl	owls
+earwig	earwigs
+egret	little egret
+elderberry	Sambucus L., 1753
+equid	horse
+equid (stallion)	horse
+falcata teal	ducks
+falcon	falcons
+falso lulo	Solanum pseudolulo Heiser
+farm chicken	chicken
+farmed rabbit	rabbit
+feces	faeces
+female horse of foreign breed	horse
+feral duck	ducks
+feral pigeon	rock pigeon
+feral swine	pigs
+fighting bird	birds
+finch	Fringillidae
+flea and ants	fleas and ants
+fowls	chickens
+free-living Vitis californica x Vitis vinifera hybrid	wine grape
+free-living grapevine	wine grape
+fresh market tomato	tomato
+freshwater arthropod	arthropods
+freshwater atyid shrimp	Atyidae
+freshwater heteroptera	true bugs
+freshwater isopoda	pill bugs
+freshwater isoptera	pill bugs
+freshwater shellfish	bivalves
+freshwater shellfish (Unio douglasiae)	bivalves
+fruit bat	bats
+gender Female; age After hatch year	birds
+gender Female; age Hatch year	birds
+gender Male; age Hatch year	birds
+giant petrel	birds
+glaucous gull-herring gull hybrid	birds
+golden parakeet; female	Guaruba guarouba
+golden parakeet; male	Guaruba guarouba
+golden parakeet; unknow	Guaruba guarouba
+goosander	common merganser
+grapevine cultivar Kekfrankos	wine grape
+grapevine; cultivar: Ayaneskeal	wine grape
+great black headed gull	Ichthyaetus ichthyaetus (Pallas, 1773)
+great created grebe	great crested grebe
+great crested-grebe	great crested grebe
+great-crested grebe; gender M; age 3	great crested grebe
+great-horned owl	owls
+greater white fronted goose	common whooper
+greater white-fronted goose	common whooper
+greater white-fronted goose; age Hatch year	common whooper
+greater white-fronted goose; gender F; age Hatch year	common whooper
+greater white-fronted goose; gender F; age after hatch year	common whooper
+greater white-fronted goose; gender M; age Hatch Year	common whooper
+grebe	great crested grebe
+green -wing teal	green-winged teal
+green bell pepper	apsicum annuum L., 1753 in [Linnaeus C (1753c)]
+green onion	Allium L.
+green pepper	apsicum annuum L., 1753 in [Linnaeus C (1753c)]
+green winged teal	green-winged teal
+green winged teal; female	green-winged teal
+green winged teal; gender F	green-winged teal
+green winged teal; gender M	green-winged teal
+green winged teal; male	green-winged teal
+green-wing teal	green-winged teal
+grey duck	ducks
+grey goose	birds
+grey squirrel	gray squirrel
+ground jay	Podoces
+groundnut (Arachis hypogaea L.)	peanut
+groundnut (peanut)	peanut
+groundnut (variety JL-24)	peanut
+groundnut cv. JL-24	peanut
+guinea fowl	guineafowls
+guinea fowl; backyard	guineafowls
+guinea fowl; backyard flock	guineafowls
+guinea fowl; backyard poultry	guineafowls
+guinea hen	guineafowls
+guineafowl	guineafowls
+guniea fowl	guineafowls
+harbour seal; male; juvenile	harbor seal
+harrier	hawks
+hawk	hawks
+hermit crab mix Beihai	crustaceans
+heron	grey heron
+high-casqued chameleon (Trioceros/Chameleo/ hoehnelii)	lizards
+holly hock	hollyhock
+honey-bee	bees
+honeysuckle	honeysuckles
+horned puffin	Rhinoceros auklet
+horseshoe crab	horseshoe crabs
+houbara	Houbara bustard
+household chicken	chicken 
+household duck	ducks
+household turkey	turkey
+humna	human
+hybrid red tilapia	red tilapia
+hybrid wild boar	pigs
+hydroponic growing lettuce	Ulva L., 1753
+insect	true insects
+knot	birds
+korean native chicken	chicken
+lamb	goat
+large billed crow	birds
+large pig roundworm	pigs
+layer	chicken
+layer chickens	chicken
+layer hen	chicken
+leech	leeches
+legume	pea family
+lesser snow goose	Snow goose
+lesser whistling-duck	ducks
+live bird market chicken	chicken
+live bird market duck	ducks
+live bird market ducks	ducks
+live bird market goose	goose
+live bird market turkey	turkey
+lizianthus	prairie gentian
+long-billed calandra	Tibetan lark
+magpie	Oriental magpie-robin
+magpie robin	Oriental magpie-robin
+magpie; gender M; age 1	Oriental magpie-robin
+male Arabian horse	horses
+male horse of foreign breed	horses
+male horse of local breed	horses
+mallard-American black duck hybrid	ducks
+mallard-black duck hybrid; gender F; age Hatch Year	ducks
+mallard-black duck hybrid; gender M; age After hatch year	ducks
+mallard-black duck hybrid; gender M; age Hatch Year	ducks
+mallard;male	ducks
+malvestrum coromendalianum	Malvastrum coromandelianum (L.) Garcke, 1857
+marabou stork	birds
+marigold	marigolds
+meat duck	ducks
+melon	muskmelon
+melon (Cucumis melo)	muskmelon
+melon cultivar Galia F1	muskmelon
+melon cultivar Piel de sapo	muskmelon
+midges	Chironomus thummi (Kieffer, 1911)
+migratory bird	birds
+migratory duck	ducks
+migratory waterfowl	waterfowl
+mint	herbs
+moorhen	Gallinula
+mosquitoe	mosquitos
+mulard duck	ducks
+mungbean	Vigna radiata (L.) R.Wilczek
+mungbean (Phaseolus radiatus L.)	Vigna radiata (L.) R.Wilczek
+mungbean cultivar SML-668	Vigna radiata (L.) R.Wilczek
+musk rat	muskrat
+mynnah	birds
+nasal swab from canine which has respiratory disease	dog
+neognath bird	birds
+night heron	birds
+nursery pig	pigs
+nursing pig	pigs
+old layer	chicken
+olive tree	common olive
+open-billed stork	Ciconia
+orchid	Orchidaceae Juss., 1789
+oriental tobacco	Nicotiana L.
+owl	owls
+oyster catcher	Eurasian oystercatcher
+pappa cultivar Granola	opium poppy
+pappa cultivar Maranga	opium poppy
+partridge	Chinese francolin
+patient from Germany with HFRS	human
+patient serum	human
+peaceful dove	birds
+pelican	Pelecanus
+pepper; cultivar: Healey	hot pepper
+pet dog	dog
+pet pig	pigs
+pheasant; backyard	birds
+pied megpie	Eurasian magpie
+piegon	birds
+pigeon; 40 days age	birds
+pigeon; Baladi	birds
+pigeon;female	birds
+pika	pikas
+pilchard	South American pilchard
+pillworm	Armadillidiidae
+pony	horse
+pool of Lumbricus and Amynthas	Amynthas morrisi (Beddard, 1892)
+pool of samples	Amynthas morrisi (Beddard, 1893)
+pressing tomato	tomato
+processing tomato	tomato
+procine	pigs
+psittacine	birds
+psittacine bird	birds
+pteropid bat	bats
+quail; Japanese	Common quail
+quail; farm	Common quail
+raven	Common raven
+red crested pochard	red-crested pochard
+red headed duck	ducks
+red-billed teal	ducks
+red-headed duck	ducks
+red-necked grebe; age hatch year	Podiceps grisegena
+red-necked grebe; gender F; age after hatch year	Podiceps grisegena
+red-necked grebe; gender F; age hatch year	Podiceps grisegena
+red-necked grebe; gender M; age hatch year	Podiceps grisegena
+red-tailed guenon	red-tailed monkey
+red-winged tinamous	red-winged tinamou
+redheaded duck	ducks
+ridge gourd	Luffa Mill., 1754
+ring necked duck	ducks
+rockmelon	muskmelon
+roe deer	deer
+rooster	chicken
+rosybilled pochard	rosy-billed pochard
+ruddy sheldrake	ruddy shelduck
+saffron	saffron crocus
+sandpiper	snipes
+sandpiper; gender Unknown; age Unknown	snipes
+scale insect	scale insects
+scaup	greater scaup
+seagull	gulls
+shearwater	birds
+shelduck	ducks
+shellduck	ducks
+shellfish	bivalves
+shorebird; age after hatch year	birds
+shorebirds	birds
+shoveller duck	ducks
+shrew	shrews
+shrike	shrikes
+shrimps	fairy shrimps
+silkie	chicken
+silkie chicken	chicken
+silky chicken	chicken
+silky fowl	chicken
+silver teal	Anas versicolor
+skunk	striped skunk
+small fish	fish
+snake loofah (Luffa spp.)	Luffa Mill., 1754
+snake-associated nematodes	roundworms
+snipe	birds
+softbill	birds
+softbill; quarantined	birds
+sow	pigs
+soy sauce chicken	chicken
+special wild pig	pigs
+specific pathogen-free rabbit	rabbit
+spider lily	trumpet lily
+spot-billed duck	ducks
+spotbill duck	ducks
+squirrel monkey	squirrel monkeys
+steelhead trout	rainbow trout
+stone curlew	birds
+suckling pig	pigs
+surf scooter	swans
+swan; Cygnus sp.	swans
+swiftlet	birds
+tadpole	sea tadpole
+tapeworm	tapeworms
+teal	ducks
+teal duck	ducks
+teal; gender F; age Hatch Year	ducks
+teal; gender M; age 2	ducks
+teal; gender M; age Hatch Year	ducks
+tern	birds
+thick-billed murre	birds
+thoroughbred	horse
+thrush	birds
+tobbaco	Nicotiana L.
+tortoise	tortoises
+true flies	fruit flies
+turtle dove	Streptopelia turtur
+turtledove	Streptopelia turtur
+turtledoves	Streptopelia turtur
+tyrkey	chicken
+unidentified mosquitos	mosquitos
+unidentified wild bird	birds
+unknown wild bird	birds
+wasp	bees
+water boatman	Corixidae
+water chicken	common moorhen
+water fowl	ducks
+water strider	water striders
+watercoot	birds
+wax moth	moths
+weed	Cannabis L., 1753
+whimbrel	birds
+white bellied bustard	birds
+white faced whistling duck	ducks
+white front goose	goose
+white fronted goose	goose
+white headed duck	ducks
+white peckin duck	ducks
+white rat	Rattus
+white-faced whistling duck (Dendrocygna viduata)	ducks
+white-faced whistling duck; gender Unknown; age Unknown	ducks
+white_winged_black_tern	white-winged tern
+whitefronted goose	goose
+whooper swan	swans
+whooper swan (Cygnus cygnus)	swans
+whooper swan; age adult	swans
+whooperswan	swans
+wild Vigna mungo var. mungo (accession no. IC-251383)	black gram
+wild bird	birds
+wild bird(Anas platyrhynchos)	birds
+wild birds	birds
+wild boars	pigs
+wild chicken	chicken
+wild duck	ducks
+wild goose	goose
+wild rabbit	rabbit
+wild ratooned cotton	cotton
+wild rodents	rodent
+wild swan	swans
+wild waterfowl	waterfowl
+wildboar	pigs
+wildfowl	birds
+woodlouse	pillbugs
+worker termites of order Odontotermes	Odontotermes
+yellow billed duck	ducks
+yellow cattle	cattle
+yellow chicken	chicken
+yellow weasel	yellow-bellied weasel
+yellow-billed duck	ducks
+yellow-headed Amazon	birds
+# patch v239
+# patch v248
+A. mellifera	Apis mellifera
+Acinetobacter baumannii strain KZ-1098	Acinetobacter baumannii 
+Bird(Acrocephalus schoenbaeus)	Acrocephalus schoenobaenus
+Bird(Andropadus virens)	Andropadus virens
+Bird(Euplectes afra)	Euplectes afer
+Bird(Ploceus melanocephalus)	Ploceus melanocephalus
+Bird(Sylvia curraca)	Sylvia curraca
+Cabbagefly	Delia radicum
+Capsicum sp.	Capsicum annuum
+Chinese fire belly newt	Cynops orientalis
+Desmodium scorpiurus	Desmodium scorpiurus
+Dipteran(Coquillettidia maculipennis)	Coquillettidia maculipennis
+Dipteran(Culex perfuscus)	Culex perfuscus
+Dipteran(Mansonia uniformis)	Mansonia uniformis
+Epikalotermes kempae	Epicalotermes kempae
+Fur seal	Arctocephalus gazella
+Gossypium hirsutum	Gossypium hirsutum
+Gossypium hirsutum cv RST-2013	Gossypium hirsutum
+Gossypium hirsutum wild genotype Dominique	Gossypium hirsutum
+Gossypium hirsutum wild genotype Haiti	Gossypium hirsutum
+Gymnophithys rufigula	Gymnopithys rufigula
+Helarctus malayanus (sun bear)	Helarctos malayanus
+Holstein Friesian cattle	Bos primigenius
+Hyalopia asiatica	Hyalopterus arundiniformis
+Hyalopteris asiatica	Hyalopterus arundiniformis
+ITC0528	Musa ornata
+Japanese black cattle	Bos primigenius
+Jatropha integerrima	atropha integerrima
+Mantispinae sp.	Dicromantispa gracilis
+Naemorhedus goral	Naemorhedus goral
+Nyctaus noctula	Nyctalus noctula
+Olive	Olea europaea
+Picrorhiza kurroa	Picrorhiza kurrooa
+Rhynchosia minima	Rhynchosia minima
+Roussetus leschenaulti; mixed sex	Rousettus leschenaultii
+Rufous-throated Antbird (Gymnopithys rufigula)	Gymnopithys rufigula
+Saanen goat	Capra hircus
+Scleropthora macrospora	Sclerophthora macrospora
+Sus_scrofa	Sus scrofa
+Thoroughbred horse	Equus caballus
+adult female Culex dunni	Culex dunni
+black gram	Vigna mungo
+black pepper	Piper nigrum
+blue tougue lizard	Tiliqua adelaidensis
+cotton	Gossypium hirsutum
+cowpea	Vigna unguiculata
+grapevine cv. Cabernet Sauvignon	Vitis vinifera
+lily	Lilium candidum
+marmot	Marmota marmota
+penguin	Aptenodytes patagonicus
+peony	Paeonia officinalis
+pod pepper	Capsicum annuum
+thoroughbred horse	Equus caballus
+tree tomato	Solanum betaceum
+us musculus	Mus musculus

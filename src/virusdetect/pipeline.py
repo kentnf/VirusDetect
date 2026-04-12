@@ -118,6 +118,21 @@ def combine_contigs(aligned_path: Path, assembled_path: Path, combined_path: Pat
     return len(combined_records)
 
 
+def cleanup_temp_dir(temp_dir: Path, keep_temp: bool = False) -> None:
+    if keep_temp:
+        return
+    shutil.rmtree(temp_dir, ignore_errors=True)
+
+
+def cleanup_plan_file(plan_path: Path, keep_file: bool = False) -> None:
+    if keep_file:
+        return
+    try:
+        plan_path.unlink()
+    except FileNotFoundError:
+        pass
+
+
 def run_pipeline(args) -> int:
     input_paths = [Path(path) for path in args.input_paths]
     missing_inputs = [str(path) for path in input_paths if not path.exists()]
@@ -144,105 +159,119 @@ def run_pipeline(args) -> int:
 
     for input_path in input_paths:
         sample_plan = create_sample_plan(input_path, args)
-        sample_output_dir, _temp_dir = resolve_sample_paths(input_path, args.output)
+        sample_output_dir, temp_dir = resolve_sample_paths(input_path, args.output)
         plan_path = write_sample_plan(sample_plan, sample_output_dir, db_path, missing_tools)
+        should_cleanup_temp = False
+        should_cleanup_plan = False
 
-        print(f"Input: {input_path}")
-        print(f"Database: {db_path}")
-        print(f"Threads: {args.threads}")
-        print(f"File type: {sample_plan.file_type}")
-        print(f"Data type: {sample_plan.data_type}")
-        print(f"Sequences: {sample_plan.sequence_count}")
-        print(f"Analysis plan: {plan_path}")
-        if args.output:
-            print(f"Output: {sample_output_dir}")
+        try:
+            print(f"Input: {input_path}")
+            print(f"Database: {db_path}")
+            print(f"Threads: {args.threads}")
+            print(f"File type: {sample_plan.file_type}")
+            print(f"Data type: {sample_plan.data_type}")
+            print(f"Sequences: {sample_plan.sequence_count}")
+            if args.check_only or args.prepare_only:
+                print(f"Analysis plan: {plan_path}")
+            if args.output:
+                print(f"Output: {sample_output_dir}")
 
-        if missing_tools:
-            print("Missing required tools: " + ", ".join(missing_tools))
-        else:
-            print("Required tools: OK")
-
-        if args.check_only:
-            continue
-
-        prepare_sample_input(sample_plan, args)
-        print(f"Prepared input: {sample_plan.prepared_input}")
-
-        if args.prepare_only and not args.keep_temp:
-            print("Temporary files retained because later stages are not ported yet.")
-
-        if not args.prepare_only:
-            sam_path, mapped_num = run_virus_alignment(sample_plan.prepared_input, db_path, args, Path(sample_plan.temp_dir))
-            print(f"Virus SAM: {sam_path}")
-            print(f"Mapped reads after filtering: {mapped_num}")
-            if args.stop_after == "align_to_virus_reference":
-                continue
-            aligned_path, aligned_contigs = generate_aligned_contigs(
-                sample_plan.prepared_input,
-                sam_path,
-                db_path,
-                args,
-                Path(sample_plan.temp_dir),
-            )
-            print(f"Aligned contigs: {aligned_path}")
-            print(f"Aligned contig count: {aligned_contigs}")
-            if args.stop_after == "generate_aligned_contigs":
-                continue
-            assembly_input_path, host_mapped_num = run_host_subtraction(
-                sample_plan.prepared_input,
-                db_path,
-                args,
-                Path(sample_plan.temp_dir),
-                sample_plan.file_type,
-                sample_plan.data_type,
-            )
-            print(f"Assembly input: {assembly_input_path}")
-            if args.host_reference:
-                print(f"Host-mapped reads: {host_mapped_num}")
-            if args.stop_after == "host_subtraction":
-                continue
-            assembled_path, assembled_contigs = run_denovo_assembly(
-                str(assembly_input_path),
-                args,
-                Path(sample_plan.temp_dir),
-                sample_plan.data_type,
-            )
-            print(f"Assembled contigs: {assembled_path}")
-            print(f"Assembled contig count: {assembled_contigs}")
-            if args.stop_after == "de_novo_assembly":
-                continue
-            combined_path = Path(sample_plan.temp_dir) / f"{Path(sample_plan.prepared_input).name}.combined.fa"
-            combined_contigs = combine_contigs(aligned_path, assembled_path, combined_path)
-            print(f"Combined contigs: {combined_path}")
-            print(f"Combined contig count: {combined_contigs}")
-            if args.stop_after == "combine_contigs":
-                continue
-            deduplicated_path = Path(sample_plan.temp_dir) / f"{Path(sample_plan.prepared_input).name}.combined.nr.fa"
-            _raw_combined_count, deduplicated_contigs = remove_redundant_contigs(combined_path, deduplicated_path)
-            print(f"Nonredundant contigs: {deduplicated_path}")
-            print(f"Nonredundant contig count: {deduplicated_contigs}")
-            if args.stop_after == "remove_redundant_contigs":
-                continue
-            if deduplicated_contigs == 0:
-                print("No combined contigs were generated; skipping identification.")
-                if args.stop_after == "identify_virus":
-                    continue
+            if missing_tools:
+                print("Missing required tools: " + ", ".join(missing_tools))
             else:
-                identify_result = run_python_identifier(
-                    args,
+                print("Required tools: OK")
+
+            if args.check_only:
+                continue
+
+            prepare_sample_input(sample_plan, args)
+            print(f"Prepared input: {sample_plan.prepared_input}")
+
+            if args.prepare_only and not args.keep_temp:
+                print("Temporary files retained because later stages are not ported yet.")
+
+            if not args.prepare_only:
+                sam_path, mapped_num = run_virus_alignment(sample_plan.prepared_input, db_path, args, Path(sample_plan.temp_dir))
+                print(f"Virus SAM: {sam_path}")
+                print(f"Mapped reads after filtering: {mapped_num}")
+                if args.stop_after == "align_to_virus_reference":
+                    continue
+                aligned_path, aligned_contigs = generate_aligned_contigs(
+                    sample_plan.prepared_input,
+                    sam_path,
                     db_path,
-                    Path(sample_plan.prepared_input),
-                    deduplicated_path,
-                    sample_output_dir,
+                    args,
+                    Path(sample_plan.temp_dir),
+                )
+                print(f"Aligned contigs: {aligned_path}")
+                print(f"Aligned contig count: {aligned_contigs}")
+                if args.stop_after == "generate_aligned_contigs":
+                    continue
+                assembly_input_path, host_mapped_num = run_host_subtraction(
+                    sample_plan.prepared_input,
+                    db_path,
+                    args,
+                    Path(sample_plan.temp_dir),
+                    sample_plan.file_type,
                     sample_plan.data_type,
                 )
-                print(f"Result directory: {identify_result.result_dir}")
-                print(f"Known contigs: {identify_result.known_contig_count}")
-                print(f"Novel contigs: {identify_result.novel_contig_count}")
-                print(f"Undetermined contigs: {identify_result.undetermined_contig_count}")
-                print(f"Summary TSV: {identify_result.summary_tsv}")
-                if args.stop_after == "identify_virus":
+                print(f"Assembly input: {assembly_input_path}")
+                if args.host_reference:
+                    print(f"Host-mapped reads: {host_mapped_num}")
+                if args.stop_after == "host_subtraction":
                     continue
+                assembled_path, assembled_contigs = run_denovo_assembly(
+                    str(assembly_input_path),
+                    args,
+                    Path(sample_plan.temp_dir),
+                    sample_plan.data_type,
+                )
+                print(f"Assembled contigs: {assembled_path}")
+                print(f"Assembled contig count: {assembled_contigs}")
+                if args.stop_after == "de_novo_assembly":
+                    continue
+                combined_path = Path(sample_plan.temp_dir) / f"{Path(sample_plan.prepared_input).name}.combined.fa"
+                combined_contigs = combine_contigs(aligned_path, assembled_path, combined_path)
+                print(f"Combined contigs: {combined_path}")
+                print(f"Combined contig count: {combined_contigs}")
+                if args.stop_after == "combine_contigs":
+                    continue
+                deduplicated_path = Path(sample_plan.temp_dir) / f"{Path(sample_plan.prepared_input).name}.combined.nr.fa"
+                _raw_combined_count, deduplicated_contigs = remove_redundant_contigs(combined_path, deduplicated_path)
+                print(f"Nonredundant contigs: {deduplicated_path}")
+                print(f"Nonredundant contig count: {deduplicated_contigs}")
+                if args.stop_after == "remove_redundant_contigs":
+                    continue
+                if deduplicated_contigs == 0:
+                    print("No combined contigs were generated; skipping identification.")
+                    should_cleanup_temp = args.stop_after in {None, "identify_virus"}
+                    should_cleanup_plan = args.stop_after in {None, "identify_virus"}
+                    if args.stop_after == "identify_virus":
+                        continue
+                else:
+                    identify_result = run_python_identifier(
+                        args,
+                        db_path,
+                        Path(sample_plan.prepared_input),
+                        deduplicated_path,
+                        sample_output_dir,
+                        sample_plan.data_type,
+                    )
+                    print(f"Result directory: {identify_result.result_dir}")
+                    print(f"Known contigs: {identify_result.known_contig_count}")
+                    print(f"Novel contigs: {identify_result.novel_contig_count}")
+                    print(f"Undetermined contigs: {identify_result.undetermined_contig_count}")
+                    if identify_result.summary_tsv:
+                        print(f"Summary TSV: {identify_result.summary_tsv}")
+                    should_cleanup_temp = args.stop_after in {None, "identify_virus"}
+                    should_cleanup_plan = args.stop_after in {None, "identify_virus"}
+                    if args.stop_after == "identify_virus":
+                        continue
+        finally:
+            if should_cleanup_temp:
+                cleanup_temp_dir(temp_dir, keep_temp=args.keep_temp)
+            if should_cleanup_plan:
+                cleanup_plan_file(plan_path)
 
     if args.check_only or args.prepare_only or args.stop_after in {
         "align_to_virus_reference",

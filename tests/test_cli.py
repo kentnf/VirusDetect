@@ -108,18 +108,8 @@ class VirusDetectCliTests(unittest.TestCase):
         self.assertIn("mamba install -c conda-forge -c bioconda", output.getvalue())
         self.assertIn("host subtraction and de novo assembly", output.getvalue())
         self.assertIn("default `main` workflow no longer needs Perl packages", output.getvalue())
-        self.assertIn("virusdetect tools install-hint --legacy", output.getvalue())
-        self.assertNotIn("Legacy backend extras:", output.getvalue())
-
-    def test_tools_install_hint_legacy_includes_perl_packages(self):
-        args = cli.build_parser().parse_args(["tools", "install-hint", "--legacy"])
-        output = io.StringIO()
-        with redirect_stdout(output):
-            exit_code = cli.handle_tools_install_hint(args)
-
-        self.assertEqual(exit_code, 0)
-        self.assertIn("Historical Perl extras:", output.getvalue())
-        self.assertIn("pixi add perl perl-bioperl", output.getvalue())
+        self.assertIn("historical Perl workflow, use the `v1` branch", output.getvalue())
+        self.assertNotIn("--legacy", output.getvalue())
 
     def test_run_parser_accepts_multiple_inputs_and_prepare_flag(self):
         args = cli.build_parser().parse_args(["run", "a.fa", "b.fa", "--prepare-only"])

@@ -5,11 +5,49 @@ from pathlib import Path
 from unittest import mock
 
 import virusdetect.cli as cli
-from virusdetect.pipeline import combine_contigs
+from virusdetect.pipeline import cleanup_plan_file, cleanup_temp_dir, combine_contigs
 from virusdetect.stages import remove_redundant_contigs
 
 
 class PipelineStageTests(unittest.TestCase):
+    def test_cleanup_plan_file_removes_plan_by_default(self):
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            plan_path = Path(tmp_dir) / "reads.fa.analysis_plan.json"
+            plan_path.write_text("{}\n", encoding="utf-8")
+
+            cleanup_plan_file(plan_path)
+
+            self.assertFalse(plan_path.exists())
+
+    def test_cleanup_plan_file_preserves_plan_when_requested(self):
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            plan_path = Path(tmp_dir) / "reads.fa.analysis_plan.json"
+            plan_path.write_text("{}\n", encoding="utf-8")
+
+            cleanup_plan_file(plan_path, keep_file=True)
+
+            self.assertTrue(plan_path.exists())
+
+    def test_cleanup_temp_dir_removes_temp_tree_by_default(self):
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            temp_dir = Path(tmp_dir) / "reads.fa_temp"
+            temp_dir.mkdir()
+            (temp_dir / "temp.txt").write_text("x\n", encoding="utf-8")
+
+            cleanup_temp_dir(temp_dir)
+
+            self.assertFalse(temp_dir.exists())
+
+    def test_cleanup_temp_dir_preserves_temp_tree_when_requested(self):
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            temp_dir = Path(tmp_dir) / "reads.fa_temp"
+            temp_dir.mkdir()
+            (temp_dir / "temp.txt").write_text("x\n", encoding="utf-8")
+
+            cleanup_temp_dir(temp_dir, keep_temp=True)
+
+            self.assertTrue(temp_dir.exists())
+
     def test_combine_contigs_concatenates_aligned_and_assembled_records(self):
         with tempfile.TemporaryDirectory() as tmp_dir:
             tmp = Path(tmp_dir)
@@ -93,13 +131,64 @@ class PipelineStageTests(unittest.TestCase):
                                                     known_contig_count=1,
                                                     novel_contig_count=0,
                                                     undetermined_contig_count=0,
-                                                    summary_tsv=str(tmp / "out" / "result_reads.fa" / "reads.fa.summary.tsv"),
+                                                    summary_tsv=str(tmp / "out" / "result_reads.fa" / "summary.tsv"),
                                                 )
 
                                                 exit_code = args.handler(args)
 
             self.assertEqual(exit_code, 0)
             mock_identify.assert_called_once()
+            self.assertFalse((tmp / "out" / "reads.fa_temp").exists())
+            self.assertFalse((tmp / "out" / "reads.fa.analysis_plan.json").exists())
+
+    def test_run_pipeline_keep_temp_preserves_sample_temp_dir(self):
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            tmp = Path(tmp_dir)
+            input_path = tmp / "reads.fa"
+            input_path.write_text(">r1\nAAAA\n", encoding="utf-8")
+
+            args = cli.build_parser().parse_args(
+                [
+                    "run",
+                    str(input_path),
+                    "--backend",
+                    "python",
+                    "--db-path",
+                    str(tmp / "db"),
+                    "--output",
+                    str(tmp / "out"),
+                    "--keep-temp",
+                ]
+            )
+
+            with mock.patch("virusdetect.pipeline.verify_database_files", return_value={}):
+                with mock.patch("virusdetect.pipeline.check_tools", return_value=[]):
+                    with mock.patch("virusdetect.pipeline.missing_required_tools", return_value=[]):
+                        with mock.patch("virusdetect.pipeline.run_virus_alignment", return_value=(tmp / "virus.sam", 1)):
+                            with mock.patch("virusdetect.pipeline.generate_aligned_contigs") as mock_aligned:
+                                with mock.patch("virusdetect.pipeline.run_host_subtraction", return_value=(input_path, 0)):
+                                    with mock.patch("virusdetect.pipeline.run_denovo_assembly") as mock_assembly:
+                                        with mock.patch("virusdetect.pipeline.remove_redundant_contigs", return_value=(2, 1)):
+                                            with mock.patch("virusdetect.pipeline.run_python_identifier") as mock_identify:
+                                                aligned_path = tmp / "aligned.fa"
+                                                assembled_path = tmp / "assembled.fa"
+                                                aligned_path.write_text(">ALIGNED1\nAAAA\n", encoding="utf-8")
+                                                assembled_path.write_text(">NODE_1\nCCCC\n", encoding="utf-8")
+                                                mock_aligned.return_value = (aligned_path, 1)
+                                                mock_assembly.return_value = (assembled_path, 1)
+                                                mock_identify.return_value = mock.Mock(
+                                                    result_dir=str(tmp / "out" / "result_reads.fa"),
+                                                    known_contig_count=1,
+                                                    novel_contig_count=0,
+                                                    undetermined_contig_count=0,
+                                                    summary_tsv=str(tmp / "out" / "result_reads.fa" / "summary.tsv"),
+                                                )
+
+                                                exit_code = args.handler(args)
+
+            self.assertEqual(exit_code, 0)
+            self.assertTrue((tmp / "out" / "reads.fa_temp").exists())
+            self.assertFalse((tmp / "out" / "reads.fa.analysis_plan.json").exists())
 
     def test_run_pipeline_python_backend_plan_omits_legacy_modules(self):
         with tempfile.TemporaryDirectory() as tmp_dir:
