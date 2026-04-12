@@ -27,17 +27,21 @@ requirements:
     - blast
     - hisat2
     - spades
+    - velvet
 
 test:
   commands:
     - virusdetect --version
     - virusdetect db path --target
+    - virusdetect tools check --strict
     - python -c "import virusdetect; print(virusdetect.__version__)"
+    - python -c "import shutil; required = ['bwa', 'samtools', 'blastn', 'blastx', 'makeblastdb', 'hisat2', 'hisat2-build', 'spades.py', 'velveth', 'velvetg']; missing = [name for name in required if shutil.which(name) is None]; assert not missing, missing"
 
 about:
   home: https://github.com/kentnf/VirusDetect
   summary: Python rewrite of the VirusDetect plant virus discovery pipeline
   license: MIT
+  license_file: LICENSE
   dev_url: https://github.com/kentnf/VirusDetect
 
 extra:
