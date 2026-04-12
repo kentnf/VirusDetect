@@ -104,9 +104,9 @@ class VirusDetectCliTests(unittest.TestCase):
 
         self.assertEqual(exit_code, 0)
         self.assertIn("Recommended pixi setup for the Python backend:", output.getvalue())
-        self.assertIn("pixi add bwa samtools blast hisat2 spades", output.getvalue())
+        self.assertIn("pixi add bwa samtools blast hisat2 spades velvet", output.getvalue())
         self.assertIn("mamba install -c conda-forge -c bioconda", output.getvalue())
-        self.assertIn("host subtraction and de novo assembly", output.getvalue())
+        self.assertIn("alternate assembler via `--assembler velvet`", output.getvalue())
         self.assertIn("default `main` workflow no longer needs Perl packages", output.getvalue())
         self.assertIn("historical Perl workflow, use the `v1` branch", output.getvalue())
         self.assertNotIn("--legacy", output.getvalue())
@@ -123,6 +123,17 @@ class VirusDetectCliTests(unittest.TestCase):
     def test_run_parser_defaults_to_python_backend(self):
         args = cli.build_parser().parse_args(["run", "a.fa"])
         self.assertEqual(args.backend, "python")
+        self.assertEqual(args.assembler, "spades")
+
+    def test_run_parser_accepts_velvet_assembler(self):
+        args = cli.build_parser().parse_args(["run", "a.fa", "--assembler", "velvet"])
+        self.assertEqual(args.assembler, "velvet")
+
+    def test_run_parser_accepts_rm_dup_aliases(self):
+        args_dash = cli.build_parser().parse_args(["run", "a.fa", "--rm-dup"])
+        args_underscore = cli.build_parser().parse_args(["run", "a.fa", "--rm_dup"])
+        self.assertTrue(args_dash.rm_dup)
+        self.assertTrue(args_underscore.rm_dup)
 
     def test_run_parser_rejects_legacy_backend(self):
         stderr = io.StringIO()

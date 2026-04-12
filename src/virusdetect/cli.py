@@ -56,6 +56,13 @@ def build_run_parser(subparsers) -> None:
     parser.add_argument("--host-reference", help="Host reference database path or name")
     parser.add_argument("-o", "--output", help="Output directory")
     parser.add_argument("-t", "--threads", type=int, default=8, help="Number of threads")
+    parser.add_argument(
+        "--assembler",
+        choices=["spades", "velvet"],
+        default="spades",
+        help="De novo assembler backend",
+    )
+    parser.add_argument("--rm-dup", "--rm_dup", dest="rm_dup", action="store_true", help="Remove duplicate reads before Velvet assembly")
     parser.add_argument("--read-length", help="sRNA length selector, for example 21-23:25:27:32-34")
     parser.add_argument("--kmer-range", default="9-23", help="De novo assembly k-mer range")
     parser.add_argument("--hisat-dist", type=int, default=5, help="Maximum edit distance surrogate for HISAT2 scoring")

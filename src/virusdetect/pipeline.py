@@ -16,7 +16,7 @@ from virusdetect.stages import (
     run_host_subtraction,
     run_virus_alignment,
 )
-from virusdetect.tools import check_tools, missing_required_tools
+from virusdetect.tools import check_tools, missing_required_tools, required_runtime_tools
 
 
 @dataclass(frozen=True)
@@ -25,6 +25,8 @@ class SamplePlan:
     sample_name: str
     file_type: str
     data_type: str
+    assembler: str
+    rm_dup: bool
     sequence_count: int
     temp_dir: str
     prepared_input: str
@@ -67,6 +69,8 @@ def create_sample_plan(input_path: Path, args) -> SamplePlan:
         sample_name=input_path.name,
         file_type=file_type,
         data_type=data_type,
+        assembler=args.assembler,
+        rm_dup=bool(args.rm_dup),
         sequence_count=sequence_count,
         temp_dir=str(temp_dir),
         prepared_input=str(prepared_input),
@@ -154,11 +158,17 @@ def run_pipeline(args) -> int:
         raise SystemExit(f"Database verification failed for {db_path}: {missing_db}")
 
     tool_statuses = check_tools()
-    missing_tools = missing_required_tools(tool_statuses)
-    overall_exit_code = 0 if not missing_tools else 1
+    overall_exit_code = 0
 
     for input_path in input_paths:
         sample_plan = create_sample_plan(input_path, args)
+        required_tools = required_runtime_tools(
+            data_type=sample_plan.data_type,
+            host_reference=args.host_reference,
+            assembler=args.assembler,
+        )
+        missing_tools = missing_required_tools(tool_statuses, required_names=required_tools)
+        overall_exit_code = max(overall_exit_code, 0 if not missing_tools else 1)
         sample_output_dir, temp_dir = resolve_sample_paths(input_path, args.output)
         plan_path = write_sample_plan(sample_plan, sample_output_dir, db_path, missing_tools)
         should_cleanup_temp = False
@@ -186,6 +196,9 @@ def run_pipeline(args) -> int:
 
             prepare_sample_input(sample_plan, args)
             print(f"Prepared input: {sample_plan.prepared_input}")
+
+            if args.assembler == "velvet" and not args.rm_dup:
+                print("Note: `--assembler velvet` is usually best paired with `--rm-dup` for v1-style comparison runs.")
 
             if args.prepare_only and not args.keep_temp:
                 print("Temporary files retained because later stages are not ported yet.")

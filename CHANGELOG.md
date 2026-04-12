@@ -24,6 +24,7 @@ The legacy Perl release history remains on the `v1` branch and the historical `v
 - Internal contig-depth intermediates (`.bwa.sai`, `.sam`, `.bam`, `.sorted.bam`, `.pileup`) are now cleaned from default identify outputs unless `--debug` is enabled.
 - Reference FASTA exports now use Perl-style plural names: `blastn.references.fa` and `blastx.references.fa`.
 - Per-sample `<sample>_temp/` working directories are now removed automatically after a successful identify-stage run unless `--keep-temp` is enabled.
+- The Python de novo assembly stage now accepts `--assembler spades|velvet`; `spades` remains the default and `velvet` is available for v1-style comparison runs, with `--rm-dup` recommended for closer legacy behavior.
 - Summary and undetermined reports now provide stronger report parity through stable anchors, grouped headers, compact coverage maps, and clearer current-Python wording without depending on extra per-reference output directories.
 - Undetermined-contig reports now use clearer `match` / `no-match` wording, grouped headers with tooltips, candidate-focus sections, and stable anchors.
 

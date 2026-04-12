@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import shutil
 import subprocess
 from pathlib import Path
 
@@ -7,7 +8,7 @@ from virusdetect.db import resolve_data_path, resolve_reference_path, resolve_se
 from virusdetect.fasta import FastaRecord, read_fasta_records, reverse_complement, write_fasta_records
 from virusdetect.pileup import count_fasta_sequences, filter_pileup_by_coverage, pileup_to_contig
 from virusdetect.runtime import tool_path_map
-from virusdetect.sample import detect_file_type
+from virusdetect.sample import detect_file_type, remove_duplicate_reads
 from virusdetect.sam import expand_xa_hits, filter_sam_best_hits, generate_unmapped_reads_from_sam
 
 
@@ -17,6 +18,14 @@ def run_command(command: list[str], debug: bool = False) -> None:
     completed = subprocess.run(command, check=False)
     if completed.returncode != 0:
         raise SystemExit(f"Command failed with exit code {completed.returncode}: {' '.join(command)}")
+
+
+def run_logged_command(command: list[str], log_path: Path, debug: bool = False) -> int:
+    if debug:
+        print("CMD:", " ".join(command), ">>", log_path)
+    with log_path.open("a", encoding="utf-8") as log_handle:
+        completed = subprocess.run(command, stdout=log_handle, stderr=subprocess.STDOUT, check=False)
+    return completed.returncode
 
 
 def build_bwa_align_command(tool_paths: dict[str, str], reference_path: str, sample_path: str, sai_path: str, threads: int) -> list[str]:
@@ -266,7 +275,59 @@ def parse_kmer_values(kmer_range: str) -> list[int]:
     return values
 
 
-def run_denovo_assembly(sample_path: str, args, temp_dir: Path, data_type: str) -> tuple[Path, int]:
+def summarize_contigs(contigs_path: Path) -> dict[str, float]:
+    if not contigs_path.exists() or contigs_path.stat().st_size == 0:
+        return {}
+
+    lengths = []
+    total_bases = 0
+    total_ns = 0
+    for record in read_fasta_records(contigs_path):
+        length = len(record.sequence)
+        if length == 0:
+            continue
+        lengths.append(length)
+        total_bases += length
+        total_ns += record.sequence.upper().count("N")
+
+    if not lengths:
+        return {}
+
+    lengths.sort()
+    cumulative = 0
+    n50 = 0
+    for length in lengths:
+        cumulative += length
+        if cumulative >= total_bases / 2:
+            n50 = length
+            break
+
+    return {
+        "numSeqs": float(len(lengths)),
+        "numBases": float(total_bases),
+        "numOK": float(total_bases - total_ns),
+        "numNs": float(total_ns),
+        "minLen": float(lengths[0]),
+        "avgLen": float(total_bases) / len(lengths),
+        "maxLen": float(lengths[-1]),
+        "n50": float(n50),
+    }
+
+
+def prepare_assembly_input(sample_path: str, temp_dir: Path) -> Path:
+    assembly_input_path = Path(sample_path)
+    assembly_file_type = detect_file_type(sample_path)
+
+    if assembly_input_path.suffix.lower() not in {".fa", ".fasta", ".fq", ".fastq", ".fa.gz", ".fasta.gz", ".fq.gz", ".fastq.gz"}:
+        normalized_suffix = ".fq" if assembly_file_type == "fastq" else ".fa"
+        normalized_input = temp_dir / f"{assembly_input_path.name}{normalized_suffix}"
+        normalized_input.write_text(assembly_input_path.read_text(encoding="utf-8"), encoding="utf-8")
+        assembly_input_path = normalized_input
+
+    return assembly_input_path
+
+
+def run_spades_assembly(sample_path: str, args, temp_dir: Path, data_type: str) -> tuple[Path, int]:
     tool_paths = tool_path_map()
     if "spades.py" not in tool_paths:
         raise SystemExit("spades.py is required for the Python de novo assembly stage")
@@ -274,17 +335,10 @@ def run_denovo_assembly(sample_path: str, args, temp_dir: Path, data_type: str) 
     sample_name = Path(sample_path).name
     spades_dir = temp_dir / f"{sample_name}.spades"
     assembled_path = temp_dir / f"{sample_name}.assembled.fa"
-    assembly_input_path = Path(sample_path)
-    assembly_file_type = detect_file_type(sample_path)
-
-    if assembly_input_path.suffix.lower() not in {".fa", ".fasta", ".fq", ".fastq", ".fa.gz", ".fasta.gz", ".fq.gz", ".fastq.gz"}:
-        normalized_suffix = ".fq" if assembly_file_type == "fastq" else ".fa"
-        normalized_input = temp_dir / f"{sample_name}{normalized_suffix}"
-        normalized_input.write_text(assembly_input_path.read_text(encoding="utf-8"), encoding="utf-8")
-        assembly_input_path = normalized_input
+    assembly_input_path = prepare_assembly_input(sample_path, temp_dir)
 
     if spades_dir.exists():
-        subprocess.run(["rm", "-rf", str(spades_dir)], check=False)
+        shutil.rmtree(spades_dir, ignore_errors=True)
 
     command = [
         tool_paths["spades.py"],
@@ -310,6 +364,133 @@ def run_denovo_assembly(sample_path: str, args, temp_dir: Path, data_type: str) 
 
     assembled_path.write_text(contigs_path.read_text(encoding="utf-8"), encoding="utf-8")
     return assembled_path, count_fasta_sequences(assembled_path)
+
+
+def run_velvet(sample_path: Path, output_dir: Path, kmer_length: int, cov_cutoff: int, tool_paths: dict[str, str], debug: bool) -> Path | None:
+    file_type = detect_file_type(sample_path)
+    log_path = output_dir.parent / "velvet.log"
+    shutil.rmtree(output_dir, ignore_errors=True)
+
+    velveth_command = [
+        tool_paths["velveth"],
+        str(output_dir),
+        str(kmer_length),
+        f"-{file_type}",
+        str(sample_path),
+    ]
+    if run_logged_command(velveth_command, log_path, debug=debug) != 0:
+        shutil.rmtree(output_dir, ignore_errors=True)
+        return None
+
+    velvetg_command = [
+        tool_paths["velvetg"],
+        str(output_dir),
+        "-cov_cutoff",
+        str(cov_cutoff),
+        "-min_contig_lgth",
+        "30",
+    ]
+    if run_logged_command(velvetg_command, log_path, debug=debug) != 0:
+        shutil.rmtree(output_dir, ignore_errors=True)
+        return None
+
+    contigs_path = output_dir / "contigs.fa"
+    if not contigs_path.exists():
+        shutil.rmtree(output_dir, ignore_errors=True)
+        return None
+
+    return contigs_path
+
+
+def run_velvet_assembly(sample_path: str, args, temp_dir: Path, data_type: str) -> tuple[Path, int]:
+    tool_paths = tool_path_map()
+    if "velveth" not in tool_paths or "velvetg" not in tool_paths:
+        raise SystemExit("velveth and velvetg are required for the Velvet de novo assembly stage")
+
+    sample_name = Path(sample_path).name
+    assembled_path = temp_dir / f"{sample_name}.assembled.fa"
+    assembly_input_path = prepare_assembly_input(sample_path, temp_dir)
+    velvet_dir = temp_dir / f"{sample_name}.velvet"
+    velvet_input_path = assembly_input_path
+
+    if args.rm_dup:
+        deduplicated_input = temp_dir / f"{assembly_input_path.name}.uniq"
+        remove_duplicate_reads(assembly_input_path, deduplicated_input)
+        velvet_input_path = deduplicated_input
+
+    if data_type == "mRNA":
+        best_kmer = 31
+        best_coverage = 10
+    else:
+        kmer_values = parse_kmer_values(args.kmer_range)
+        best_kmer = kmer_values[0]
+        best_coverage = 5
+        best_objective = -1.0
+
+        for kmer_value in kmer_values:
+            candidate_dir = temp_dir / f"{sample_name}.velvet.{kmer_value}.5"
+            contigs_path = run_velvet(
+                velvet_input_path,
+                candidate_dir,
+                kmer_value,
+                5,
+                tool_paths,
+                debug=args.debug,
+            )
+            stats = summarize_contigs(contigs_path) if contigs_path is not None else {}
+            objective = stats.get("maxLen", -1.0)
+            if objective > best_objective:
+                best_objective = objective
+                best_kmer = kmer_value
+            shutil.rmtree(candidate_dir, ignore_errors=True)
+
+        for coverage_value in range(7, 26):
+            candidate_dir = temp_dir / f"{sample_name}.velvet.{best_kmer}.{coverage_value}"
+            contigs_path = run_velvet(
+                velvet_input_path,
+                candidate_dir,
+                best_kmer,
+                coverage_value,
+                tool_paths,
+                debug=args.debug,
+            )
+            stats = summarize_contigs(contigs_path) if contigs_path is not None else {}
+            objective = stats.get("maxLen", -1.0)
+            if objective > best_objective:
+                best_objective = objective
+                best_coverage = coverage_value
+            shutil.rmtree(candidate_dir, ignore_errors=True)
+
+        if args.debug:
+            print(
+                "Velvet best parameters:",
+                f"kmer={best_kmer}",
+                f"coverage={best_coverage}",
+                f"objective=maxLen",
+            )
+
+    final_contigs = run_velvet(
+        velvet_input_path,
+        velvet_dir,
+        best_kmer,
+        best_coverage,
+        tool_paths,
+        debug=args.debug,
+    )
+    if final_contigs is None:
+        assembled_path.write_text("", encoding="utf-8")
+        return assembled_path, 0
+
+    assembled_path.write_text(final_contigs.read_text(encoding="utf-8"), encoding="utf-8")
+    return assembled_path, count_fasta_sequences(assembled_path)
+
+
+def run_denovo_assembly(sample_path: str, args, temp_dir: Path, data_type: str) -> tuple[Path, int]:
+    if args.assembler == "spades":
+        return run_spades_assembly(sample_path, args, temp_dir, data_type)
+    if args.assembler == "velvet":
+        return run_velvet_assembly(sample_path, args, temp_dir, data_type)
+    raise SystemExit(f"Unsupported assembler: {args.assembler}")
 
 
 def remove_redundant_contigs(input_path: str | Path, output_path: str | Path) -> tuple[int, int]:

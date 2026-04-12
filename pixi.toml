@@ -10,6 +10,7 @@ samtools = "*"
 blast = "*"
 hisat2 = "*"
 spades = "*"
+velvet = "*"
 
 [tasks]
 virusdetect = "PYTHONPATH=src python -m virusdetect"

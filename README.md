@@ -77,6 +77,7 @@ The `pixi` environment now includes the core command-line tools needed for the c
 - `blast`
 - `hisat2`
 - `spades`
+- `velvet`
 
 Legacy-only extras are no longer installed on `main`. If you still need the historical Perl workflow, switch to the `v1` branch and manage its dependencies there.
 
@@ -147,6 +148,7 @@ virusdetect run <reads.fa> --prepare-only --read-length 21-23
 virusdetect run <reads.fa> --stop-after align_to_virus_reference
 virusdetect run <reads.fa> --stop-after host_subtraction --host-reference host.fa
 virusdetect run <reads.fa> --stop-after de_novo_assembly
+virusdetect run <reads.fa> --stop-after de_novo_assembly --assembler velvet
 virusdetect run <reads.fa> --stop-after generate_aligned_contigs
 virusdetect run <reads.fa> --stop-after combine_contigs
 virusdetect run <reads.fa> --stop-after identify_virus
@@ -162,6 +164,14 @@ virusdetect db bundle --path <db_dir> --db-version 2026.04
 This writes a tarball under `dist/` with a generated `manifest.json` and a sibling `.sha256` file.
 
 By default, `virusdetect db download` resolves to the current VirusDetect GitHub release assets and uses the matching `.sha256` file automatically. You can override the repository, tag, or asset names with CLI flags when staging a different database bundle.
+
+The default v2 assembler is `spades`. For v1-style comparison work, you can switch to `velvet` with `--assembler velvet`.
+
+Recommended v1-style comparison command:
+
+```bash
+virusdetect run <reads.fa> --assembler velvet --rm-dup --stop-after identify_virus
+```
 
 ## Python Identify Outputs
 

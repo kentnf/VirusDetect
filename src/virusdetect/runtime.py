@@ -28,6 +28,8 @@ TOOL_SPECS = (
     ("hisat2", False),
     ("hisat2-build", False),
     ("spades.py", False),
+    ("velveth", False),
+    ("velvetg", False),
 )
 
 
@@ -73,5 +75,9 @@ def tool_path_map() -> dict[str, str]:
     return {status.name: status.path for status in resolve_tools() if status.path is not None}
 
 
-def missing_required_tools(statuses: list[ResolvedTool]) -> list[str]:
-    return [status.name for status in statuses if status.required and not status.found]
+def missing_required_tools(statuses: list[ResolvedTool], required_names: tuple[str, ...] | list[str] | set[str] | None = None) -> list[str]:
+    if required_names is None:
+        return [status.name for status in statuses if status.required and not status.found]
+
+    required_set = set(required_names)
+    return [status.name for status in statuses if status.name in required_set and not status.found]

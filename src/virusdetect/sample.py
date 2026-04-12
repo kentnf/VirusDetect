@@ -112,3 +112,23 @@ def filter_reads_by_length(read_length: str, input_path: str | Path, output_path
 
     return kept
 
+
+def remove_duplicate_reads(input_path: str | Path, output_path: str | Path) -> int:
+    input_candidate = Path(input_path)
+    output_candidate = Path(output_path)
+    file_type = detect_file_type(input_candidate)
+    seen_sequences: set[str] = set()
+    kept = 0
+
+    with output_candidate.open("w", encoding="utf-8") as output_handle:
+        for header, sequence, plus, quality in iter_sequences(input_candidate):
+            if sequence in seen_sequences:
+                continue
+            seen_sequences.add(sequence)
+            output_handle.write(f"{header}\n{sequence}\n")
+            if file_type == "fastq":
+                output_handle.write(plus)
+                output_handle.write(quality)
+            kept += 1
+
+    return kept
